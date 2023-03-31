@@ -69,3 +69,14 @@ public abstract class NetworkedWithLogger<T> : NetworkBehaviour where T : Networ
         this._logger = new Logger((this as T).ToString());
     }
 }
+
+public abstract class NetworkedStaticInstanceWithLogger<T> : NetworkedStaticInstance<T> where T : NetworkBehaviour
+{
+    protected Logger _logger;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        this._logger = new Logger((this as T).ToString());
+    }
+}

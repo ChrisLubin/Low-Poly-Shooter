@@ -11,9 +11,9 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using static Unity.Services.Lobbies.Models.DataObject;
 
-public class MultiplayerSystem : NetworkedWithLogger<MultiplayerSystem>
+public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSystem>
 {
-    public static event Action<MultiplayerState> OnStateChanged;
+    public static event Action<MultiplayerState> OnStateChange;
     public MultiplayerState State { get; private set; }
     private const string LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
 
@@ -47,7 +47,7 @@ public class MultiplayerSystem : NetworkedWithLogger<MultiplayerSystem>
     {
         if (this.State == newState) { return; }
         this._logger.Log($"New state: {newState}");
-        MultiplayerSystem.OnStateChanged?.Invoke(newState);
+        MultiplayerSystem.OnStateChange?.Invoke(newState);
 
         RelayServerData relayServerData;
 

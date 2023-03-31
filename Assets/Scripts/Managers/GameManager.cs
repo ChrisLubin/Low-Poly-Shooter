@@ -2,19 +2,19 @@ using System;
 
 public class GameManager : StaticInstanceWithLogger<GameManager>
 {
-    public static event Action<GameState> OnBeforeStateChanged;
-    public static event Action<GameState> OnAfterStateChanged;
+    public static event Action<GameState> OnStateChange;
     public GameState State { get; private set; }
 
     private void Start() => ChangeState(GameState.Starting);
 
-    public void ChangeState(GameState newState)
+    private void ChangeState(GameState newState)
     {
         if (this.State == newState) { return; }
 
-        OnBeforeStateChanged?.Invoke(newState);
+        this._logger.Log($"New state: {newState}");
+        OnStateChange?.Invoke(newState);
 
-        State = newState;
+        this.State = newState;
         switch (newState)
         {
             case GameState.Starting:
@@ -33,15 +33,12 @@ public class GameManager : StaticInstanceWithLogger<GameManager>
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
 
-        OnAfterStateChanged?.Invoke(newState);
-
-        this._logger.Log($"New state: {newState}");
     }
 
     private void HandleStarting()
     {
         SoldierManager.Instance.SpawnSoldiers();
-        ChangeState(GameState.InGame);
+        this.ChangeState(GameState.InGame);
     }
 
     private void HandleInGame()

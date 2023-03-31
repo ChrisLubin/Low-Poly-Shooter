@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -45,5 +46,17 @@ public abstract class PersistentSingleton<T> : Singleton<T> where T : MonoBehavi
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
+    }
+}
+
+public abstract class NetworkedStaticInstance<T> : NetworkBehaviour where T : NetworkBehaviour
+{
+    public static T Instance { get; private set; }
+    protected virtual void Awake() => Instance = this as T;
+
+    protected virtual void OnApplicationQuit()
+    {
+        Instance = null;
+        Destroy(gameObject);
     }
 }
