@@ -19,11 +19,15 @@ public class MultiplayerWaitingOverlay : MonoBehaviour
     {
         switch (state)
         {
+            case MultiplayerState.CreatingLobby:
+                this._overlay.gameObject.SetActive(true);
+                this._overlayText.text = "Creating game...";
+                break;
             case MultiplayerState.HostWaitingForPlayer:
                 this._overlay.gameObject.SetActive(true);
                 this._overlayText.text = "Waiting for a player to join...";
                 break;
-            case MultiplayerState.PlayerJoiningGame:
+            case MultiplayerState.JoiningLobby:
                 this._overlay.gameObject.SetActive(true);
                 this._overlayText.text = "Joining game...";
                 break;
