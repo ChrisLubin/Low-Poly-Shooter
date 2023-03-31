@@ -884,11 +884,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: d18e87f6-289d-4bf9-b31b-ded03f624bf2
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Low-Poly Shooter
+  organizationId: chrisx700
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 

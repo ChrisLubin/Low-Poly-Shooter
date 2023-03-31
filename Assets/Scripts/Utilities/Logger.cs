@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Logger
@@ -38,6 +39,16 @@ public class Logger
     }
 }
 
+public abstract class WithLogger<T> : MonoBehaviour where T : MonoBehaviour
+{
+    protected Logger _logger;
+
+    private void Awake()
+    {
+        this._logger = new Logger((this as T).ToString());
+    }
+}
+
 public abstract class StaticInstanceWithLogger<T> : StaticInstance<T> where T : MonoBehaviour
 {
     protected Logger _logger;
@@ -45,6 +56,16 @@ public abstract class StaticInstanceWithLogger<T> : StaticInstance<T> where T : 
     protected override void Awake()
     {
         base.Awake();
+        this._logger = new Logger((this as T).ToString());
+    }
+}
+
+public abstract class NetworkedWithLogger<T> : NetworkBehaviour where T : NetworkBehaviour
+{
+    protected Logger _logger;
+
+    private void Awake()
+    {
         this._logger = new Logger((this as T).ToString());
     }
 }
