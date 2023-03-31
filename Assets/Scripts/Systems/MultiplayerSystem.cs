@@ -26,7 +26,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         }
     }
 
-    private void Start() => this.ChangeState(MultiplayerState.LobbyRelayNotConnected);
+    private void Start() => this.ChangeState(MultiplayerState.NotConnected);
 
     private void OnRelaySignIn() => this._logger.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
 
@@ -53,7 +53,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
         switch (newState)
         {
-            case MultiplayerState.LobbyRelayNotConnected:
+            case MultiplayerState.NotConnected:
                 NetworkManager.Singleton.OnClientConnectedCallback += this.OnClientConnected;
                 string profileName = $"Player-{UnityEngine.Random.Range(1, 9999999)}";
                 InitializationOptions initOptions = new();
@@ -63,11 +63,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 await UnityServices.InitializeAsync(initOptions);
                 AuthenticationService.Instance.SignedIn += this.OnRelaySignIn;
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                this.ChangeState(MultiplayerState.Connected);
                 break;
-            case MultiplayerState.LobbyRelayConnected:
+            case MultiplayerState.Connected:
                 AuthenticationService.Instance.SignedIn -= this.OnRelaySignIn;
                 break;
-            case MultiplayerState.HostWaitingForPlayer:
+            case MultiplayerState.CreatingLobby:
                 int maxPlayersCount = 7;
                 CreateLobbyOptions lobbyOptions = new() { IsPrivate = false };
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
@@ -89,10 +90,13 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     NetworkManager.Singleton.StartHost();
                     this._logger.Log("Started host");
+                    this.ChangeState(MultiplayerState.HostWaitingForPlayer);
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
-            case MultiplayerState.PlayerJoiningGame:
+            case MultiplayerState.HostWaitingForPlayer:
+                break;
+            case MultiplayerState.JoiningLobby:
                 try
                 {
                     Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync();
@@ -144,9 +148,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 public enum MultiplayerState
 {
     None,
-    LobbyRelayNotConnected,
-    LobbyRelayConnected,
+    NotConnected,
+    Connected,
+    CreatingLobby,
     HostWaitingForPlayer,
-    PlayerJoiningGame,
+    JoiningLobby,
     TwoPlayersConnected,
 }
