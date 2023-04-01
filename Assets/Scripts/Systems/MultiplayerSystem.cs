@@ -90,11 +90,11 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     NetworkManager.Singleton.StartHost();
                     this._logger.Log("Started host");
-                    this.ChangeState(MultiplayerState.HostWaitingForPlayer);
+                    this.ChangeState(MultiplayerState.HostWaitingForPlayers);
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
-            case MultiplayerState.HostWaitingForPlayer:
+            case MultiplayerState.HostWaitingForPlayers:
                 break;
             case MultiplayerState.JoiningLobby:
                 try
@@ -118,7 +118,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
-            case MultiplayerState.TwoPlayersConnected:
+            case MultiplayerState.WaitingForHostToStart:
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -140,8 +140,8 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         else
         {
             this._logger.Log($"You joined with a client ID of {clientId}.");
+            this.ChangeState(MultiplayerState.WaitingForHostToStart);
         }
-        this.ChangeState(MultiplayerState.TwoPlayersConnected);
     }
 }
 
@@ -151,7 +151,8 @@ public enum MultiplayerState
     NotConnected,
     Connected,
     CreatingLobby,
-    HostWaitingForPlayer,
+    HostWaitingForPlayers,
     JoiningLobby,
-    TwoPlayersConnected,
+    WaitingForHostToStart,
+    GameStarted,
 }

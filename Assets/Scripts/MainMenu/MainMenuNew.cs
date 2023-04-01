@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace SlimUI.ModernMenu
 {
-    public class MainMenuNew : MonoBehaviour
+    public class MainMenuNew : NetworkBehaviour
     {
         Animator CameraObject;
         /*
@@ -99,11 +100,24 @@ namespace SlimUI.ModernMenu
             SetThemeColors();
         }
 
-        private void OnDestroy() => MultiplayerSystem.OnStateChange -= this.OnMultiplayerStateChange;
+        public override void OnDestroy()
+        {
+            MultiplayerSystem.OnStateChange -= this.OnMultiplayerStateChange;
+            base.OnDestroy();
+        }
 
         private void OnMultiplayerStateChange(MultiplayerState state)
         {
-            // if (mutl)
+            if (state == MultiplayerState.CreatingLobby || state == MultiplayerState.JoiningLobby)
+            {
+                firstMenu.SetActive(false);
+                playMenu.SetActive(false);
+                multiplayerMenu.SetActive(false);
+            }
+            else if (state == MultiplayerState.HostWaitingForPlayers || state == MultiplayerState.WaitingForHostToStart)
+            {
+                LoadNetwork("GameScene");
+            }
         }
 
         void SetThemeColors()
@@ -347,6 +361,13 @@ namespace SlimUI.ModernMenu
 
                 yield return null;
             }
+        }
+
+        void LoadNetwork(string sceneName)
+        {
+            mainCanvas.SetActive(false);
+            loadingMenu.SetActive(true);
+            NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
     }
 }
