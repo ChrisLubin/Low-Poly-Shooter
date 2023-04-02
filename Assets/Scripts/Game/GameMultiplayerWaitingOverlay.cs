@@ -42,7 +42,6 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
 
     private void StartGame()
     {
-        RpcSystem.Instance.ChangeMultiplayerStateServerRpc(MultiplayerState.GameStarting);
         RpcSystem.Instance.ChangeGameStateServerRpc(GameState.GameStarting);
     }
 

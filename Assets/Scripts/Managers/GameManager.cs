@@ -5,6 +5,12 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public static event Action<GameState> OnStateChange;
     public GameState State { get; private set; }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
+    }
+
     public void ChangeState(GameState newState)
     {
         if (this.State == newState) { return; }
@@ -15,6 +21,10 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         this.State = newState;
         switch (newState)
         {
+            case GameState.HostWaitingForPlayers:
+                break;
+            case GameState.PlayerWaitingForHostToStart:
+                break;
             case GameState.GameStarting:
                 this.HandleGameStarting();
                 break;
@@ -61,6 +71,8 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 public enum GameState
 {
     None,
+    HostWaitingForPlayers,
+    PlayerWaitingForHostToStart,
     GameStarting,
     GameStarted,
     Win,

@@ -114,9 +114,15 @@ namespace SlimUI.ModernMenu
                 playMenu.SetActive(false);
                 multiplayerMenu.SetActive(false);
             }
-            else if (state == MultiplayerState.HostWaitingForPlayers || state == MultiplayerState.WaitingForHostToStart)
+            else if (state == MultiplayerState.CreatedLobby)
             {
                 LoadNetwork("GameScene");
+            }
+            else if (state == MultiplayerState.JoinedLobby)
+            {
+                // Game scene will automatically be loaded by NetworkSceneManager
+                mainCanvas.SetActive(false);
+                loadingMenu.SetActive(true);
             }
         }
 

@@ -90,11 +90,8 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     NetworkManager.Singleton.StartHost();
                     this._logger.Log("Started host");
-                    this.ChangeState(MultiplayerState.HostWaitingForPlayers);
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
-                break;
-            case MultiplayerState.HostWaitingForPlayers:
                 break;
             case MultiplayerState.JoiningLobby:
                 try
@@ -118,11 +115,9 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
-            case MultiplayerState.WaitingForHostToStart:
+            case MultiplayerState.CreatedLobby:
                 break;
-            case MultiplayerState.GameStarting:
-                break;
-            case MultiplayerState.GameStarted:
+            case MultiplayerState.JoinedLobby:
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -134,6 +129,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         if (this.IsHost && this.OwnerClientId == clientId)
         {
             // Ignore when host first connects
+            this.ChangeState(MultiplayerState.CreatedLobby);
             return;
         }
 
@@ -144,7 +140,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         else
         {
             this._logger.Log($"You joined with a client ID of {clientId}.");
-            this.ChangeState(MultiplayerState.WaitingForHostToStart);
+            this.ChangeState(MultiplayerState.JoinedLobby);
         }
     }
 }
@@ -155,9 +151,7 @@ public enum MultiplayerState
     NotConnected,
     Connected,
     CreatingLobby,
-    HostWaitingForPlayers,
+    CreatedLobby,
     JoiningLobby,
-    WaitingForHostToStart,
-    GameStarting,
-    GameStarted,
+    JoinedLobby,
 }
