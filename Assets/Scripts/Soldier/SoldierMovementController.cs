@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class SoldierMovementController : MonoBehaviour
+public class SoldierMovementController : NetworkBehaviour
 {
     [Header("Base setup")]
     public float walkingSpeed = 7.5f;
@@ -21,8 +22,16 @@ public class SoldierMovementController : MonoBehaviour
     private float cameraYOffset = 0.4f;
     private Camera playerCamera;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
+        if (!this.IsOwner)
+        {
+            this.enabled = false;
+            return;
+        }
+
         characterController = GetComponent<CharacterController>();
         playerCamera = Camera.main;
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z);
