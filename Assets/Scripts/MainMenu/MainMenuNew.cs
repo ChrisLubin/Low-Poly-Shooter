@@ -113,16 +113,12 @@ namespace SlimUI.ModernMenu
                 firstMenu.SetActive(false);
                 playMenu.SetActive(false);
                 multiplayerMenu.SetActive(false);
+                mainCanvas.SetActive(false);
+                loadingMenu.SetActive(true);
             }
             else if (state == MultiplayerState.CreatedLobby)
             {
                 LoadNetwork("GameScene");
-            }
-            else if (state == MultiplayerState.JoinedLobby)
-            {
-                // Game scene will automatically be loaded by NetworkSceneManager
-                mainCanvas.SetActive(false);
-                loadingMenu.SetActive(true);
             }
         }
 
@@ -371,8 +367,6 @@ namespace SlimUI.ModernMenu
 
         void LoadNetwork(string sceneName)
         {
-            mainCanvas.SetActive(false);
-            loadingMenu.SetActive(true);
             NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
     }
