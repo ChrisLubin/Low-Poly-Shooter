@@ -1,13 +1,11 @@
 using System;
 
-public class GameManager : StaticInstanceWithLogger<GameManager>
+public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
     public static event Action<GameState> OnStateChange;
     public GameState State { get; private set; }
 
-    private void Start() => ChangeState(GameState.Starting);
-
-    private void ChangeState(GameState newState)
+    public void ChangeState(GameState newState)
     {
         if (this.State == newState) { return; }
 
@@ -17,11 +15,11 @@ public class GameManager : StaticInstanceWithLogger<GameManager>
         this.State = newState;
         switch (newState)
         {
-            case GameState.Starting:
-                this.HandleStarting();
+            case GameState.GameStarting:
+                this.HandleGameStarting();
                 break;
-            case GameState.InGame:
-                this.HandleInGame();
+            case GameState.GameStarted:
+                this.HandleGameStarted();
                 break;
             case GameState.Win:
                 this.HandleWin();
@@ -35,10 +33,15 @@ public class GameManager : StaticInstanceWithLogger<GameManager>
 
     }
 
-    private void HandleStarting()
+    private void HandleGameStarting()
     {
+        if (!this.IsHost) { return; }
+
         SoldierManager.Instance.SpawnSoldiers();
-        this.ChangeState(GameState.InGame);
+    }
+
+    private void HandleGameStarted()
+    {
     }
 
     private void HandleInGame()
@@ -57,9 +60,9 @@ public class GameManager : StaticInstanceWithLogger<GameManager>
 [Serializable]
 public enum GameState
 {
-    None = 0,
-    Starting = 1,
-    InGame = 2,
-    Win = 3,
-    Lose = 4,
+    None,
+    GameStarting,
+    GameStarted,
+    Win,
+    Lose,
 }

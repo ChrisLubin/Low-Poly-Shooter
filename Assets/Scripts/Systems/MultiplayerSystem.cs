@@ -120,6 +120,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 break;
             case MultiplayerState.WaitingForHostToStart:
                 break;
+            case MultiplayerState.GameStarting:
+                break;
+            case MultiplayerState.GameStarted:
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
@@ -154,5 +158,6 @@ public enum MultiplayerState
     HostWaitingForPlayers,
     JoiningLobby,
     WaitingForHostToStart,
+    GameStarting,
     GameStarted,
 }
