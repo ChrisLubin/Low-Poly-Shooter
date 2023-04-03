@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -154,7 +158,13 @@ namespace SlimUI.ModernMenu
 
         public void PlaySingleplayer()
         {
-            StartCoroutine(LoadAsynchronously("GameScene"));
+            firstMenu.SetActive(false);
+            playMenu.SetActive(false);
+            multiplayerMenu.SetActive(false);
+            mainCanvas.SetActive(false);
+            loadingMenu.SetActive(true);
+            NetworkManager.Singleton.StartHost();
+            LoadNetwork("GameScene");
         }
 
         public void PlayMultiplayer()

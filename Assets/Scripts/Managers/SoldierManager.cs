@@ -11,8 +11,9 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private bool _hasSpawnedSoldiers = false;
     [SerializeField] Transform _playerPrefab;
 
-    private void Start()
+    protected override void Awake()
     {
+        base.Awake();
         foreach (Transform spawnPoint in this._spawnPointsParent)
         {
             this._spawnPoints.Add(spawnPoint);

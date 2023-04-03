@@ -47,6 +47,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     {
         if (this.State == newState) { return; }
         this._logger.Log($"New state: {newState}");
+        this.State = newState;
         MultiplayerSystem.OnStateChange?.Invoke(newState);
 
         RelayServerData relayServerData;
@@ -90,6 +91,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     NetworkManager.Singleton.StartHost();
                     this._logger.Log("Started host");
+                    this.ChangeState(MultiplayerState.CreatedLobby);
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
@@ -112,6 +114,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     NetworkManager.Singleton.StartClient();
                     this._logger.Log("Started client");
+                    this.ChangeState(MultiplayerState.JoinedLobby);
                 }
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
@@ -129,7 +132,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         if (this.IsHost && this.OwnerClientId == clientId)
         {
             // Ignore when host first connects
-            this.ChangeState(MultiplayerState.CreatedLobby);
             return;
         }
 
@@ -140,7 +142,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         else
         {
             this._logger.Log($"You joined with a client ID of {clientId}.");
-            this.ChangeState(MultiplayerState.JoinedLobby);
         }
     }
 }

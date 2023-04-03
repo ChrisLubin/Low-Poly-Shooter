@@ -24,12 +24,23 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        this._waitForText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
-        if (this.IsHost)
+
+        if (MultiplayerSystem.Instance.State != MultiplayerState.CreatedLobby && MultiplayerSystem.Instance.State != MultiplayerState.JoinedLobby)
         {
-            this._startGameButton.gameObject.SetActive(true);
-            this._startGameButton.onClick.AddListener(this.StartGame);
+            // Doing singleplayer
+            this.gameObject.SetActive(false);
+            return;
         }
+
+        this._waitForText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
+
+        if (!this.IsHost)
+        {
+            return;
+        }
+
+        this._startGameButton.gameObject.SetActive(true);
+        this._startGameButton.onClick.AddListener(this.StartGame);
     }
 
     public override void OnDestroy()

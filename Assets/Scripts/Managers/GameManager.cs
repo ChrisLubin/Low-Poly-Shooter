@@ -8,7 +8,16 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
+
+        if (MultiplayerSystem.Instance.State != MultiplayerState.CreatedLobby && MultiplayerSystem.Instance.State != MultiplayerState.JoinedLobby)
+        {
+            // Doing singleplayer
+            this.ChangeState(GameState.GameStarting);
+        }
+        else
+        {
+            this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
+        }
     }
 
     public void ChangeState(GameState newState)
@@ -16,9 +25,9 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         if (this.State == newState) { return; }
 
         this._logger.Log($"New state: {newState}");
+        this.State = newState;
         OnStateChange?.Invoke(newState);
 
-        this.State = newState;
         switch (newState)
         {
             case GameState.HostWaitingForPlayers:
