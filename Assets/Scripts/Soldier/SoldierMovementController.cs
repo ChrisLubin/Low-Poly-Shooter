@@ -4,23 +4,19 @@ using UnityEngine;
 public class SoldierMovementController : NetworkBehaviour
 {
     [Header("Base setup")]
-    public float walkingSpeed = 7.5f;
-    public float runningSpeed = 11.5f;
-    public float jumpSpeed = 8.0f;
-    public float gravity = 20.0f;
-    public float lookSpeed = 2.0f;
-    public float lookXLimit = 45.0f;
-
-    CharacterController characterController;
-    Vector3 moveDirection = Vector3.zero;
-    float rotationX = 0;
-
-    [HideInInspector]
-    public bool canMove = true;
-
-    [SerializeField]
-    private float cameraYOffset = 0.4f;
-    private Camera playerCamera;
+    [SerializeField] private float _walkingSpeed = 4.5f;
+    [SerializeField] private float _runningSpeed = 6.5f;
+    [SerializeField] private float _jumpSpeed = 8.0f;
+    [SerializeField] private float _gravity = 20.0f;
+    [SerializeField] private float _lookSpeed = 2.0f;
+    [SerializeField] private float _lookXLimit = 45.0f;
+    private CharacterController _characterController;
+    private Vector3 _moveDirection = Vector3.zero;
+    private float _rotationX = 0;
+    private bool _canMove = true;
+    [SerializeField] private float _cameraYOffset = 1.7f;
+    [SerializeField] private Camera _playerCamera;
+    public bool IsGrounded => this._characterController.isGrounded;
 
     public override void OnNetworkSpawn()
     {
@@ -32,10 +28,7 @@ public class SoldierMovementController : NetworkBehaviour
             return;
         }
 
-        characterController = GetComponent<CharacterController>();
-        playerCamera = Camera.main;
-        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z);
-        playerCamera.transform.SetParent(transform);
+        this._characterController = GetComponent<CharacterController>();
 
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
@@ -50,35 +43,35 @@ public class SoldierMovementController : NetworkBehaviour
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
-        float movementDirectionY = moveDirection.y;
-        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
+        float curSpeedX = this._canMove ? (isRunning ? this._runningSpeed : this._walkingSpeed) * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = this._canMove ? (isRunning ? this._runningSpeed : this._walkingSpeed) * Input.GetAxis("Horizontal") : 0;
+        float movementDirectionY = this._moveDirection.y;
+        this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
-        if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
+        if (Input.GetButton("Jump") && this._canMove && this._characterController.isGrounded)
         {
-            moveDirection.y = jumpSpeed;
+            this._moveDirection.y = this._jumpSpeed;
         }
         else
         {
-            moveDirection.y = movementDirectionY;
+            this._moveDirection.y = movementDirectionY;
         }
 
-        if (!characterController.isGrounded)
+        if (!this._characterController.isGrounded)
         {
-            moveDirection.y -= gravity * Time.deltaTime;
+            this._moveDirection.y -= this._gravity * Time.deltaTime;
         }
 
         // Move the controller
-        characterController.Move(moveDirection * Time.deltaTime);
+        this._characterController.Move(this._moveDirection * Time.deltaTime);
 
         // Player and Camera rotation
-        if (canMove && playerCamera != null)
+        if (this._canMove && this._playerCamera != null)
         {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+            this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed;
+            this._rotationX = Mathf.Clamp(this._rotationX, -this._lookXLimit, this._lookXLimit);
+            this._playerCamera.transform.localRotation = Quaternion.Euler(this._rotationX, 0, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * this._lookSpeed, 0);
         }
     }
 }
