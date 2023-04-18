@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class WeaponAnimationController : MonoBehaviour
@@ -12,6 +13,7 @@ public class WeaponAnimationController : MonoBehaviour
 
     private void Awake() => this._animator = GetComponent<Animator>();
     private void Start() => this._isADS = false;
+    public Action<bool> OnADSEvent;
 
     void Update()
     {
@@ -24,6 +26,7 @@ public class WeaponAnimationController : MonoBehaviour
             this._isADS = !this._isADS;
             this._animator.SetBool(_IS_ADS_PARAMETER_NAME, this._isADS);
             this._timeSinceLastADSAnimation = 0f;
+            this.OnADSEvent?.Invoke(this._isADS);
         }
     }
 }

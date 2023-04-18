@@ -4,6 +4,7 @@ using UnityEngine;
 public class SoldierMovementController : NetworkBehaviour
 {
     [Header("Base setup")]
+    [SerializeField] private float _adsSpeed = 1.8f;
     [SerializeField] private float _walkingSpeed = 4.5f;
     [SerializeField] private float _runningSpeed = 6.5f;
     [SerializeField] private float _jumpSpeed = 8.0f;
@@ -18,6 +19,9 @@ public class SoldierMovementController : NetworkBehaviour
     [SerializeField] private Camera _playerCamera;
     public bool IsGrounded => this._characterController.isGrounded;
 
+    private WeaponAnimationController _weaponAnimationController;
+    private bool _isADS = false;
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -29,11 +33,22 @@ public class SoldierMovementController : NetworkBehaviour
         }
 
         this._characterController = GetComponent<CharacterController>();
+        this._weaponAnimationController = GetComponentInChildren<WeaponAnimationController>();
+
+        this._weaponAnimationController.OnADSEvent += this.OnADSEvent;
 
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        this._weaponAnimationController.OnADSEvent -= this.OnADSEvent;
+    }
+
+    private void OnADSEvent(bool isADS) => this._isADS = isADS;
 
     private void Update()
     {
@@ -43,8 +58,9 @@ public class SoldierMovementController : NetworkBehaviour
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        float curSpeedX = this._canMove ? (isRunning ? this._runningSpeed : this._walkingSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = this._canMove ? (isRunning ? this._runningSpeed : this._walkingSpeed) * Input.GetAxis("Horizontal") : 0;
+        float movementSpeed = this._isADS ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
+        float curSpeedX = this._canMove ? movementSpeed * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = this._canMove ? movementSpeed * Input.GetAxis("Horizontal") : 0;
         float movementDirectionY = this._moveDirection.y;
         this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
