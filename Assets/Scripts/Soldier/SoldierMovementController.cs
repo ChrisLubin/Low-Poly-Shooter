@@ -19,7 +19,7 @@ public class SoldierMovementController : NetworkBehaviour
     [SerializeField] private Camera _playerCamera;
     public bool IsGrounded => this._characterController.isGrounded;
 
-    private WeaponAnimationController _weaponAnimationController;
+    private WeaponController _weaponController;
     private bool _isADS = false;
 
     public override void OnNetworkSpawn()
@@ -33,9 +33,9 @@ public class SoldierMovementController : NetworkBehaviour
         }
 
         this._characterController = GetComponent<CharacterController>();
-        this._weaponAnimationController = GetComponentInChildren<WeaponAnimationController>();
+        this._weaponController = GetComponentInChildren<WeaponController>();
 
-        this._weaponAnimationController.OnADSEvent += this.OnADSEvent;
+        this._weaponController.OnADS += this.OnADS;
 
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
@@ -45,10 +45,8 @@ public class SoldierMovementController : NetworkBehaviour
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._weaponAnimationController.OnADSEvent -= this.OnADSEvent;
+        this._weaponController.OnADS -= this.OnADS;
     }
-
-    private void OnADSEvent(bool isADS) => this._isADS = isADS;
 
     private void Update()
     {
@@ -90,4 +88,6 @@ public class SoldierMovementController : NetworkBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * this._lookSpeed, 0);
         }
     }
+
+    private void OnADS(bool isADS) => this._isADS = isADS;
 }

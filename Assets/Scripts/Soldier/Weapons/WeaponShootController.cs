@@ -1,0 +1,39 @@
+using System;
+using UnityEngine;
+
+public class WeaponShootController : MonoBehaviour
+{
+    [SerializeField] private Transform _bulletPrefab;
+    [SerializeField] private Transform _bulletVfxPrefab;
+    [SerializeField] private Transform _shootPoint;
+    private float _bulletSpeed;
+
+    private float _minTimeBetweenShots;
+    private float _timeSinceLastShot = Mathf.Infinity;
+    public Action OnShoot;
+
+    public void Init(float bulletSpeed, int roundPerMinute)
+    {
+        int millisecondsInAMinute = 1000 * 60;
+        this._minTimeBetweenShots = millisecondsInAMinute / roundPerMinute;
+        this._bulletSpeed = bulletSpeed;
+    }
+
+    private void Update()
+    {
+        this._timeSinceLastShot += Time.deltaTime * 1000;
+        if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
+        {
+            Shoot();
+            this._timeSinceLastShot = 0f;
+        }
+    }
+
+    public void Shoot()
+    {
+        Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward));
+        Transform bulletVfx = Instantiate(this._bulletVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
+        bullet.GetComponent<BulletController>().Init(this._bulletSpeed);
+        this.OnShoot?.Invoke();
+    }
+}

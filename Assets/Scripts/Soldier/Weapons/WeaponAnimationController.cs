@@ -1,32 +1,22 @@
-using System;
 using UnityEngine;
 
 public class WeaponAnimationController : MonoBehaviour
 {
     private Animator _animator;
+    private WeaponController _weaponController;
+
     private const string _IS_ADS_PARAMETER_NAME = "IsADS";
     private const int _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS = 500;
     private const float _ADS_ANIMATION_SPEED_MULTIPLIER = 1.7f;
-    private const float _ADS_ANIMATION_TIME_MILLISECONDS = _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS / _ADS_ANIMATION_SPEED_MULTIPLIER;
-    public bool IsADS { get; private set; }
-    private float _timeSinceLastADSAnimation = Mathf.Infinity;
+    public const float ADS_ANIMATION_TIME_MILLISECONDS = _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS / _ADS_ANIMATION_SPEED_MULTIPLIER;
 
-    private void Awake() => this._animator = GetComponent<Animator>();
-    private void Start() => this.IsADS = false;
-    public Action<bool> OnADSEvent;
-
-    void Update()
+    private void Awake()
     {
-        // Can't switch ADS during animation
-        this._timeSinceLastADSAnimation += Time.deltaTime * 1000;
-        if (this._timeSinceLastADSAnimation < _ADS_ANIMATION_TIME_MILLISECONDS) { return; }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            this.IsADS = !this.IsADS;
-            this._animator.SetBool(_IS_ADS_PARAMETER_NAME, this.IsADS);
-            this._timeSinceLastADSAnimation = 0f;
-            this.OnADSEvent?.Invoke(this.IsADS);
-        }
+        this._animator = GetComponent<Animator>();
+        this._weaponController = GetComponent<WeaponController>();
+        this._weaponController.OnADS += this.SetADS;
     }
+
+    private void OnDestroy() => this._weaponController.OnADS -= this.SetADS;
+    public void SetADS(bool isADS) => this._animator.SetBool(_IS_ADS_PARAMETER_NAME, isADS);
 }
