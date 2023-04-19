@@ -17,6 +17,12 @@ public class CameraRecoil : MonoBehaviour
     private float _timeSinceLastShot = Mathf.Infinity;
     private const float _MIN_TIME_BETWEEN_SHOTS = 85.71f; // 700 RPM
 
+    [SerializeField] private Transform _bulletPrefab;
+    [SerializeField] private Transform _bulletVfxPrefab;
+    [SerializeField] private Transform _shootPoint;
+    [SerializeField] private Transform _directionBulletShouldGo;
+    [SerializeField] private float _bulletSpeed;
+
     void Update()
     {
         this._timeSinceLastShot += Time.deltaTime * 1000;
@@ -35,5 +41,9 @@ public class CameraRecoil : MonoBehaviour
     private void Fire()
     {
         this._targetRotation += new Vector3(this._recoilX, Random.Range(-this._recoilY, this._recoilY), Random.Range(-this._recoilZ, this._recoilZ));
+        Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.identity);
+        Transform bulletVfx = Instantiate(this._bulletVfxPrefab, this._shootPoint.position, Quaternion.identity, transform);
+        bulletVfx.transform.LookAt(this._directionBulletShouldGo);
+        bullet.GetComponent<BulletController>().Setup(this._directionBulletShouldGo.position, this._bulletSpeed);
     }
 }
