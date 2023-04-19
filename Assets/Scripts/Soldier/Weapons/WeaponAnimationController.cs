@@ -8,11 +8,11 @@ public class WeaponAnimationController : MonoBehaviour
     private const int _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS = 500;
     private const float _ADS_ANIMATION_SPEED_MULTIPLIER = 1.7f;
     private const float _ADS_ANIMATION_TIME_MILLISECONDS = _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS / _ADS_ANIMATION_SPEED_MULTIPLIER;
-    private bool _isADS;
+    public bool IsADS { get; private set; }
     private float _timeSinceLastADSAnimation = Mathf.Infinity;
 
     private void Awake() => this._animator = GetComponent<Animator>();
-    private void Start() => this._isADS = false;
+    private void Start() => this.IsADS = false;
     public Action<bool> OnADSEvent;
 
     void Update()
@@ -23,10 +23,10 @@ public class WeaponAnimationController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            this._isADS = !this._isADS;
-            this._animator.SetBool(_IS_ADS_PARAMETER_NAME, this._isADS);
+            this.IsADS = !this.IsADS;
+            this._animator.SetBool(_IS_ADS_PARAMETER_NAME, this.IsADS);
             this._timeSinceLastADSAnimation = 0f;
-            this.OnADSEvent?.Invoke(this._isADS);
+            this.OnADSEvent?.Invoke(this.IsADS);
         }
     }
 }
