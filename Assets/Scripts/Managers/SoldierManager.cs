@@ -10,6 +10,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private List<Transform> _spawnPoints = new();
     private bool _hasSpawnedSoldiers = false;
     [SerializeField] Transform _playerPrefab;
+    private List<SoldierController> _players = new();
 
     protected override void Awake()
     {
@@ -18,6 +19,35 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         {
             this._spawnPoints.Add(spawnPoint);
         }
+        SoldierController.OnSpawn += this.OnPlayerSpawn;
+        SoldierController.OnDespawn += this.OnPlayerDespawn;
+        SoldierController.OnLocalShot += this.OnLocalShot;
+        RpcSystem.OnPlayerShot += this.OnServerShot;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        SoldierController.OnSpawn -= this.OnPlayerSpawn;
+        SoldierController.OnDespawn -= this.OnPlayerDespawn;
+        SoldierController.OnLocalShot -= this.OnLocalShot;
+        RpcSystem.OnPlayerShot -= this.OnServerShot;
+    }
+
+    private void OnPlayerSpawn(SoldierController player) => this._players.Add(player);
+    private void OnPlayerDespawn(SoldierController player) => this._players.Remove(player);
+    private void OnLocalShot(SoldierController player) => RpcSystem.Instance.OnPlayerShotServerRpc(NetworkManager.Singleton.LocalClientId, this._players.IndexOf(player));
+    private void OnServerShot(int playerIndex)
+    {
+        SoldierController player = this._players.ElementAtOrDefault(playerIndex);
+
+        if (!player)
+        {
+            this._logger.Log("Unable to find player who shot", Logger.LogLevel.Error);
+            return;
+        }
+
+        player.Shoot(true);
     }
 
     public void SpawnSoldiers()
@@ -37,9 +67,9 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
             }
             Transform spawnPoint = this._spawnPoints[i];
 
-            Transform player = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity, this._spawnedSoldiersParent);
-            player.rotation = spawnPoint.rotation;
-            player.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+            Transform playerTransform = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity, this._spawnedSoldiersParent);
+            playerTransform.rotation = spawnPoint.rotation;
+            playerTransform.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
             this._logger.Log($"Spawned soldier for client ID {clientId}");
         }
 

@@ -20,13 +20,17 @@ public class CameraRecoilController : NetworkBehaviorAutoDisable<CameraRecoilCon
         this._recoilZ = this._weaponController.RecoilZ;
         this._snappiness = this._weaponController.Snappiness;
         this._returnSpeed = this._weaponController.ReturnSpeed;
-        this._weaponController.OnShoot += this.DoRecoil;
+    }
+
+    protected override void OnOwnerNetworkSpawn()
+    {
+        this._weaponController.OnShot += this.DoRecoil;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._weaponController.OnShoot -= this.DoRecoil;
+        this._weaponController.OnShot -= this.DoRecoil;
     }
 
     void Update()

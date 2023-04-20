@@ -20,19 +20,23 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     private float _timeSinceLastADS = Mathf.Infinity;
     public Action<bool> OnADS;
 
-    public Action OnShoot;
+    public Action OnShot;
 
     private void Awake()
     {
         this._shootController = GetComponent<WeaponShootController>();
         this._shootController.Init(this._bulletSpeed, this._roundsPerMinute);
-        this._shootController.OnShoot += this.OnShoot;
+    }
+
+    protected override void OnOwnerNetworkSpawn()
+    {
+        this._shootController.OnShot += this.OnShot;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._shootController.OnShoot -= this.OnShoot;
+        this._shootController.OnShot -= this.OnShot;
     }
 
     private void Update()
