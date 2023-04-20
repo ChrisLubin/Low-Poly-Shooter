@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RotationTiltSway : MonoBehaviour
+public class RotationTiltSway : NetworkBehaviorAutoDisable<RotationTiltSway>
 {
     [Header("Position")]
     [SerializeField] private float _amount = 0.02f;

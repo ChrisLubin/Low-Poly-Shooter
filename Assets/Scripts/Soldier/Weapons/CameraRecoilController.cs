@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CameraRecoilController : MonoBehaviour
+public class CameraRecoilController : NetworkBehaviorAutoDisable<CameraRecoilController>
 {
     [SerializeField] private WeaponController _weaponController;
 
@@ -23,8 +23,9 @@ public class CameraRecoilController : MonoBehaviour
         this._weaponController.OnShoot += this.DoRecoil;
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         this._weaponController.OnShoot -= this.DoRecoil;
     }
 

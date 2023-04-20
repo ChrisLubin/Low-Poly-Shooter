@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class WeaponController : MonoBehaviour
+public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 {
     private WeaponShootController _shootController;
 
@@ -29,8 +29,9 @@ public class WeaponController : MonoBehaviour
         this._shootController.OnShoot += this.OnShoot;
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         this._shootController.OnShoot -= this.OnShoot;
     }
 

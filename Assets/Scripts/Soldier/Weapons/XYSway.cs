@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class XYSway : MonoBehaviour
+public class XYSway : NetworkBehaviorAutoDisable<XYSway>
 {
     [SerializeField] private float _intensity = 1;
     [SerializeField] private float _smooth = 10;

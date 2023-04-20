@@ -1,7 +1,6 @@
-using Unity.Netcode;
 using UnityEngine;
 
-public class SoldierMovementController : NetworkBehaviour
+public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovementController>
 {
     [Header("Base setup")]
     [SerializeField] private float _adsSpeed = 1.8f;
@@ -22,19 +21,14 @@ public class SoldierMovementController : NetworkBehaviour
     private WeaponController _weaponController;
     private bool _isADS = false;
 
-    public override void OnNetworkSpawn()
+    private void Awake()
     {
-        base.OnNetworkSpawn();
-
-        if (!this.IsOwner)
-        {
-            this.enabled = false;
-            return;
-        }
-
         this._characterController = GetComponent<CharacterController>();
         this._weaponController = GetComponentInChildren<WeaponController>();
+    }
 
+    protected override void OnOwnerNetworkSpawn()
+    {
         this._weaponController.OnADS += this.OnADS;
 
         // Lock cursor

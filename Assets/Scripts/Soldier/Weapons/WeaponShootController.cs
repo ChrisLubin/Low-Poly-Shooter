@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class WeaponShootController : MonoBehaviour
+public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootController>
 {
     [SerializeField] private Transform _bulletPrefab;
     [SerializeField] private Transform _bulletVfxPrefab;
