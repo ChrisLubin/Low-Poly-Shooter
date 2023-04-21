@@ -7,6 +7,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
     public static Action<ulong, ulong[]> OnPlayerGameSceneLoaded;
     public static Action<int> OnPlayerShot;
+    public static Action<int, SoldierController.DamageType> OnPlayerDamageReceived;
 
     [ServerRpc(RequireOwnership = false)]
     public void PlayerGameSceneLoadedServerRpc(ulong joinedClientId) => this.PlayerGameSceneLoadedClientRpc(this.OwnerClientId, joinedClientId, Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds));
@@ -45,4 +46,23 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     }
     [ClientRpc]
     private void OnPlayerShotClientRpc(int playerIndex, ClientRpcParams _ = default) => RpcSystem.OnPlayerShot?.Invoke(playerIndex);
+
+    [ServerRpc(RequireOwnership = false)]
+    public void OnPlayerDamageReceivedServerRpc(ulong originClientId, int damagedSoldierIndex, SoldierController.DamageType damageType)
+    {
+        ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
+
+        // Send to all clients except the origin client
+        ClientRpcParams rpcParams = new()
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = allClientIds.Where((ulong clientId) => clientId != originClientId).ToArray()
+            }
+        };
+
+        this.OnPlayerDamageReceivedClientRpc(damagedSoldierIndex, damageType, rpcParams);
+    }
+    [ClientRpc]
+    private void OnPlayerDamageReceivedClientRpc(int damagedSoldierIndex, SoldierController.DamageType damageType, ClientRpcParams _ = default) => RpcSystem.OnPlayerDamageReceived?.Invoke(damagedSoldierIndex, damageType);
 }

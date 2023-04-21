@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -11,6 +12,10 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private bool _hasSpawnedSoldiers = false;
     [SerializeField] Transform _playerPrefab;
     private List<SoldierController> _players = new();
+    private SoldierController _localPlayer;
+
+    public static Action OnLocalPlayerShot;
+    public static Action OnLocalPlayerDamageReceived;
 
     protected override void Awake()
     {
@@ -19,24 +24,37 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         {
             this._spawnPoints.Add(spawnPoint);
         }
-        SoldierController.OnSpawn += this.OnPlayerSpawn;
-        SoldierController.OnDespawn += this.OnPlayerDespawn;
-        SoldierController.OnLocalShot += this.OnLocalShot;
+        SoldierController.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+        SoldierController.OnSpawn += this.OnSpawn;
+        SoldierController.OnDespawn += this.OnDespawn;
+        SoldierController.OnShot += this.OnShot;
+        SoldierController.OnDamageReceived += this.OnLocalDamageReceived;
         RpcSystem.OnPlayerShot += this.OnServerShot;
+        RpcSystem.OnPlayerDamageReceived += this.OnServerDamageReceived;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        SoldierController.OnSpawn -= this.OnPlayerSpawn;
-        SoldierController.OnDespawn -= this.OnPlayerDespawn;
-        SoldierController.OnLocalShot -= this.OnLocalShot;
+        SoldierController.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+        SoldierController.OnSpawn -= this.OnSpawn;
+        SoldierController.OnDespawn -= this.OnDespawn;
+        SoldierController.OnShot -= this.OnShot;
+        SoldierController.OnDamageReceived -= this.OnLocalDamageReceived;
         RpcSystem.OnPlayerShot -= this.OnServerShot;
+        RpcSystem.OnPlayerDamageReceived -= this.OnServerDamageReceived;
     }
 
-    private void OnPlayerSpawn(SoldierController player) => this._players.Add(player);
-    private void OnPlayerDespawn(SoldierController player) => this._players.Remove(player);
-    private void OnLocalShot(SoldierController player) => RpcSystem.Instance.OnPlayerShotServerRpc(NetworkManager.Singleton.LocalClientId, this._players.IndexOf(player));
+    private void OnLocalPlayerSpawn(SoldierController player) => this._localPlayer = player;
+    private void OnSpawn(SoldierController player) => this._players.Add(player);
+    private void OnDespawn(SoldierController player) => this._players.Remove(player);
+    private void OnShot(SoldierController player)
+    {
+        if (player != this._localPlayer) { return; }
+        RpcSystem.Instance.OnPlayerShotServerRpc(NetworkManager.Singleton.LocalClientId, this._players.IndexOf(player));
+        SoldierManager.OnLocalPlayerShot?.Invoke();
+    }
+
     private void OnServerShot(int playerIndex)
     {
         SoldierController player = this._players.ElementAtOrDefault(playerIndex);
@@ -46,8 +64,30 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
             this._logger.Log("Unable to find player who shot", Logger.LogLevel.Error);
             return;
         }
+        if (player == this._localPlayer) { return; }
 
-        player.Shoot(true);
+        player.Shoot();
+    }
+
+    private void OnLocalDamageReceived(SoldierController player, SoldierController.DamageType damageType)
+    {
+        if (player == this._localPlayer) { return; }
+        RpcSystem.Instance.OnPlayerDamageReceivedServerRpc(NetworkManager.Singleton.LocalClientId, this._players.IndexOf(player), damageType);
+    }
+
+    private void OnServerDamageReceived(int playerIndex, SoldierController.DamageType damageType)
+    {
+        SoldierController player = this._players.ElementAtOrDefault(playerIndex);
+
+        if (!player)
+        {
+            this._logger.Log("Unable to find player who took damage", Logger.LogLevel.Error);
+            return;
+        }
+        if (player != this._localPlayer) { return; }
+
+        player.TakeServerDamage(damageType);
+        SoldierManager.OnLocalPlayerDamageReceived?.Invoke();
     }
 
     public void SpawnSoldiers()

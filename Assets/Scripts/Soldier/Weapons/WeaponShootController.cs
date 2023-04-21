@@ -11,7 +11,6 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     private float _minTimeBetweenShots;
     private float _timeSinceLastShot = Mathf.Infinity;
     public Action OnShot;
-    public Action OnLocalShot;
 
     public void Init(float bulletSpeed, int roundPerMinute)
     {
@@ -25,21 +24,16 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         this._timeSinceLastShot += Time.deltaTime * 1000;
         if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
         {
-            Shoot(false);
+            Shoot();
             this._timeSinceLastShot = 0f;
         }
     }
 
-    private void OnShootRpc() => this.Shoot(true);
-
-    public void Shoot(bool isRpc)
+    public void Shoot()
     {
         Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward));
         Transform bulletVfx = Instantiate(this._bulletVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
         bullet.GetComponent<BulletController>().Init(this._bulletSpeed);
         this.OnShot?.Invoke();
-
-        if (isRpc) { return; }
-        this.OnLocalShot?.Invoke();
     }
 }
