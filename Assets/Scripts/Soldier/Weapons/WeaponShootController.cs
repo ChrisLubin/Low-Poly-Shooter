@@ -4,7 +4,7 @@ using UnityEngine;
 public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootController>
 {
     [SerializeField] private Transform _bulletPrefab;
-    [SerializeField] private Transform _bulletVfxPrefab;
+    [SerializeField] private Transform _muzzleFlashVfxPrefab;
     [SerializeField] private Transform _shootPoint;
     private float _bulletSpeed;
 
@@ -32,7 +32,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     public void Shoot()
     {
         Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward));
-        Transform bulletVfx = Instantiate(this._bulletVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
+        Instantiate(this._muzzleFlashVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
         bullet.GetComponent<BulletController>().Init(this._bulletSpeed);
         this.OnShot?.Invoke();
     }

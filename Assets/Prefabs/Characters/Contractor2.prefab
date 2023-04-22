@@ -869,6 +869,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16946db45073243429cdb3b45bb731c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _bloodSplatterVfxPrefab: {fileID: 4179378053120898, guid: 5c0bef95182fd5447aac2392a32c713e,
+    type: 3}
 --- !u!114 &3396908969173115210
 MonoBehaviour:
   m_ObjectHideFlags: 0

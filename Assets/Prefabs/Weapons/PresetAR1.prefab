@@ -442,7 +442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bulletPrefab: {fileID: 4638714538486548, guid: 6f1ab64f483a9f942bc3c22a1ad325ba,
     type: 3}
-  _bulletVfxPrefab: {fileID: 4502835693877224, guid: e5223050c3688f84ea9ed8bb4ee04d4e,
+  _muzzleFlashVfxPrefab: {fileID: 4502835693877224, guid: e5223050c3688f84ea9ed8bb4ee04d4e,
     type: 3}
   _shootPoint: {fileID: 7353478113595497723}
 --- !u!114 &5918442952042138978

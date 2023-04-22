@@ -1,8 +1,11 @@
 using System;
 using Unity.Netcode;
+using UnityEngine;
 
 public class SoldierDamageController : NetworkBehaviour
 {
+    [SerializeField] private Transform _bloodSplatterVfxPrefab;
+
     public Action<DamageType> OnDamageReceived;
 
     [Serializable]
@@ -13,10 +16,12 @@ public class SoldierDamageController : NetworkBehaviour
         Missile
     }
 
-    public void TakeLocalDamage(DamageType type)
+    public void TakeLocalDamage(DamageType type, Vector3 damagePoint)
     {
         // Only take damage when another client says we have
         if (this.IsOwner) { return; }
+
+        Instantiate(this._bloodSplatterVfxPrefab, damagePoint, Quaternion.identity, transform);
 
         if (type == DamageType.Bullet)
         {

@@ -57,7 +57,7 @@ public class BulletController : MonoBehaviour
         // Set transform to collision point then wait a frame before taking action
         transform.position = collidePosition;
         await Task.Delay(0);
-        soldier.TakeLocalDamage(SoldierDamageController.DamageType.Bullet);
+        soldier.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, collidePosition);
         Destroy(gameObject);
     }
 }
