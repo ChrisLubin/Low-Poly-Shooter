@@ -714,6 +714,7 @@ GameObject:
   - component: {fileID: 8074606574535659940}
   - component: {fileID: 3396908969173115212}
   - component: {fileID: 4760462111602770173}
+  - component: {fileID: 9189164359248743288}
   - component: {fileID: 3396908969173115210}
   - component: {fileID: 6968672576979400691}
   - component: {fileID: 2014753114515829184}
@@ -855,6 +856,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 8007331112903200479}
   _shootController: {fileID: 4635433451376190348}
+  _damageController: {fileID: 9189164359248743288}
+--- !u!114 &9189164359248743288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3395804636025468854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16946db45073243429cdb3b45bb731c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3396908969173115210
 MonoBehaviour:
   m_ObjectHideFlags: 0

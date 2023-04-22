@@ -69,13 +69,13 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         player.Shoot();
     }
 
-    private void OnLocalDamageReceived(SoldierController player, SoldierController.DamageType damageType)
+    private void OnLocalDamageReceived(SoldierController player, SoldierDamageController.DamageType damageType)
     {
         if (player == this._localPlayer) { return; }
         RpcSystem.Instance.OnPlayerDamageReceivedServerRpc(NetworkManager.Singleton.LocalClientId, this._players.IndexOf(player), damageType);
     }
 
-    private void OnServerDamageReceived(int playerIndex, SoldierController.DamageType damageType)
+    private void OnServerDamageReceived(int playerIndex, SoldierDamageController.DamageType damageType)
     {
         SoldierController player = this._players.ElementAtOrDefault(playerIndex);
 
