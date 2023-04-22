@@ -855,7 +855,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 8007331112903200479}
-  _shootController: {fileID: 4635433451376190348}
+  _weaponController: {fileID: 5393219146533398}
   _damageController: {fileID: 9189164359248743288}
 --- !u!114 &9189164359248743288
 MonoBehaviour:
@@ -7625,15 +7625,3 @@ Animator:
     type: 3}
   m_PrefabInstance: {fileID: 1340804235841977109}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4635433451376190348 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5967023710246181017, guid: 5f8f12d0dd37bfa42b00c0a28f479976,
-    type: 3}
-  m_PrefabInstance: {fileID: 1340804235841977109}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341595389269972963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63ae3adebe8b1b549a3424e1b7c928e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

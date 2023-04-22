@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootController>
@@ -17,7 +18,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     private float _timeSinceLastShot = Mathf.Infinity;
     public Action OnShot;
 
-    private bool _isADS = false;
+    private NetworkVariable<bool> _isADS = new(false);
 
     public void Init(float bulletSpeed, int roundPerMinute, float bloomMaxAngle)
     {
@@ -46,11 +47,11 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         }
     }
 
-    private void OnADS(bool isADS) => this._isADS = isADS;
+    private void OnADS(bool isADS) => this._isADS.Value = isADS;
 
     public void Shoot()
     {
-        Vector3 pointForBulletToLookAt = this._isADS ? this._shootPoint.position + this._shootPoint.forward : this.GetRandomBulletDirectionPoint(this._shootPoint.position, _BULLET_BLOOM_OFFSET, this._bloomMaxAngle, this._shootPoint.forward);
+        Vector3 pointForBulletToLookAt = this._isADS.Value ? this._shootPoint.position + this._shootPoint.forward : this.GetRandomBulletDirectionPoint(this._shootPoint.position, _BULLET_BLOOM_OFFSET, this._bloomMaxAngle, this._shootPoint.forward);
         Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.identity);
         bullet.LookAt(pointForBulletToLookAt);
         Instantiate(this._muzzleFlashVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);

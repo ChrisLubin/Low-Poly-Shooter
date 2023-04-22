@@ -48,4 +48,6 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
             this.OnADS?.Invoke(this._isADS);
         }
     }
+
+    public void Shoot() => this._shootController.Shoot();
 }
