@@ -18,7 +18,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     private float _timeSinceLastShot = Mathf.Infinity;
     public Action OnShot;
 
-    private NetworkVariable<bool> _isADS = new(false);
+    private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public void Init(float bulletSpeed, int roundPerMinute, float bloomMaxAngle)
     {
