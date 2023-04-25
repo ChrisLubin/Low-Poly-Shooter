@@ -6,7 +6,7 @@ public class SoldierDamageController : NetworkBehaviour
 {
     [SerializeField] private Transform _bloodSplatterVfxPrefab;
 
-    public Action<DamageType> OnDamageReceived;
+    public Action<DamageType, int> OnDamageReceived;
 
     [Serializable]
     public enum DamageType
@@ -16,7 +16,7 @@ public class SoldierDamageController : NetworkBehaviour
         Missile
     }
 
-    public void TakeLocalDamage(DamageType type, Vector3 damagePoint, bool isDamageFromLocalPlayer)
+    public void TakeLocalDamage(DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer)
     {
         if (!this.IsOwner)
         {
@@ -28,11 +28,11 @@ public class SoldierDamageController : NetworkBehaviour
         if (type == DamageType.Bullet)
         {
             // We shot another soldier locally
-            this.OnDamageReceived?.Invoke(type);
+            this.OnDamageReceived?.Invoke(type, damageAmount);
         }
     }
 
-    public void TakeServerDamage(DamageType type)
+    public void TakeServerDamage(DamageType type, int damageAmount)
     {
         // Only take damage when another client says we have
         if (!this.IsOwner) { return; }
@@ -40,7 +40,7 @@ public class SoldierDamageController : NetworkBehaviour
         if (type == DamageType.Bullet)
         {
             // We got shot by another client
-            this.OnDamageReceived?.Invoke(type);
+            this.OnDamageReceived?.Invoke(type, damageAmount);
         }
     }
 }

@@ -8,6 +8,7 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     [Header("Weapon Attributes")]
     [SerializeField] private int _roundsPerMinute = 700;
     [SerializeField] private float _bulletSpeed = 70f;
+    [SerializeField] private int _bulletDamage = 15;
     [SerializeField] private float _bloomMaxAngle = 20f;
 
     [field: SerializeField, Header("Recoil")] public float RecoilX { get; private set; } = -2f;
@@ -26,7 +27,7 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     private void Awake()
     {
         this._shootController = GetComponent<WeaponShootController>();
-        this._shootController.Init(this._bulletSpeed, this._roundsPerMinute, this._bloomMaxAngle);
+        this._shootController.Init(this._bulletSpeed, this._bulletDamage, this._roundsPerMinute, this._bloomMaxAngle);
     }
 
     protected override void OnOwnerNetworkSpawn() => this._shootController.OnShot += this.OnShot;

@@ -11,7 +11,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     public static Action<SoldierController> OnSpawn;
     public static Action<SoldierController> OnDespawn;
     public static Action<SoldierController> OnShot;
-    public static Action<SoldierController, SoldierDamageController.DamageType> OnDamageReceived;
+    public static Action<SoldierController, SoldierDamageController.DamageType, int> OnDamageReceived;
 
     private void Awake()
     {
@@ -34,9 +34,9 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
         this._damageController.OnDamageReceived -= this._OnDamageReceived;
     }
 
-    public void TakeLocalDamage(SoldierDamageController.DamageType type, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damagePoint, isDamageFromLocalPlayer);
-    public void TakeServerDamage(SoldierDamageController.DamageType type) => this._damageController.TakeServerDamage(type);
-    private void _OnDamageReceived(SoldierDamageController.DamageType type) => SoldierController.OnDamageReceived?.Invoke(this, type);
+    public void TakeLocalDamage(SoldierDamageController.DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damageAmount, damagePoint, isDamageFromLocalPlayer);
+    public void TakeServerDamage(SoldierDamageController.DamageType type, int damageAmount) => this._damageController.TakeServerDamage(type, damageAmount);
+    private void _OnDamageReceived(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnDamageReceived?.Invoke(this, type, damageAmount);
 
     public void Shoot() => this._weaponController.Shoot();
     private void _OnShot() => SoldierController.OnShot?.Invoke(this);

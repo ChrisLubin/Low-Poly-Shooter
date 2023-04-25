@@ -7,7 +7,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
     public static Action<ulong, ulong[]> OnPlayerGameSceneLoaded;
     public static Action<int> OnPlayerShot;
-    public static Action<int, SoldierDamageController.DamageType> OnPlayerDamageReceived;
+    public static Action<int, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
 
     [ServerRpc(RequireOwnership = false)]
     public void PlayerGameSceneLoadedServerRpc(ulong joinedClientId) => this.PlayerGameSceneLoadedClientRpc(this.OwnerClientId, joinedClientId, Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds));
@@ -48,7 +48,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     private void OnPlayerShotClientRpc(int playerIndex, ClientRpcParams _ = default) => RpcSystem.OnPlayerShot?.Invoke(playerIndex);
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnPlayerDamageReceivedServerRpc(ulong originClientId, int damagedSoldierIndex, SoldierDamageController.DamageType damageType)
+    public void OnPlayerDamageReceivedServerRpc(ulong originClientId, int damagedSoldierIndex, SoldierDamageController.DamageType damageType, int damageAmount)
     {
         ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
 
@@ -61,8 +61,8 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
             }
         };
 
-        this.OnPlayerDamageReceivedClientRpc(damagedSoldierIndex, damageType, rpcParams);
+        this.OnPlayerDamageReceivedClientRpc(damagedSoldierIndex, damageType, damageAmount, rpcParams);
     }
     [ClientRpc]
-    private void OnPlayerDamageReceivedClientRpc(int damagedSoldierIndex, SoldierDamageController.DamageType damageType, ClientRpcParams _ = default) => RpcSystem.OnPlayerDamageReceived?.Invoke(damagedSoldierIndex, damageType);
+    private void OnPlayerDamageReceivedClientRpc(int damagedSoldierIndex, SoldierDamageController.DamageType damageType, int damageAmount, ClientRpcParams _ = default) => RpcSystem.OnPlayerDamageReceived?.Invoke(damagedSoldierIndex, damageType, damageAmount);
 }

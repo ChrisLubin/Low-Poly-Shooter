@@ -12,6 +12,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private const float _BULLET_BLOOM_OFFSET = 0.1f;
     private float _bulletSpeed;
+    private int _bulletDamage;
     private float _bloomMaxAngle;
 
     private float _minTimeBetweenShots;
@@ -20,11 +21,12 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    public void Init(float bulletSpeed, int roundPerMinute, float bloomMaxAngle)
+    public void Init(float bulletSpeed, int bulletDamage, int roundPerMinute, float bloomMaxAngle)
     {
         int millisecondsInAMinute = 1000 * 60;
         this._minTimeBetweenShots = millisecondsInAMinute / roundPerMinute;
         this._bulletSpeed = bulletSpeed;
+        this._bulletDamage = bulletDamage;
         this._bloomMaxAngle = bloomMaxAngle;
     }
 
@@ -55,7 +57,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.identity);
         bullet.LookAt(pointForBulletToLookAt);
         Instantiate(this._muzzleFlashVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
-        bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this.IsOwner);
+        bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this._bulletDamage, this.IsOwner);
         this.OnShot?.Invoke();
     }
 
