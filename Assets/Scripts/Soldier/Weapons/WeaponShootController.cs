@@ -55,7 +55,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.identity);
         bullet.LookAt(pointForBulletToLookAt);
         Instantiate(this._muzzleFlashVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
-        bullet.GetComponent<BulletController>().Init(this._bulletSpeed);
+        bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this.IsOwner);
         this.OnShot?.Invoke();
     }
 

@@ -16,12 +16,14 @@ public class SoldierDamageController : NetworkBehaviour
         Missile
     }
 
-    public void TakeLocalDamage(DamageType type, Vector3 damagePoint)
+    public void TakeLocalDamage(DamageType type, Vector3 damagePoint, bool isDamageFromLocalPlayer)
     {
+        if (!this.IsOwner)
+        {
+            Instantiate(this._bloodSplatterVfxPrefab, damagePoint, Quaternion.identity, transform);
+        }
         // Only take damage when another client says we have
-        if (this.IsOwner) { return; }
-
-        Instantiate(this._bloodSplatterVfxPrefab, damagePoint, Quaternion.identity, transform);
+        if (!isDamageFromLocalPlayer) { return; }
 
         if (type == DamageType.Bullet)
         {

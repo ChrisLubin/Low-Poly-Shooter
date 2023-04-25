@@ -6,8 +6,13 @@ public class BulletController : MonoBehaviour
     private float _speed = 0f;
     private float _timeSinceCreation = 0f;
     private float _maxLifeSpan = 2f;
+    private bool _wasShotByLocalPlayer;
 
-    public void Init(float bulletSpeed) => this._speed = bulletSpeed;
+    public void Init(float bulletSpeed, bool wasShotByLocalPlayer)
+    {
+        this._speed = bulletSpeed;
+        this._wasShotByLocalPlayer = wasShotByLocalPlayer;
+    }
 
     private void Start()
     {
@@ -57,7 +62,7 @@ public class BulletController : MonoBehaviour
         // Set transform to collision point then wait a frame before taking action
         transform.position = collidePosition;
         await Task.Delay(0);
-        soldier.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, collidePosition);
+        soldier.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, collidePosition, this._wasShotByLocalPlayer);
         Destroy(gameObject);
     }
 }

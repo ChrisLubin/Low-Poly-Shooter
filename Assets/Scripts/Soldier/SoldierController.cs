@@ -34,7 +34,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
         this._damageController.OnDamageReceived -= this._OnDamageReceived;
     }
 
-    public void TakeLocalDamage(SoldierDamageController.DamageType type, Vector3 damagePoint) => this._damageController.TakeLocalDamage(type, damagePoint);
+    public void TakeLocalDamage(SoldierDamageController.DamageType type, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damagePoint, isDamageFromLocalPlayer);
     public void TakeServerDamage(SoldierDamageController.DamageType type) => this._damageController.TakeServerDamage(type);
     private void _OnDamageReceived(SoldierDamageController.DamageType type) => SoldierController.OnDamageReceived?.Invoke(this, type);
 
