@@ -9,24 +9,27 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     [SerializeField] private GameObject _playerCamera;
     [SerializeField] private WeaponController _weaponController;
 
-    public static Action<SoldierController> OnLocalPlayerSpawn;
-    public static Action<SoldierController> OnSpawn;
-    public static Action<SoldierController> OnDeath;
-    public static Action<SoldierController> OnShot;
-    public static Action<SoldierController, SoldierDamageController.DamageType, int> OnDamageReceived;
+    public static Action<ulong, SoldierController> OnSpawn;
+    public static Action<ulong> OnDeath;
+    public static Action<ulong> OnShot;
+    public static Action<ulong, SoldierDamageController.DamageType, int> OnDamageReceived;
 
     private void Awake()
     {
-        SoldierController.OnSpawn?.Invoke(this);
         this._deathController = GetComponent<SoldierDeathController>();
         this._damageController = GetComponent<SoldierDamageController>();
         this._damageController.OnDamageReceived += this._OnDamageReceived;
         this._deathController.OnDeath += this._OnDeath;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        SoldierController.OnSpawn?.Invoke(this.OwnerClientId, this);
+    }
+
     protected override void OnOwnerNetworkSpawn()
     {
-        SoldierController.OnLocalPlayerSpawn?.Invoke(this);
         this._playerCamera.GetComponent<Camera>().enabled = true;
         this._weaponController.OnShot += this._OnShot;
     }
@@ -40,10 +43,10 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     public void TakeLocalDamage(SoldierDamageController.DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damageAmount, damagePoint, isDamageFromLocalPlayer);
     public void TakeServerDamage(SoldierDamageController.DamageType type, int damageAmount) => this._damageController.TakeServerDamage(type, damageAmount);
-    private void _OnDamageReceived(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnDamageReceived?.Invoke(this, type, damageAmount);
+    private void _OnDamageReceived(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnDamageReceived?.Invoke(this.OwnerClientId, type, damageAmount);
 
     public void Shoot() => this._weaponController.Shoot();
-    private void _OnShot() => SoldierController.OnShot?.Invoke(this);
+    private void _OnShot() => SoldierController.OnShot?.Invoke(this.OwnerClientId);
 
-    private void _OnDeath() => SoldierController.OnDeath?.Invoke(this);
+    private void _OnDeath() => SoldierController.OnDeath?.Invoke(this.OwnerClientId);
 }
