@@ -720,6 +720,7 @@ GameObject:
   - component: {fileID: 4330846700210131509}
   - component: {fileID: 9189164359248743288}
   - component: {fileID: 3396908969173115210}
+  - component: {fileID: 1837996852871556149}
   m_Layer: 7
   m_Name: Contractor2
   m_TagString: Untagged
@@ -962,6 +963,22 @@ MonoBehaviour:
   _lookXLimit: 45
   _cameraYOffset: 1.7
   _playerCamera: {fileID: 3413166565676438122}
+--- !u!114 &1837996852871556149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3395804636025468854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21d0b539621dcf94bbed985c68f5dcc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soldierRootBone: {fileID: 3398616007911099702}
+  _ragdollPrefab: {fileID: 4537163431751777623, guid: 898c9c37227403148badf0b48666cc90,
+    type: 3}
+  _weapon: {fileID: 1336401366911582075}
 --- !u!1 &3395817449617735310
 GameObject:
   m_ObjectHideFlags: 0

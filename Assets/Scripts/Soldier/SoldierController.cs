@@ -3,20 +3,25 @@ using UnityEngine;
 
 public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 {
+    private SoldierDamageController _damageController;
+    private SoldierDeathController _deathController;
+
     [SerializeField] private GameObject _playerCamera;
     [SerializeField] private WeaponController _weaponController;
-    [SerializeField] private SoldierDamageController _damageController;
 
     public static Action<SoldierController> OnLocalPlayerSpawn;
     public static Action<SoldierController> OnSpawn;
-    public static Action<SoldierController> OnDespawn;
+    public static Action<SoldierController> OnDeath;
     public static Action<SoldierController> OnShot;
     public static Action<SoldierController, SoldierDamageController.DamageType, int> OnDamageReceived;
 
     private void Awake()
     {
         SoldierController.OnSpawn?.Invoke(this);
+        this._deathController = GetComponent<SoldierDeathController>();
+        this._damageController = GetComponent<SoldierDamageController>();
         this._damageController.OnDamageReceived += this._OnDamageReceived;
+        this._deathController.OnDeath += this._OnDeath;
     }
 
     protected override void OnOwnerNetworkSpawn()
@@ -29,7 +34,6 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     public override void OnDestroy()
     {
         base.OnDestroy();
-        SoldierController.OnDespawn?.Invoke(this);
         this._weaponController.OnShot -= this._OnShot;
         this._damageController.OnDamageReceived -= this._OnDamageReceived;
     }
@@ -40,4 +44,6 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     public void Shoot() => this._weaponController.Shoot();
     private void _OnShot() => SoldierController.OnShot?.Invoke(this);
+
+    private void _OnDeath() => SoldierController.OnDeath?.Invoke(this);
 }
