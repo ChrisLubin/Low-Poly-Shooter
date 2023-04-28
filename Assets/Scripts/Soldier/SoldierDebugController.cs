@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class SoldierTestingController : MonoBehaviour
+public class SoldierDebugController : MonoBehaviour
 {
     private SoldierHealthController _healthController;
     [SerializeField] private TextMeshPro _debugHealthText;

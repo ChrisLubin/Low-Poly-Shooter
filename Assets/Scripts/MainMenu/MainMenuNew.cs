@@ -42,6 +42,7 @@ namespace SlimUI.ModernMenu
         public GameObject PanelCombat;
         [Tooltip("The UI Sub-Panel under KEY BINDINGS for GENERAL")]
         public GameObject PanelGeneral;
+        public TextMeshPro VersionText;
 
         [Header("SFX")]
         [Tooltip("The GameObject holding the Audio Source component for the HOVER SOUND")]
@@ -102,6 +103,7 @@ namespace SlimUI.ModernMenu
             mainMenu.SetActive(true);
 
             SetThemeColors();
+            this.VersionText.text = $"{(Debug.isDebugBuild ? "DEV" : "PROD")} {this.VersionText.text}";
         }
 
         public override void OnDestroy()
