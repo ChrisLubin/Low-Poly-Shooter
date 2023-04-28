@@ -22,7 +22,7 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     private float _timeSinceLastADS = Mathf.Infinity;
     public Action<bool> OnADS;
 
-    public Action OnShot;
+    public Action OnShoot;
 
     private void Awake()
     {
@@ -30,12 +30,12 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
         this._shootController.Init(this._bulletSpeed, this._bulletDamage, this._roundsPerMinute, this._bloomMaxAngle);
     }
 
-    protected override void OnOwnerNetworkSpawn() => this._shootController.OnShot += this.OnShot;
+    protected override void OnOwnerNetworkSpawn() => this._shootController.OnShoot += this.OnShoot;
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._shootController.OnShot -= this.OnShot;
+        this._shootController.OnShoot -= this.OnShoot;
     }
 
     private void Update()

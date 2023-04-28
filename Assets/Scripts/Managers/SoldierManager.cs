@@ -18,7 +18,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private const int _DEAD_PLAYER_DESPAWN_TIMER = 5;
     public const int SPAWN_PLAYER_REQUEST_TIMER = 3; // Make private after doing Cinemachine fix
 
-    public static Action OnLocalPlayerShot;
+    public static Action OnLocalPlayerShoot;
     public static Action OnLocalPlayerDamageReceived;
 
     protected override void Awake()
@@ -30,9 +30,9 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         }
         SoldierController.OnSpawn += this.OnSpawn;
         SoldierController.OnDeath += this.OnDeath;
-        SoldierController.OnShot += this.OnShot;
+        SoldierController.OnShoot += this.OnShoot;
         SoldierController.OnDamageReceived += this.OnLocalDamageReceived;
-        RpcSystem.OnPlayerShot += this.OnServerShot;
+        RpcSystem.OnPlayerShoot += this.OnServerShoot;
         RpcSystem.OnPlayerDamageReceived += this.OnServerDamageReceived;
         RpcSystem.OnPlayerRequestSpawn += this.OnPlayerRequestSpawn;
         GameManager.OnStateChange += this.OnGameStateChange;
@@ -49,9 +49,9 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         base.OnDestroy();
         SoldierController.OnSpawn -= this.OnSpawn;
         SoldierController.OnDeath -= this.OnDeath;
-        SoldierController.OnShot -= this.OnShot;
+        SoldierController.OnShoot -= this.OnShoot;
         SoldierController.OnDamageReceived -= this.OnLocalDamageReceived;
-        RpcSystem.OnPlayerShot -= this.OnServerShot;
+        RpcSystem.OnPlayerShoot -= this.OnServerShoot;
         RpcSystem.OnPlayerDamageReceived -= this.OnServerDamageReceived;
         RpcSystem.OnPlayerRequestSpawn -= this.OnPlayerRequestSpawn;
         GameManager.OnStateChange -= this.OnGameStateChange;
@@ -90,14 +90,14 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         player.GetComponent<NetworkObject>().Despawn();
     }
 
-    private void OnShot(ulong clientId)
+    private void OnShoot(ulong clientId)
     {
         if (clientId != this._localClientId) { return; }
-        RpcSystem.Instance.OnPlayerShotServerRpc();
-        SoldierManager.OnLocalPlayerShot?.Invoke();
+        RpcSystem.Instance.OnPlayerShootServerRpc();
+        SoldierManager.OnLocalPlayerShoot?.Invoke();
     }
 
-    private void OnServerShot(ulong clientId)
+    private void OnServerShoot(ulong clientId)
     {
         if (!this._playersMap.TryGetValue(clientId, out SoldierController player)) { return; }
         if (clientId == this._localClientId) { return; }

@@ -24,14 +24,14 @@ public class CameraRecoilController : NetworkBehaviorAutoDisable<CameraRecoilCon
 
     protected override void OnOwnerNetworkSpawn()
     {
-        SoldierManager.OnLocalPlayerShot += this.DoRecoil;
+        SoldierManager.OnLocalPlayerShoot += this.DoRecoil;
         SoldierManager.OnLocalPlayerDamageReceived += this.DoRecoil;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        SoldierManager.OnLocalPlayerShot -= this.DoRecoil;
+        SoldierManager.OnLocalPlayerShoot -= this.DoRecoil;
         SoldierManager.OnLocalPlayerDamageReceived -= this.DoRecoil;
     }
 

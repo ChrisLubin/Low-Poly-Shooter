@@ -6,7 +6,7 @@ using UnityEngine;
 public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
     public static Action<ulong, ulong[]> OnPlayerGameSceneLoaded;
-    public static Action<ulong> OnPlayerShot;
+    public static Action<ulong> OnPlayerShoot;
     public static Action<ulong, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
     public static Action<MultiplayerState> OnMultiplayerStateChange;
     public static Action<GameState> OnGameStateChange;
@@ -32,7 +32,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     private void ChangeGameStateClientRpc(GameState state) => RpcSystem.OnGameStateChange?.Invoke(state);
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnPlayerShotServerRpc(ServerRpcParams serverRpcParams = default)
+    public void OnPlayerShootServerRpc(ServerRpcParams serverRpcParams = default)
     {
         ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
 
@@ -45,10 +45,10 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
             }
         };
 
-        this.OnPlayerShotClientRpc(serverRpcParams.Receive.SenderClientId, rpcParams);
+        this.OnPlayerShootClientRpc(serverRpcParams.Receive.SenderClientId, rpcParams);
     }
     [ClientRpc]
-    private void OnPlayerShotClientRpc(ulong clientId, ClientRpcParams _ = default) => RpcSystem.OnPlayerShot?.Invoke(clientId);
+    private void OnPlayerShootClientRpc(ulong clientId, ClientRpcParams _ = default) => RpcSystem.OnPlayerShoot?.Invoke(clientId);
 
     [ServerRpc(RequireOwnership = false)]
     public void OnPlayerDamageReceivedServerRpc(ulong damagedSoldierClientId, SoldierDamageController.DamageType damageType, int damageAmount)

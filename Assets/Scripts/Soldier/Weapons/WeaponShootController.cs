@@ -17,7 +17,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private float _minTimeBetweenShots;
     private float _timeSinceLastShot = Mathf.Infinity;
-    public Action OnShot;
+    public Action OnShoot;
 
     private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -58,7 +58,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         bullet.LookAt(pointForBulletToLookAt);
         Instantiate(this._muzzleFlashVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
         bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this._bulletDamage, this.IsOwner);
-        this.OnShot?.Invoke();
+        this.OnShoot?.Invoke();
     }
 
     public Vector3 GetRandomBulletDirectionPoint(Vector3 origin, float coneAltitude, float coneAngle, Vector3 coneDirection, float biasTowardsCenter = 1f)

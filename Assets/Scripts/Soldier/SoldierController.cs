@@ -11,7 +11,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     public static Action<ulong, SoldierController> OnSpawn;
     public static Action<ulong> OnDeath;
-    public static Action<ulong> OnShot;
+    public static Action<ulong> OnShoot;
     public static Action<ulong, SoldierDamageController.DamageType, int> OnDamageReceived;
 
     private void Awake()
@@ -31,13 +31,13 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     protected override void OnOwnerNetworkSpawn()
     {
         this._playerCamera.GetComponent<Camera>().enabled = true;
-        this._weaponController.OnShot += this._OnShot;
+        this._weaponController.OnShoot += this._OnShoot;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._weaponController.OnShot -= this._OnShot;
+        this._weaponController.OnShoot -= this._OnShoot;
         this._damageController.OnDamageReceived -= this._OnDamageReceived;
     }
 
@@ -46,7 +46,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     private void _OnDamageReceived(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnDamageReceived?.Invoke(this.OwnerClientId, type, damageAmount);
 
     public void Shoot() => this._weaponController.Shoot();
-    private void _OnShot() => SoldierController.OnShot?.Invoke(this.OwnerClientId);
+    private void _OnShoot() => SoldierController.OnShoot?.Invoke(this.OwnerClientId);
 
     private void _OnDeath() => SoldierController.OnDeath?.Invoke(this.OwnerClientId);
 }
