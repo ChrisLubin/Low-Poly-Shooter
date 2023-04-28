@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class SoldierRagdollController : MonoBehaviour
@@ -5,7 +7,7 @@ public class SoldierRagdollController : MonoBehaviour
     [SerializeField] private Transform _ragdollRootBone;
     [SerializeField] private Camera _camera;
 
-    public void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
+    public async void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
     {
         if (isLocalPlayer)
         {
@@ -13,6 +15,10 @@ public class SoldierRagdollController : MonoBehaviour
         }
 
         this.MatchAllChildTransform(originalRootBone, this._ragdollRootBone);
+
+        // Remove this and make SPAWN_PLAYER_REQUEST_TIMER private after doing Cinemachine fix and also auto remove auto spawn and add button that user clicks to spawn
+        await Task.Delay(TimeSpan.FromSeconds(SoldierManager.SPAWN_PLAYER_REQUEST_TIMER));
+        this._camera.enabled = false;
     }
 
     private void MatchAllChildTransform(Transform root, Transform clone)

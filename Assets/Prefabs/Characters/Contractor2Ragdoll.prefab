@@ -119,13 +119,8 @@ PrefabInstance:
     - {fileID: 3234160274183083613, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 1837996852871556149, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 1490572320250783304, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
+    - {fileID: 3647622671833079134, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
---- !u!4 &236952563601623180 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1336401366911582075, guid: c8da68aabce1c724091fdf4779198a68,
-    type: 3}
-  m_PrefabInstance: {fileID: 1279597268257454071}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &242146586496770068 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1341595389269972963, guid: c8da68aabce1c724091fdf4779198a68,
@@ -630,7 +625,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ragdollRootBone: {fileID: 4532949643699747521}
   _camera: {fileID: 4511491956000023965}
-  _weapon: {fileID: 236952563601623180}
 --- !u!1 &4531439207829789405 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3395974827745701162, guid: c8da68aabce1c724091fdf4779198a68,

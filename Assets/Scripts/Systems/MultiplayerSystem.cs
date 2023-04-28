@@ -17,9 +17,16 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     public MultiplayerState State { get; private set; }
     private const string LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
 
+    protected override void Awake()
+    {
+        base.Awake();
+        RpcSystem.OnMultiplayerStateChange += this.ChangeState;
+    }
+
     public override void OnDestroy()
     {
         base.OnDestroy();
+        RpcSystem.OnMultiplayerStateChange -= this.ChangeState;
         if (NetworkManager.Singleton)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= this.OnClientConnected;

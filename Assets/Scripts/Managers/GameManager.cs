@@ -5,6 +5,18 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public static event Action<GameState> OnStateChange;
     public GameState State { get; private set; }
 
+    protected override void Awake()
+    {
+        base.Awake();
+        RpcSystem.OnGameStateChange += this.ChangeState;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        RpcSystem.OnGameStateChange -= this.ChangeState;
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -54,9 +66,6 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 
     private void HandleGameStarting()
     {
-        if (!this.IsHost) { return; }
-
-        SoldierManager.Instance.SpawnSoldiers();
     }
 
     private void HandleGameStarted()

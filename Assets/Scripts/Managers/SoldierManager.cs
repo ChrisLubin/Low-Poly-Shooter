@@ -15,7 +15,8 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private IDictionary<ulong, SoldierController> _playersMap = new Dictionary<ulong, SoldierController>();
     private ulong _localClientId;
     private bool _hasSpawnedPlayers = false;
-    private const int _PLAYER_DESPAWN_TIMER = 5;
+    private const int _DEAD_PLAYER_DESPAWN_TIMER = 5;
+    public const int SPAWN_PLAYER_REQUEST_TIMER = 3; // Make private after doing Cinemachine fix
 
     public static Action OnLocalPlayerShot;
     public static Action OnLocalPlayerDamageReceived;
@@ -33,6 +34,8 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierController.OnDamageReceived += this.OnLocalDamageReceived;
         RpcSystem.OnPlayerShot += this.OnServerShot;
         RpcSystem.OnPlayerDamageReceived += this.OnServerDamageReceived;
+        RpcSystem.OnPlayerRequestSpawn += this.OnPlayerRequestSpawn;
+        GameManager.OnStateChange += this.OnGameStateChange;
     }
 
     public override void OnNetworkSpawn()
@@ -50,26 +53,47 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierController.OnDamageReceived -= this.OnLocalDamageReceived;
         RpcSystem.OnPlayerShot -= this.OnServerShot;
         RpcSystem.OnPlayerDamageReceived -= this.OnServerDamageReceived;
+        RpcSystem.OnPlayerRequestSpawn -= this.OnPlayerRequestSpawn;
+        GameManager.OnStateChange -= this.OnGameStateChange;
+    }
+
+    private void OnGameStateChange(GameState state)
+    {
+        if (!this.IsHost) { return; }
+
+        switch (state)
+        {
+            case GameState.GameStarting:
+                this.SpawnPlayers();
+                break;
+        }
     }
 
     private void OnSpawn(ulong clientId, SoldierController player) => this._playersMap[clientId] = player;
 
     private async void OnDeath(ulong clientId)
     {
+        this._logger.Log($"Soldier for client ID {clientId} died");
         this._playersMap.TryGetValue(clientId, out SoldierController player);
         this._playersMap.Remove(clientId);
+        if (clientId == this._localClientId)
+        {
+            // Request server to spawn us after a timer
+            await Task.Delay(TimeSpan.FromSeconds(SPAWN_PLAYER_REQUEST_TIMER));
+            RpcSystem.Instance.RequestPlayerSpawnServerRpc();
+        }
 
         if (!this.IsHost) { return; }
 
         // Wait to despawn player so all clients get time to spawn ragdoll if host dies
-        await Task.Delay(TimeSpan.FromSeconds(_PLAYER_DESPAWN_TIMER));
+        await Task.Delay(TimeSpan.FromSeconds(_DEAD_PLAYER_DESPAWN_TIMER));
         player.GetComponent<NetworkObject>().Despawn();
     }
 
     private void OnShot(ulong clientId)
     {
         if (clientId != this._localClientId) { return; }
-        RpcSystem.Instance.OnPlayerShotServerRpc(NetworkManager.Singleton.LocalClientId, this._localClientId);
+        RpcSystem.Instance.OnPlayerShotServerRpc();
         SoldierManager.OnLocalPlayerShot?.Invoke();
     }
 
@@ -84,7 +108,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private void OnLocalDamageReceived(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
     {
         if (clientId == this._localClientId) { return; }
-        RpcSystem.Instance.OnPlayerDamageReceivedServerRpc(NetworkManager.Singleton.LocalClientId, clientId, damageType, damageAmount);
+        RpcSystem.Instance.OnPlayerDamageReceivedServerRpc(clientId, damageType, damageAmount);
     }
 
     private void OnServerDamageReceived(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
@@ -96,7 +120,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierManager.OnLocalPlayerDamageReceived?.Invoke();
     }
 
-    public void SpawnSoldiers()
+    public void SpawnPlayers()
     {
         if (!this.IsHost || this._hasSpawnedPlayers) { return; }
         this._logger.Log("Spawning soldiers");
@@ -106,21 +130,41 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         for (int i = 0; i < connectedClientIds.Count(); i++)
         {
             ulong clientId = connectedClientIds[i];
-            if (i + 1 > this._spawnPoints.Count)
-            {
-                this._logger.Log($"Not enough spawn points to spawn player for client ID {clientId}", Logger.LogLevel.Error);
-                continue;
-            }
-            Transform spawnPoint = this._spawnPoints[i];
-
-            Transform playerTransform = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity, this._spawnedSoldiersParent);
-            playerTransform.rotation = spawnPoint.rotation;
-            playerTransform.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
-            this._logger.Log($"Spawned soldier for client ID {clientId}");
+            this.SpawnPlayer(clientId, i);
         }
 
         this._logger.Log("Spawned soldiers");
         this._hasSpawnedPlayers = true;
         RpcSystem.Instance.ChangeGameStateServerRpc(GameState.GameStarted);
     }
+
+    private void SpawnPlayer(ulong clientId, int spawnPointIndex = -1)
+    {
+        if (!this.IsHost) { return; }
+        if (spawnPointIndex != -1 && spawnPointIndex < 0)
+        {
+            this._logger.Log($"Cannot spawn player for {clientId} with a spawn index of {spawnPointIndex}", Logger.LogLevel.Error);
+            return;
+        }
+        if (spawnPointIndex != -1 && spawnPointIndex > this._spawnPoints.Count - 1)
+        {
+            this._logger.Log($"Cannot spawn player for {clientId} with a spawn index of {spawnPointIndex}. There are {this._spawnPoints.Count} spawn points", Logger.LogLevel.Error);
+            return;
+        }
+        if (this._playersMap.ContainsKey(clientId))
+        {
+            this._logger.Log($"This player is still alive. Cannot spawn them again.", Logger.LogLevel.Error);
+            return;
+        }
+
+        spawnPointIndex = spawnPointIndex != -1 ? spawnPointIndex : UnityEngine.Random.Range(0, this._spawnPoints.Count - 1);
+        Transform spawnPoint = this._spawnPoints[spawnPointIndex];
+
+        Transform playerTransform = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity, this._spawnedSoldiersParent);
+        playerTransform.rotation = spawnPoint.rotation;
+        playerTransform.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+        this._logger.Log($"Spawned soldier for client ID {clientId}");
+    }
+
+    private void OnPlayerRequestSpawn(ulong clientId) => this.SpawnPlayer(clientId);
 }
