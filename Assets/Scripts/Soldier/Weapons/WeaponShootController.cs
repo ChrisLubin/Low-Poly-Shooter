@@ -54,10 +54,17 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     public void Shoot()
     {
         Vector3 pointForBulletToLookAt = this._isADS.Value ? this._shootPoint.position + this._shootPoint.forward : this.GetRandomBulletDirectionPoint(this._shootPoint.position, _BULLET_BLOOM_OFFSET, this._bloomMaxAngle, this._shootPoint.forward);
-        Transform bullet = Instantiate(this._bulletPrefab, this._shootPoint.position, Quaternion.identity);
+
+        ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.Bullet, out Transform bullet);
+        bullet.position = this._shootPoint.transform.position;
         bullet.LookAt(pointForBulletToLookAt);
-        Instantiate(this._muzzleFlashVfxPrefab, this._shootPoint.position, Quaternion.LookRotation(this._shootPoint.forward), transform);
         bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this._bulletDamage, this.IsOwner);
+
+        ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.MuzzleFlash, out Transform muzzleFlash);
+        muzzleFlash.transform.position = this._shootPoint.position;
+        muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
+        muzzleFlash.GetComponent<MuzzleFlashController>().Init();
+
         this.OnShoot?.Invoke();
     }
 

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4502835693877224}
   - component: {fileID: 198644345807152676}
   - component: {fileID: 199321567221638614}
+  - component: {fileID: 7488113964900374796}
   m_Layer: 0
   m_Name: MuzzleFlashVfx
   m_TagString: Untagged
@@ -44,7 +45,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 0.5
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 0
   cullingMode: 3
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
@@ -4685,6 +4686,18 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &7488113964900374796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126046646508270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a90f66a45014a9d43b58331057f80cd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1256240454717084
 GameObject:
   m_ObjectHideFlags: 0

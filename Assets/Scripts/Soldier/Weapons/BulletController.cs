@@ -11,6 +11,7 @@ public class BulletController : MonoBehaviour
 
     public void Init(float bulletSpeed, int damageAmount, bool wasShotByLocalPlayer)
     {
+        this._timeSinceCreation = 0f;
         this._speed = bulletSpeed;
         this._damageAmount = damageAmount;
         this._wasShotByLocalPlayer = wasShotByLocalPlayer;
@@ -36,7 +37,7 @@ public class BulletController : MonoBehaviour
 
         if (this._timeSinceCreation > this._maxLifeSpan)
         {
-            Destroy(gameObject);
+            ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.Bullet, transform);
         }
     }
 
@@ -65,6 +66,6 @@ public class BulletController : MonoBehaviour
         transform.position = collidePosition;
         await Task.Delay(0);
         soldier.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
-        Destroy(gameObject);
+        ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.Bullet, transform);
     }
 }
