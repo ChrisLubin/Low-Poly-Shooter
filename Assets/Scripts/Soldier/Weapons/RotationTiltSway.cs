@@ -31,6 +31,8 @@ public class RotationTiltSway : NetworkBehaviorAutoDisable<RotationTiltSway>
 
     void Update()
     {
+        if (PauseMenuController.IsPaused) { return; }
+
         CalculateSway();
 
         MoveSway();

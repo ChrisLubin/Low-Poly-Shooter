@@ -24,6 +24,7 @@ namespace QFSW.QC.Editor
         private SerializedProperty _interceptDebugProperty;
         private SerializedProperty _interceptInactiveProperty;
         private SerializedProperty _prependTimestampsProperty;
+        private SerializedProperty _isEnabled;
         private SerializedProperty _activateOnStartupProperty;
         private SerializedProperty _initialiseOnStartupProperty;
         private SerializedProperty _closeOnSubmitProperty;
@@ -84,6 +85,7 @@ namespace QFSW.QC.Editor
             _interceptDebugProperty = serializedObject.FindProperty("_interceptDebugLogger");
             _interceptInactiveProperty = serializedObject.FindProperty("_interceptWhilstInactive");
             _prependTimestampsProperty = serializedObject.FindProperty("_prependTimestamps");
+            _isEnabled = serializedObject.FindProperty("_isEnabled");
             _activateOnStartupProperty = serializedObject.FindProperty("_activateOnStartup");
             _initialiseOnStartupProperty = serializedObject.FindProperty("_initialiseOnStartup");
             _closeOnSubmitProperty = serializedObject.FindProperty("_closeOnSubmit");
@@ -158,6 +160,7 @@ namespace QFSW.QC.Editor
             EditorGUILayout.PropertyField(_supportedStateProperty, new GUIContent("Enabled", "On which build/editor states should the console be enabled on"));
             ShowSceneViewToggle();
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.PropertyField(_isEnabled, new GUIContent("Is Enabled", "If the Quantum Console should be able to be activated."));
             EditorGUILayout.PropertyField(_activateOnStartupProperty, new GUIContent("Activate on Startup", "If the Quantum Console should be shown and activated on startup."));
             if (!_activateOnStartupProperty.boolValue)
             {
@@ -195,7 +198,7 @@ namespace QFSW.QC.Editor
             {
                 EditorGUILayout.PropertyField(_fuzzyProperty, new GUIContent("Use Fuzzy Search", "If fuzzy search is disabled, then your current search must match the beginning of the suggestion to be suggested (foo*). If fuzzy search is enabled, it can be anywhere within the suggestion to be suggested (*foo*)."));
                 EditorGUILayout.PropertyField(_caseSensitiveProperty, new GUIContent("Case Sensitive", "If the search should be case sensitive or not."));
-                EditorGUILayout.PropertyField(_collapseSuggestionOverloadsProperty, new GUIContent("Collapse Overloads", 
+                EditorGUILayout.PropertyField(_collapseSuggestionOverloadsProperty, new GUIContent("Collapse Overloads",
                     "If multiple overloads of the same suggestion should be collapsed into a single suggestion with optional elements where possible." +
                     "\nFor example, the following" +
                     "\ncommand arg0" +

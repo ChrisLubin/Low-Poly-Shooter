@@ -62,6 +62,7 @@ namespace QFSW.QC
         [SerializeField] private bool _prependTimestamps = false;
 
         [SerializeField] private SupportedState _supportedState = SupportedState.Always;
+        [SerializeField] private bool _isEnabled = false;
         [SerializeField] private bool _activateOnStartup = true;
         [SerializeField] private bool _initialiseOnStartup = false;
         [SerializeField] private bool _closeOnSubmit = false;
@@ -928,7 +929,7 @@ namespace QFSW.QC
 
         private void Awake()
         {
-            if (!Debug.isDebugBuild)
+            if (!Debug.isDebugBuild || !this._isEnabled)
             {
                 this.gameObject.SetActive(false);
                 return;
@@ -988,7 +989,7 @@ namespace QFSW.QC
 
         private void OnDisable()
         {
-            if (!Debug.isDebugBuild)
+            if (!Debug.isDebugBuild || !this._isEnabled)
             {
                 return;
             }

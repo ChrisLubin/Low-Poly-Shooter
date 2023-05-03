@@ -14,7 +14,8 @@ using static Unity.Services.Lobbies.Models.DataObject;
 public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSystem>
 {
     public static event Action<MultiplayerState> OnStateChange;
-    public MultiplayerState State { get; private set; }
+    public static bool IsMultiplayer { get; private set; } = false;
+    public static MultiplayerState State { get; private set; }
     private const string LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
 
     protected override void Awake()
@@ -34,7 +35,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     }
 
     private void Start() => this.ChangeState(MultiplayerState.NotConnected);
-
     private void OnRelaySignIn() => this._logger.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
 
     // Referenced in main menu buttons
@@ -52,9 +52,9 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
     public async void ChangeState(MultiplayerState newState)
     {
-        if (this.State == newState) { return; }
+        if (MultiplayerSystem.State == newState) { return; }
         this._logger.Log($"New state: {newState}");
-        this.State = newState;
+        MultiplayerSystem.State = newState;
         MultiplayerSystem.OnStateChange?.Invoke(newState);
 
         RelayServerData relayServerData;
@@ -75,6 +75,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 break;
             case MultiplayerState.Connected:
                 AuthenticationService.Instance.SignedIn -= this.OnRelaySignIn;
+                MultiplayerSystem.IsMultiplayer = false;
                 break;
             case MultiplayerState.CreatingLobby:
                 int maxPlayersCount = 7;
@@ -126,8 +127,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
                 break;
             case MultiplayerState.CreatedLobby:
+                MultiplayerSystem.IsMultiplayer = true;
                 break;
             case MultiplayerState.JoinedLobby:
+                MultiplayerSystem.IsMultiplayer = true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);

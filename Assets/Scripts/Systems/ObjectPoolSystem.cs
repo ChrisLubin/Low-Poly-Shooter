@@ -76,15 +76,21 @@ public class ObjectPoolSystem : NetworkedStaticInstanceWithLogger<ObjectPoolSyst
 
     private void InitPool(PoolType type, int startingAmount, int startingSize, int maxSize)
     {
-        if (this._objectPoolMap.ContainsKey(type))
+        if (this._objectPoolMap.ContainsKey(type) && GameManager.State != GameState.GameStarting)
         {
-            this._logger.Log($"The {type} pool has already been initialized", Logger.LogLevel.Error);
+            this._logger.Log($"Can only reinitialize {type} pool as game is starting", Logger.LogLevel.Error);
             return;
         }
         if (!this._prefabMap.ContainsKey(type))
         {
             this._logger.Log($"The {type} prefab doesn't exist", Logger.LogLevel.Error);
             return;
+        }
+
+        if (this._objectPoolMap.ContainsKey(type))
+        {
+            this._logger.Log($"Reinitializing {type} pool");
+            this._objectPoolMap[type].Dispose();
         }
 
         this._prefabMap.TryGetValue(type, out Transform prefab);

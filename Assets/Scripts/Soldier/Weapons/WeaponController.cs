@@ -40,7 +40,9 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 
     private void Update()
     {
+        if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
         this._timeSinceLastADS += Time.deltaTime * 1000;
+        if (PauseMenuController.IsPaused) { return; }
 
         if (Input.GetMouseButtonDown(1) && this._timeSinceLastADS > this._minTimeBetweenADS)
         {

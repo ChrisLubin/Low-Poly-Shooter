@@ -41,7 +41,10 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private void Update()
     {
+        if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
         this._timeSinceLastShot += Time.deltaTime * 1000;
+        if (PauseMenuController.IsPaused) { return; }
+
         if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
         {
             Shoot();

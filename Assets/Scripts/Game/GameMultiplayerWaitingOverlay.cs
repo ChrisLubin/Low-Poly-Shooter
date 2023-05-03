@@ -16,16 +16,11 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
         RpcSystem.OnPlayerGameSceneLoaded += this.OnPlayerGameSceneLoaded;
     }
 
-    private void Start()
-    {
-        RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(NetworkManager.Singleton.LocalClientId);
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        if (MultiplayerSystem.Instance.State != MultiplayerState.CreatedLobby && MultiplayerSystem.Instance.State != MultiplayerState.JoinedLobby)
+        if (!MultiplayerSystem.IsMultiplayer)
         {
             // Doing singleplayer
             this.gameObject.SetActive(false);

@@ -37,7 +37,7 @@ public class CameraRecoilController : NetworkBehaviorAutoDisable<CameraRecoilCon
 
     void Update()
     {
-        if (this._currentRotation == this._targetRotation) { return; }
+        if (this._currentRotation == this._targetRotation || (PauseMenuController.IsPaused && !MultiplayerSystem.IsMultiplayer)) { return; }
 
         this._targetRotation = Vector3.Lerp(this._targetRotation, Vector3.zero, this._returnSpeed * Time.deltaTime);
         this._currentRotation = Vector3.Slerp(this._currentRotation, this._targetRotation, this._snappiness * Time.fixedDeltaTime);

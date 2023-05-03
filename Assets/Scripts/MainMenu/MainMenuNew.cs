@@ -177,6 +177,9 @@ namespace SlimUI.ModernMenu
             playMenu.SetActive(true);
         }
 
+        public void OnHostMultiplayerButtonClick() => MultiplayerSystem.Instance.ChangeState(MultiplayerState.CreatingLobby);
+        public void OnJoinMultiplayerButtonClick() => MultiplayerSystem.Instance.ChangeState(MultiplayerState.JoiningLobby);
+
         public void PlayCampaignMobile()
         {
             exitMenu.SetActive(false);

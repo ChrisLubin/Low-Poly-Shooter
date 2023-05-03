@@ -1,9 +1,10 @@
 using System;
+using Unity.Netcode;
 
 public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
     public static event Action<GameState> OnStateChange;
-    public GameState State { get; private set; }
+    public static GameState State { get; private set; }
 
     protected override void Awake()
     {
@@ -20,25 +21,25 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(NetworkManager.Singleton.LocalClientId);
 
-        if (MultiplayerSystem.Instance.State != MultiplayerState.CreatedLobby && MultiplayerSystem.Instance.State != MultiplayerState.JoinedLobby)
+        if (MultiplayerSystem.IsMultiplayer)
         {
-            // Doing singleplayer
-            this.ChangeState(GameState.GameStarting);
+            this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
         }
         else
         {
-            this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
+            this.ChangeState(GameState.GameStarting);
         }
     }
 
     public void ChangeState(GameState newState)
     {
-        if (this.State == newState) { return; }
+        if (GameManager.State == newState) { return; }
 
         this._logger.Log($"New state: {newState}");
-        this.State = newState;
-        OnStateChange?.Invoke(newState);
+        GameManager.State = newState;
+        GameManager.OnStateChange?.Invoke(newState);
 
         switch (newState)
         {
