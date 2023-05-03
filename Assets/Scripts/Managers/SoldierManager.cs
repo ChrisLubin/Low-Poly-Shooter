@@ -15,8 +15,8 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private IDictionary<ulong, SoldierController> _playersMap = new Dictionary<ulong, SoldierController>();
     private ulong _localClientId;
     private bool _hasSpawnedPlayers = false;
-    private const int _DEAD_PLAYER_DESPAWN_TIMER = 5;
-    public const int SPAWN_PLAYER_REQUEST_TIMER = 3; // Make private after doing Cinemachine fix
+    private const int _DEAD_PLAYER_DESPAWN_TIMER = 5000;
+    public const int SPAWN_PLAYER_REQUEST_TIMER = 3000; // Make private after doing Cinemachine fix
 
     public static event Action OnLocalPlayerShoot;
     public static event Action OnLocalPlayerDamageReceived;
@@ -79,14 +79,14 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         if (clientId == this._localClientId)
         {
             // Request server to spawn us after a timer
-            await Task.Delay(TimeSpan.FromSeconds(SPAWN_PLAYER_REQUEST_TIMER));
+            await UnityTimer.Delay(SPAWN_PLAYER_REQUEST_TIMER);
             RpcSystem.Instance.RequestPlayerSpawnServerRpc();
         }
 
         if (!this.IsHost) { return; }
 
         // Wait to despawn player so all clients get time to spawn ragdoll if host dies
-        await Task.Delay(TimeSpan.FromSeconds(_DEAD_PLAYER_DESPAWN_TIMER));
+        await UnityTimer.Delay(_DEAD_PLAYER_DESPAWN_TIMER);
         player.GetComponent<NetworkObject>().Despawn();
     }
 

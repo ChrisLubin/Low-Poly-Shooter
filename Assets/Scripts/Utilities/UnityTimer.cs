@@ -7,22 +7,25 @@ public class UnityTimer : MonoBehaviour
     private static List<TimerData> _timers = new();
     List<TimerData> _timersToRemove = new();
 
-    public static Task Delay(float timer)
+    public static Task Delay(int timerMilliseconds)
     {
-        TimerData timerData = new(timer);
+        TimerData timerData = new(timerMilliseconds);
         _timers.Add(timerData);
         return timerData.Tcs.Task;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        if (UnityTimer._timers.Count == 0) { return; }
+
         _timersToRemove.Clear();
+        int decrementBy = (int)(Time.fixedDeltaTime * 1000);
 
         foreach (TimerData timerData in UnityTimer._timers)
         {
-            timerData.DecrementTimer(Time.deltaTime);
+            timerData.DecrementTimer(decrementBy);
 
-            if (timerData.Timer <= 0f)
+            if (timerData.Timer <= 0)
             {
                 timerData.Tcs.SetResult(true);
                 _timersToRemove.Add(timerData);
@@ -37,15 +40,15 @@ public class UnityTimer : MonoBehaviour
 
     private class TimerData
     {
-        public float Timer { get; private set; }
+        public int Timer { get; private set; }
         public TaskCompletionSource<bool> Tcs { get; private set; }
 
-        public TimerData(float timer)
+        public TimerData(int timer)
         {
             this.Timer = timer;
             this.Tcs = new();
         }
 
-        public void DecrementTimer(float decrementAmount) => this.Timer -= decrementAmount;
+        public void DecrementTimer(int decrementAmount) => this.Timer -= decrementAmount;
     }
 }

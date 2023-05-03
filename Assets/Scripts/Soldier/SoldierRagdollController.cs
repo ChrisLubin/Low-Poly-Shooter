@@ -9,15 +9,13 @@ public class SoldierRagdollController : MonoBehaviour
 
     public async void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
     {
-        if (isLocalPlayer)
-        {
-            this._camera.enabled = true;
-        }
-
         this.MatchAllChildTransform(originalRootBone, this._ragdollRootBone);
 
+        if (!isLocalPlayer) { return; }
+
+        this._camera.enabled = true;
         // Remove this and make SPAWN_PLAYER_REQUEST_TIMER private after doing Cinemachine fix and also auto remove auto spawn and add button that user clicks to spawn
-        await Task.Delay(TimeSpan.FromSeconds(SoldierManager.SPAWN_PLAYER_REQUEST_TIMER));
+        await UnityTimer.Delay(SoldierManager.SPAWN_PLAYER_REQUEST_TIMER);
         this._camera.enabled = false;
     }
 

@@ -3,7 +3,7 @@ using UnityEngine;
 public class MuzzleFlashController : MonoBehaviour
 {
     private ParticleSystem _particleSystem;
-    private float _maxLifeSpan = 0.2f;
+    private int _maxLifeSpan = 200;
 
     private void Awake() => this._particleSystem = GetComponent<ParticleSystem>();
 
