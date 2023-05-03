@@ -6,7 +6,7 @@ public class SoldierDamageController : NetworkBehaviour
 {
     [SerializeField] private Transform _bloodSplatterVfxPrefab;
 
-    public Action<DamageType, int> OnDamageReceived;
+    public event Action<DamageType, int> OnDamageReceived;
 
     [Serializable]
     public enum DamageType

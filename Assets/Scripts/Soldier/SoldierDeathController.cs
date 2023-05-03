@@ -9,7 +9,7 @@ public class SoldierDeathController : NetworkBehaviour
     [SerializeField] private Transform _soldierRootBone;
     [SerializeField] private Transform _ragdollPrefab;
 
-    public Action OnDeath;
+    public event Action OnDeath;
 
     private void Awake()
     {

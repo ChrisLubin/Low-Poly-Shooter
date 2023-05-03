@@ -18,8 +18,8 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private const int _DEAD_PLAYER_DESPAWN_TIMER = 5;
     public const int SPAWN_PLAYER_REQUEST_TIMER = 3; // Make private after doing Cinemachine fix
 
-    public static Action OnLocalPlayerShoot;
-    public static Action OnLocalPlayerDamageReceived;
+    public static event Action OnLocalPlayerShoot;
+    public static event Action OnLocalPlayerDamageReceived;
 
     protected override void Awake()
     {

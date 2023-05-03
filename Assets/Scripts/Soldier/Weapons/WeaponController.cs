@@ -20,9 +20,9 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     private bool _isADS = false;
     private float _minTimeBetweenADS = WeaponAnimationController.ADS_ANIMATION_TIME_MILLISECONDS;
     private float _timeSinceLastADS = Mathf.Infinity;
-    public Action<bool> OnADS;
+    public event Action<bool> OnADS;
 
-    public Action OnShoot;
+    public event Action OnShoot;
 
     private void Awake()
     {

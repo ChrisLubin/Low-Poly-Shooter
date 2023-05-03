@@ -9,10 +9,10 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     [SerializeField] private GameObject _playerCamera;
     [SerializeField] private WeaponController _weaponController;
 
-    public static Action<ulong, SoldierController> OnSpawn;
-    public static Action<ulong> OnDeath;
-    public static Action<ulong> OnShoot;
-    public static Action<ulong, SoldierDamageController.DamageType, int> OnDamageReceived;
+    public static event Action<ulong, SoldierController> OnSpawn;
+    public static event Action<ulong> OnDeath;
+    public static event Action<ulong> OnShoot;
+    public static event Action<ulong, SoldierDamageController.DamageType, int> OnDamageReceived;
 
     private void Awake()
     {

@@ -4,12 +4,12 @@ using Unity.Netcode;
 
 public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
-    public static Action<ulong, ulong[]> OnPlayerGameSceneLoaded;
-    public static Action<ulong> OnPlayerShoot;
-    public static Action<ulong, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
-    public static Action<MultiplayerState> OnMultiplayerStateChange;
-    public static Action<GameState> OnGameStateChange;
-    public static Action<ulong> OnPlayerRequestSpawn;
+    public static event Action<ulong, ulong[]> OnPlayerGameSceneLoaded;
+    public static event Action<ulong> OnPlayerShoot;
+    public static event Action<ulong, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
+    public static event Action<MultiplayerState> OnMultiplayerStateChange;
+    public static event Action<GameState> OnGameStateChange;
+    public static event Action<ulong> OnPlayerRequestSpawn;
 
     [ServerRpc(RequireOwnership = false)]
     public void PlayerGameSceneLoadedServerRpc(ulong joinedClientId) => this.PlayerGameSceneLoadedClientRpc(this.OwnerClientId, joinedClientId, Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds));

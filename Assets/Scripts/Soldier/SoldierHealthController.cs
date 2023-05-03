@@ -8,7 +8,7 @@ public class SoldierHealthController : NetworkBehaviorAutoDisable<SoldierHealthC
     private const int _MAX_HEALTH = 100;
     public const int MIN_HEALTH = 0;
     private NetworkVariable<int> _currentHealth = new(_MAX_HEALTH, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    public Action<int> OnHealthChange;
+    public event Action<int> OnHealthChange;
 
     private void Awake()
     {

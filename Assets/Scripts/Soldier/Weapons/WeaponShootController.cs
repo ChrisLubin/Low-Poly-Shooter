@@ -17,7 +17,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private float _minTimeBetweenShots;
     private float _timeSinceLastShot = Mathf.Infinity;
-    public Action OnShoot;
+    public event Action OnShoot;
 
     private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
