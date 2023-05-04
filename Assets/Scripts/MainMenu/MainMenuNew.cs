@@ -114,7 +114,14 @@ namespace SlimUI.ModernMenu
 
         private void OnMultiplayerStateChange(MultiplayerState state)
         {
-            if (state == MultiplayerState.CreatingLobby || state == MultiplayerState.JoiningLobby)
+            if (state == MultiplayerState.Connected)
+            {
+                loadingMenu.SetActive(false);
+                mainCanvas.SetActive(true);
+                firstMenu.SetActive(true);
+                mainMenu.SetActive(true);
+            }
+            else if (state == MultiplayerState.CreatingLobby || state == MultiplayerState.JoiningLobby)
             {
                 firstMenu.SetActive(false);
                 playMenu.SetActive(false);

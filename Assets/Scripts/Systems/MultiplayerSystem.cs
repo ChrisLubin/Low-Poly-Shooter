@@ -14,9 +14,11 @@ using static Unity.Services.Lobbies.Models.DataObject;
 public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSystem>
 {
     public static event Action<MultiplayerState> OnStateChange;
+    public static event Action OnError;
     public static bool IsMultiplayer { get; private set; } = false;
     public static MultiplayerState State { get; private set; }
-    private const string LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
+    private const string _LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
+    private const int _MAX_PLAYER_COUNT = 7;
 
     protected override void Awake()
     {
@@ -78,30 +80,34 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 MultiplayerSystem.IsMultiplayer = false;
                 break;
             case MultiplayerState.CreatingLobby:
-                int maxPlayersCount = 7;
                 CreateLobbyOptions lobbyOptions = new() { IsPrivate = false };
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
 
                 try
                 {
                     // Create allocation
-                    Allocation createAllocation = await RelayService.Instance.CreateAllocationAsync(maxPlayersCount);
+                    Allocation createAllocation = await RelayService.Instance.CreateAllocationAsync(_MAX_PLAYER_COUNT);
                     string relayCode = await RelayService.Instance.GetJoinCodeAsync(createAllocation.AllocationId);
                     relayServerData = new(createAllocation, "dtls");
                     NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
-                    Dictionary<string, DataObject> lobbyData = new() { { LOBBY_RELAY_CODE_KEY, new DataObject(VisibilityOptions.Member, relayCode) } };
+                    Dictionary<string, DataObject> lobbyData = new() { { _LOBBY_RELAY_CODE_KEY, new DataObject(VisibilityOptions.Member, relayCode) } };
                     lobbyOptions.Data = lobbyData;
                     this._logger.Log($"Lobby Relay code: {relayCode}");
 
-                    await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayersCount, lobbyOptions);
+                    await LobbyService.Instance.CreateLobbyAsync(lobbyName, _MAX_PLAYER_COUNT, lobbyOptions);
                     this._logger.Log($"Created lobby {lobbyName}");
 
                     NetworkManager.Singleton.StartHost();
                     this._logger.Log("Started host");
                     this.ChangeState(MultiplayerState.CreatedLobby);
                 }
-                catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
+                catch (Exception e)
+                {
+                    this._logger.Log(e.Message, Logger.LogLevel.Error);
+                    MultiplayerSystem.OnError?.Invoke();
+                    this.ChangeState(MultiplayerState.Connected);
+                }
                 break;
             case MultiplayerState.JoiningLobby:
                 try
@@ -109,7 +115,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync();
                     this._logger.Log($"Joined lobby {lobby.Name}");
 
-                    if (!lobby.Data.TryGetValue(LOBBY_RELAY_CODE_KEY, out DataObject joinedLobbyData))
+                    if (!lobby.Data.TryGetValue(_LOBBY_RELAY_CODE_KEY, out DataObject joinedLobbyData))
                     {
                         this._logger.Log("Unable to get Relay code from lobby", Logger.LogLevel.Error);
                         return;
@@ -124,7 +130,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     this._logger.Log("Started client");
                     this.ChangeState(MultiplayerState.JoinedLobby);
                 }
-                catch (RelayServiceException e) { this._logger.Log(e.ToString(), Logger.LogLevel.Error); }
+                catch (Exception e)
+                {
+                    this._logger.Log(e.Message, Logger.LogLevel.Error);
+                    MultiplayerSystem.OnError?.Invoke();
+                    this.ChangeState(MultiplayerState.Connected);
+                }
                 break;
             case MultiplayerState.CreatedLobby:
                 MultiplayerSystem.IsMultiplayer = true;
