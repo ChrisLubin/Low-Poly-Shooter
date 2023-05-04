@@ -2,6 +2,7 @@ using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameMultiplayerWaitingOverlay : NetworkBehaviour
@@ -9,11 +10,13 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI _waitForText;
     [SerializeField] private TextMeshProUGUI _playersListText;
     [SerializeField] private Button _startGameButton;
+    [SerializeField] private Button _quitButton;
 
     private void Awake()
     {
         GameManager.OnStateChange += this.OnGameStateChange;
         RpcSystem.OnPlayerGameSceneLoaded += this.OnPlayerGameSceneLoaded;
+        this._quitButton.onClick.AddListener(this.OnQuitButtonClick);
     }
 
     public override void OnNetworkSpawn()
@@ -43,6 +46,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
         GameManager.OnStateChange -= this.OnGameStateChange;
         RpcSystem.OnPlayerGameSceneLoaded -= this.OnPlayerGameSceneLoaded;
         this._startGameButton.onClick.RemoveListener(this.StartGame);
+        this._quitButton.onClick.RemoveListener(this.OnQuitButtonClick);
         base.OnDestroy();
     }
 
@@ -94,5 +98,11 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
 
             this._playersListText.text += $"{textToAdd}\n\n";
         }
+    }
+
+    private void OnQuitButtonClick()
+    {
+        MultiplayerSystem.QuitMultiplayer();
+        SceneManager.LoadScene("MainMenuScene");
     }
 }

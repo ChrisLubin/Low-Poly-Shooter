@@ -78,8 +78,7 @@ public class PauseMenuController : NetworkBehaviour
 
     private void OnQuitClick()
     {
-        NetworkManager.Singleton.Shutdown();
-        MultiplayerSystem.Instance.ChangeState(MultiplayerState.Connected);
+        MultiplayerSystem.QuitMultiplayer();
         SceneManager.LoadScene("MainMenuScene");
     }
 }

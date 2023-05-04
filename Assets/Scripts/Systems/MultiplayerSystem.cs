@@ -39,6 +39,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     private void Start() => this.ChangeState(MultiplayerState.NotConnected);
     private void OnRelaySignIn() => this._logger.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
 
+    public static void QuitMultiplayer()
+    {
+        NetworkManager.Singleton.Shutdown();
+        MultiplayerSystem.Instance.ChangeState(MultiplayerState.Connected);
+    }
+
     // Referenced in main menu buttons
     public void ChangeState(string newStateString)
     {

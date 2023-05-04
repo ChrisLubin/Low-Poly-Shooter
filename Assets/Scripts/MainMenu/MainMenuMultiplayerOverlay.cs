@@ -56,6 +56,7 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
 
     private void OnOkClick()
     {
+        MultiplayerSystem.QuitMultiplayer();
         this._overlayStatusText.gameObject.SetActive(false);
         this._overlay.gameObject.SetActive(false);
         this._okButton.gameObject.SetActive(false);
