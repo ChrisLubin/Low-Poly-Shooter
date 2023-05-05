@@ -10,6 +10,7 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 /[Uu]ser[Ss]ettings/
+[Aa]ssets/[Ee]xternal/[Pp]olygon[Mm]ilitary/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
@@ -60,5 +61,4 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Custom
-[Aa]ssets/[Ee]xternal/PolygonMilitary/
 TODO.txt
