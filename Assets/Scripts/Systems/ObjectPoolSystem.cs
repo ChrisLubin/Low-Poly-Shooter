@@ -12,8 +12,6 @@ public class ObjectPoolSystem : NetworkedStaticInstanceWithLogger<ObjectPoolSyst
     [SerializeField] private Transform _bulletPrefab;
     [SerializeField] private Transform _muzzleFlashPrefab;
 
-    private int _numOfPlayers = 1;
-
     public enum PoolType
     {
         Bullet,
@@ -24,14 +22,12 @@ public class ObjectPoolSystem : NetworkedStaticInstanceWithLogger<ObjectPoolSyst
     {
         base.Awake();
         GameManager.OnStateChange += this.OnGameStateChange;
-        RpcSystem.OnPlayerGameSceneLoaded += this.OnPlayerGameSceneLoaded;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
         GameManager.OnStateChange -= this.OnGameStateChange;
-        RpcSystem.OnPlayerGameSceneLoaded -= this.OnPlayerGameSceneLoaded;
     }
 
     private void Start()
@@ -57,8 +53,6 @@ public class ObjectPoolSystem : NetworkedStaticInstanceWithLogger<ObjectPoolSyst
         }
     }
 
-    private void OnPlayerGameSceneLoaded(ulong _, ulong[] connectedClientIds) => this._numOfPlayers = connectedClientIds.Length;
-
     private void OnGameStateChange(GameState state)
     {
         switch (state)
@@ -66,8 +60,8 @@ public class ObjectPoolSystem : NetworkedStaticInstanceWithLogger<ObjectPoolSyst
             case GameState.GameStarting:
                 int bulletsToCachePerPlayer = 25;
                 int muzzleFlashToCachePerPlayer = bulletsToCachePerPlayer / 5;
-                int startingAmountBullet = bulletsToCachePerPlayer * this._numOfPlayers;
-                int startingAmountMuzzleFlash = muzzleFlashToCachePerPlayer * this._numOfPlayers;
+                int startingAmountBullet = bulletsToCachePerPlayer * MultiplayerSystem.Instance.ConnectedClientIds.Count;
+                int startingAmountMuzzleFlash = muzzleFlashToCachePerPlayer * MultiplayerSystem.Instance.ConnectedClientIds.Count;
                 this.InitPool(PoolType.Bullet, startingAmountBullet, startingAmountBullet, (int)(startingAmountBullet * 1.2f));
                 this.InitPool(PoolType.MuzzleFlash, startingAmountMuzzleFlash, startingAmountMuzzleFlash, (int)(startingAmountMuzzleFlash * 1.2f));
                 break;

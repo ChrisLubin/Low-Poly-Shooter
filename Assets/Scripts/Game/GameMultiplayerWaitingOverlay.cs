@@ -1,4 +1,3 @@
-using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -31,6 +30,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
         }
 
         this._waitForText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
+        MultiplayerSystem.Instance.ConnectedClientIds.OnListChanged += this.OnConnectedClientIdsChange;
 
         if (!this.IsHost)
         {
@@ -45,6 +45,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
     {
         GameManager.OnStateChange -= this.OnGameStateChange;
         RpcSystem.OnPlayerGameSceneLoaded -= this.OnPlayerGameSceneLoaded;
+        MultiplayerSystem.Instance.ConnectedClientIds.OnListChanged -= this.OnConnectedClientIdsChange;
         this._startGameButton.onClick.RemoveListener(this.StartGame);
         this._quitButton.onClick.RemoveListener(this.OnQuitButtonClick);
         base.OnDestroy();
@@ -69,34 +70,33 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
         }
     }
 
-    private void OnPlayerGameSceneLoaded(ulong hostId, ulong[] connectedClientIds)
-    {
-        if (this.IsHost && connectedClientIds.Count() >= 2)
-        {
-            this._startGameButton.interactable = true;
-        }
-        this.UpdatePlayerList(hostId, connectedClientIds);
-    }
+    private void OnPlayerGameSceneLoaded(ulong joinedClientId) => this.UpdatePlayerList();
+    private void OnConnectedClientIdsChange(NetworkListEvent<ulong> _) => this.UpdatePlayerList();
 
-    private void UpdatePlayerList(ulong hostId, ulong[] connectedClientIds)
+    private void UpdatePlayerList()
     {
         this._playersListText.text = "";
 
-        foreach (ulong clientId in connectedClientIds)
+        foreach (ulong connectedClientId in MultiplayerSystem.Instance.ConnectedClientIds)
         {
             string textToAdd = "";
-            textToAdd += clientId;
+            textToAdd += connectedClientId;
 
-            if (clientId == NetworkManager.Singleton.LocalClientId)
+            if (connectedClientId == NetworkManager.Singleton.LocalClientId)
             {
                 textToAdd += " (You)";
             }
-            else if (clientId == hostId)
+            else if (connectedClientId == MultiplayerSystem.Instance.HostId.Value)
             {
                 textToAdd += " (Host)";
             }
 
             this._playersListText.text += $"{textToAdd}\n\n";
+        }
+
+        if (this.IsHost && MultiplayerSystem.Instance.ConnectedClientIds.Count >= 2)
+        {
+            this._startGameButton.interactable = true;
         }
     }
 

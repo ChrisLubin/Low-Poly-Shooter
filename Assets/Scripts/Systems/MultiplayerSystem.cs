@@ -19,11 +19,15 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     public static MultiplayerState State { get; private set; }
     private const string _LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
     private const int _MAX_PLAYER_COUNT = 7;
+    public NetworkVariable<ulong> HostId { get; private set; }
+    public NetworkList<ulong> ConnectedClientIds { get; private set; }
 
     protected override void Awake()
     {
         base.Awake();
         RpcSystem.OnMultiplayerStateChange += this.ChangeState;
+        this.HostId = new();
+        this.ConnectedClientIds = new();
     }
 
     public override void OnDestroy()
@@ -34,6 +38,14 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= this.OnClientConnected;
         }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (!this.IsHost) { return; }
+
+        this.HostId.Value = NetworkManager.Singleton.LocalClientId;
     }
 
     private void Start() => this.ChangeState(MultiplayerState.NotConnected);
@@ -156,6 +168,11 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
     private void OnClientConnected(ulong clientId)
     {
+        if (this.IsHost)
+        {
+            this.ConnectedClientIds.Add(clientId);
+        }
+
         if (this.IsHost && this.OwnerClientId == clientId)
         {
             // Ignore when host first connects

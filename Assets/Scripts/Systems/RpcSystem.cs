@@ -4,7 +4,7 @@ using Unity.Netcode;
 
 public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
-    public static event Action<ulong, ulong[]> OnPlayerGameSceneLoaded;
+    public static event Action<ulong> OnPlayerGameSceneLoaded;
     public static event Action<ulong> OnPlayerShoot;
     public static event Action<ulong, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
     public static event Action<MultiplayerState> OnMultiplayerStateChange;
@@ -12,12 +12,12 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     public static event Action<ulong> OnPlayerRequestSpawn;
 
     [ServerRpc(RequireOwnership = false)]
-    public void PlayerGameSceneLoadedServerRpc(ulong joinedClientId) => this.PlayerGameSceneLoadedClientRpc(this.OwnerClientId, joinedClientId, Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds));
+    public void PlayerGameSceneLoadedServerRpc(ServerRpcParams serverRpcParams = default) => this.PlayerGameSceneLoadedClientRpc(serverRpcParams.Receive.SenderClientId);
     [ClientRpc]
-    private void PlayerGameSceneLoadedClientRpc(ulong hostId, ulong joinedClientId, ulong[] connectedClientIds)
+    private void PlayerGameSceneLoadedClientRpc(ulong joinedClientId)
     {
         this._logger.Log($"Client with id {joinedClientId} has loaded their game scene");
-        RpcSystem.OnPlayerGameSceneLoaded?.Invoke(hostId, connectedClientIds);
+        RpcSystem.OnPlayerGameSceneLoaded?.Invoke(joinedClientId);
     }
 
     [ServerRpc]

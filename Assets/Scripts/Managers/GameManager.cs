@@ -1,5 +1,4 @@
 using System;
-using Unity.Netcode;
 
 public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
@@ -21,7 +20,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(NetworkManager.Singleton.LocalClientId);
+        RpcSystem.Instance.PlayerGameSceneLoadedServerRpc();
 
         if (MultiplayerSystem.IsMultiplayer)
         {
@@ -62,7 +61,6 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
-
     }
 
     private void HandleGameStarting()
