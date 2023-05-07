@@ -29,7 +29,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     private const string _LOBBY_PLAYER_NAME_KEY = "PLAYER_NAME";
     private LobbyEventCallbacks lobbyEventCallbacks;
     private Lobby _lobby;
-    private Dictionary<string, string> _playerUnityIdToNameMap = new();
 
     protected override void Awake()
     {
@@ -47,10 +46,17 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= this.OnClientRelayConnected;
         }
+        this.DisposeLobby();
+    }
+
+    private void DisposeLobby()
+    {
         if (this.lobbyEventCallbacks != null)
         {
             this.lobbyEventCallbacks.PlayerJoined -= this._OnPlayerJoinedLobby;
         }
+        this.lobbyEventCallbacks = null;
+        this._lobby = null;
     }
 
     public override void OnNetworkSpawn()
@@ -110,17 +116,11 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
             case MultiplayerState.Connected:
                 AuthenticationService.Instance.SignedIn -= this.OnRelaySignIn;
                 MultiplayerSystem.IsMultiplayer = false;
-                if (this.lobbyEventCallbacks != null)
-                {
-                    this.lobbyEventCallbacks.PlayerJoined -= this._OnPlayerJoinedLobby;
-                }
-                this.lobbyEventCallbacks = null;
-                this._lobby = null;
-                this._playerUnityIdToNameMap = new();
+                this.DisposeLobby();
                 break;
             case MultiplayerState.CreatingLobby:
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
-                playerName = $"Player-{UnityEngine.Random.Range(1, 9999999)}";
+                playerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
                 MultiplayerSystem.LocalPlayerName = playerName;
 
                 try
@@ -147,8 +147,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     this._lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, _MAX_PLAYER_COUNT, createLobbyOptions);
                     this._logger.Log($"Created private lobby {lobbyName} as {playerName}");
 
-                    this.InitPlayerMap();
-
                     this.lobbyEventCallbacks = new LobbyEventCallbacks();
                     this.lobbyEventCallbacks.PlayerJoined += this._OnPlayerJoinedLobby;
                     await LobbyService.Instance.SubscribeToLobbyEventsAsync(this._lobby.Id, lobbyEventCallbacks);
@@ -163,7 +161,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 break;
             case MultiplayerState.JoiningLobby:
-                playerName = $"Player-{UnityEngine.Random.Range(1, 9999999)}";
+                playerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
                 MultiplayerSystem.LocalPlayerName = playerName;
 
                 try
@@ -181,8 +179,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                         return;
                     }
 
-                    this.InitPlayerMap();
-
                     this._logger.Log($"Lobby Relay code: {joinedLobbyRelayCodeData.Value}");
                     JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinedLobbyRelayCodeData.Value);
                     relayServerData = new(joinAllocation, "dtls");
@@ -190,11 +186,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     NetworkManager.Singleton.StartClient();
                     this._logger.Log("Started client");
-
-                    this.lobbyEventCallbacks = new LobbyEventCallbacks();
-                    this.lobbyEventCallbacks.PlayerJoined += this._OnPlayerJoinedLobby;
-                    await LobbyService.Instance.SubscribeToLobbyEventsAsync(this._lobby.Id, lobbyEventCallbacks);
-                    this._logger.Log($"Subscribed to lobby events");
 
                     UpdatePlayerOptions updatePlayerOptions = new() { AllocationId = joinAllocation.AllocationId.ToString() };
                     await LobbyService.Instance.UpdatePlayerAsync(this._lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
@@ -229,39 +220,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         this._logger.Log($"Set lobby to public");
     }
 
-    public Dictionary<string, string> GetPlayersInLobbyWithName()
-    {
-        if (this._lobby == null)
-        {
-            this._logger.Log("We are not in a lobby!", Logger.LogLevel.Error);
-            return null;
-        }
-
-        return this._playerUnityIdToNameMap;
-    }
-
-    private void InitPlayerMap()
-    {
-        if (this._lobby == null)
-        {
-            this._logger.Log("We are not in a lobby!", Logger.LogLevel.Error);
-            return;
-        }
-
-        foreach (Player player in this._lobby.Players)
-        {
-            if (!player.Data.TryGetValue(_LOBBY_PLAYER_NAME_KEY, out PlayerDataObject playerNameData))
-            {
-                this._logger.Log($"Unable to get player name from player data with ID {player.Id}", Logger.LogLevel.Error);
-                continue;
-            }
-
-            this._playerUnityIdToNameMap[player.Id] = playerNameData.Value;
-        }
-    }
-
     private void _OnPlayerJoinedLobby(List<LobbyPlayerJoined> joinedPlayers)
     {
+        if (!this.IsHost) { return; }
+
         foreach (LobbyPlayerJoined joinedPlayer in joinedPlayers)
         {
             string playerName;
@@ -276,7 +238,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 playerName = playerNameData.Value;
             }
 
-            this._playerUnityIdToNameMap[joinedPlayer.Player.Id] = playerName;
             MultiplayerSystem.OnPlayerJoinedLobby?.Invoke(joinedPlayer.Player.Id, playerName);
         }
     }

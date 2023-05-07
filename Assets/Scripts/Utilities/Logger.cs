@@ -60,11 +60,11 @@ public abstract class StaticInstanceWithLogger<T> : StaticInstance<T> where T : 
     }
 }
 
-public abstract class NetworkedWithLogger<T> : NetworkBehaviour where T : NetworkBehaviour
+public abstract class NetworkBehaviourWithLogger<T> : NetworkBehaviour where T : NetworkBehaviour
 {
     protected Logger _logger;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         this._logger = new Logger((this as T).ToString());
     }

@@ -1,26 +1,28 @@
-using System.Collections.Generic;
+using System;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameMultiplayerWaitingOverlay : NetworkBehaviour
+public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMultiplayerWaitingOverlay>
 {
     [SerializeField] private TextMeshProUGUI _waitForText;
     [SerializeField] private TextMeshProUGUI _playersListText;
     [SerializeField] private Button _startGameButton;
     [SerializeField] private Button _quitButton;
 
-    private List<string> _playerUnityIdsCurrentlyLoading = new();
+    private NetworkList<PlayerState> _playerStates;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         GameManager.OnStateChange += this.OnGameStateChange;
-        RpcSystem.OnPlayerGameSceneLoaded += this.OnPlayerGameSceneLoaded;
-        MultiplayerSystem.OnPlayerJoinedLobby += this.OnPlayerJoinedLobby;
         this._quitButton.onClick.AddListener(this.OnQuitButtonClick);
+        this._playerStates = new();
+        this._playerStates.OnListChanged += this.OnPlayerStatesChanged;
     }
 
     public override void OnNetworkSpawn()
@@ -35,23 +37,29 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
         }
 
         this._waitForText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
+        this.UpdatePlayerList();
 
-        if (!this.IsHost)
-        {
-            return;
-        }
+        if (!this.IsHost) { return; }
 
+        RpcSystem.OnPlayerGameSceneLoaded += this.OnPlayerGameSceneLoaded;
+        MultiplayerSystem.OnPlayerJoinedLobby += this.OnPlayerJoinedLobby;
         this._startGameButton.gameObject.SetActive(true);
         this._startGameButton.onClick.AddListener(this.StartGame);
+        this._playerStates.Add(new PlayerState(AuthenticationService.Instance.PlayerId, MultiplayerSystem.LocalPlayerName, LoadingState.Loaded));
     }
 
     public override void OnDestroy()
     {
         GameManager.OnStateChange -= this.OnGameStateChange;
-        RpcSystem.OnPlayerGameSceneLoaded -= this.OnPlayerGameSceneLoaded;
-        MultiplayerSystem.OnPlayerJoinedLobby -= this.OnPlayerJoinedLobby;
         this._startGameButton.onClick.RemoveListener(this.StartGame);
         this._quitButton.onClick.RemoveListener(this.OnQuitButtonClick);
+
+        if (this.IsHost)
+        {
+            RpcSystem.OnPlayerGameSceneLoaded -= this.OnPlayerGameSceneLoaded;
+            MultiplayerSystem.OnPlayerJoinedLobby -= this.OnPlayerJoinedLobby;
+        }
+
         base.OnDestroy();
     }
 
@@ -74,46 +82,72 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
         }
     }
 
-    private void OnPlayerJoinedLobby(string playerUnityId, string _)
+    private void OnPlayerJoinedLobby(string playerUnityId, string playerName)
     {
-        this._playerUnityIdsCurrentlyLoading.Add(playerUnityId);
+        if (!this.IsHost) { return; }
+
+        this._playerStates.Add(new PlayerState(playerUnityId, playerName, LoadingState.Loading));
         this.UpdatePlayerList();
     }
 
-    private void OnPlayerGameSceneLoaded(string playerUnityId, string _)
+    private void OnPlayerGameSceneLoaded(string playerUnityId, string playerName)
     {
-        this._playerUnityIdsCurrentlyLoading.Remove(playerUnityId);
+        if (!this.IsHost) { return; }
+
+        bool didFindPlayer = false;
+
+        for (int i = 0; i < this._playerStates.Count; i++)
+        {
+            PlayerState playerState = this._playerStates[i];
+            if (playerState.Id != playerUnityId) { continue; }
+
+            didFindPlayer = true;
+            playerState.LoadingState = LoadingState.Loaded;
+            this._playerStates[i] = playerState;
+            break;
+        }
+
+        if (!didFindPlayer)
+        {
+            this._playerStates.Add(new PlayerState(playerUnityId, playerName, LoadingState.Loaded));
+        }
+
+        this.UpdatePlayerList();
+    }
+
+    private void OnPlayerStatesChanged(NetworkListEvent<PlayerState> _)
+    {
+        this._logger.Log("Player state list changed");
         this.UpdatePlayerList();
     }
 
     private void UpdatePlayerList()
     {
         this._playersListText.text = "";
-        Dictionary<string, string> playerIdToNameMap = MultiplayerSystem.Instance.GetPlayersInLobbyWithName();
+        int loadingPlayersCount = 0;
 
-        foreach (KeyValuePair<string, string> playerIdAndMapPair in playerIdToNameMap)
+        foreach (PlayerState playerState in this._playerStates)
         {
-            string playerUnityId = playerIdAndMapPair.Key;
-            string playerName = playerIdAndMapPair.Value;
-            string textToAdd = playerName;
+            FixedString64Bytes textToAdd = playerState.Name;
 
-            if (playerUnityId == AuthenticationService.Instance.PlayerId)
+            if (playerState.Id == AuthenticationService.Instance.PlayerId)
             {
                 textToAdd += " (You)";
             }
-            else if (playerUnityId == MultiplayerSystem.Instance.HostUnityId.Value)
+            else if (playerState.Id == MultiplayerSystem.Instance.HostUnityId.Value)
             {
                 textToAdd += " (Host)";
             }
-            else if (this._playerUnityIdsCurrentlyLoading.Contains(playerUnityId))
+            else if (playerState.LoadingState == LoadingState.Loading)
             {
                 textToAdd += " (Loading...)";
+                loadingPlayersCount++;
             }
 
             this._playersListText.text += $"{textToAdd}\n\n";
         }
 
-        if (this.IsHost && playerIdToNameMap.Count >= 2 && this._playerUnityIdsCurrentlyLoading.Count == 0)
+        if (this.IsHost && this._playerStates.Count >= 2 && loadingPlayersCount == 0)
         {
             this._startGameButton.interactable = true;
         }
@@ -123,5 +157,46 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviour
     {
         MultiplayerSystem.QuitMultiplayer();
         SceneManager.LoadScene("MainMenuScene");
+    }
+
+    [Serializable]
+    private struct PlayerState : INetworkSerializable, System.IEquatable<PlayerState>
+    {
+        public FixedString64Bytes Id;
+        public FixedString64Bytes Name;
+        public LoadingState LoadingState;
+
+        public PlayerState(FixedString64Bytes id, FixedString64Bytes name, LoadingState loadingState)
+        {
+            this.Id = id;
+            this.Name = name;
+            this.LoadingState = loadingState;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            if (serializer.IsReader)
+            {
+                var reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out Id);
+                reader.ReadValueSafe(out Name);
+                reader.ReadValueSafe(out LoadingState);
+            }
+            else
+            {
+                var writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(Id);
+                writer.WriteValueSafe(Name);
+                writer.WriteValueSafe(LoadingState);
+            }
+        }
+
+        public readonly bool Equals(PlayerState other) => other.Equals(this) && Id == other.Id && Name == other.Name && LoadingState == other.LoadingState;
+    }
+
+    private enum LoadingState
+    {
+        Loading,
+        Loaded,
     }
 }
