@@ -902,7 +902,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 8007331112903200479}
   _weaponController: {fileID: 5393219146533398}
-  _damageController: {fileID: 9189164359248743288}
 --- !u!114 &9030879020514382541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -978,7 +977,6 @@ MonoBehaviour:
   _soldierRootBone: {fileID: 3398616007911099702}
   _ragdollPrefab: {fileID: 4537163431751777623, guid: 898c9c37227403148badf0b48666cc90,
     type: 3}
-  _weapon: {fileID: 1336401366911582075}
 --- !u!1 &3395817449617735310
 GameObject:
   m_ObjectHideFlags: 0
@@ -7702,7 +7700,7 @@ MonoBehaviour:
   SyncScaleY: 0
   SyncScaleZ: 0
   PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
+  RotAngleThreshold: 2
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
