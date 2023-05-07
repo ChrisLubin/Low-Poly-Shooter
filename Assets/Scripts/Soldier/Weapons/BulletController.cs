@@ -7,6 +7,7 @@ public class BulletController : MonoBehaviour
     private float _timeSinceCreation = 0f;
     private float _maxLifeSpan = 2f;
     private bool _wasShotByLocalPlayer;
+    private Vector3 _scaleOnSpawn = new(1f, 1f, 0.05f);
 
     public void Init(float bulletSpeed, int damageAmount, bool wasShotByLocalPlayer)
     {
@@ -14,6 +15,7 @@ public class BulletController : MonoBehaviour
         this._speed = bulletSpeed;
         this._damageAmount = damageAmount;
         this._wasShotByLocalPlayer = wasShotByLocalPlayer;
+        this.transform.localScale = this._scaleOnSpawn;
     }
 
     private void Start()
@@ -33,6 +35,7 @@ public class BulletController : MonoBehaviour
         }
         this._timeSinceCreation += Time.fixedDeltaTime;
         transform.position = this.GetNextPosition();
+        this.transform.localScale = Vector3.one;
 
         if (this._timeSinceCreation > this._maxLifeSpan)
         {
