@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,6 +19,8 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
 
     public static event Action OnLocalPlayerShoot;
     public static event Action OnLocalPlayerDamageReceived;
+    public static event Action OnLocalPlayerSpawn;
+    public static event Action OnLocalPlayerDeath;
 
     protected override void Awake()
     {
@@ -69,7 +70,14 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         }
     }
 
-    private void OnSpawn(ulong clientId, SoldierController player) => this._playersMap[clientId] = player;
+    private void OnSpawn(ulong clientId, SoldierController player)
+    {
+        this._playersMap[clientId] = player;
+        if (clientId == this._localClientId)
+        {
+            SoldierManager.OnLocalPlayerSpawn?.Invoke();
+        }
+    }
 
     private async void OnDeath(ulong clientId)
     {
@@ -78,6 +86,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         this._playersMap.Remove(clientId);
         if (clientId == this._localClientId)
         {
+            SoldierManager.OnLocalPlayerDeath?.Invoke();
             // Request server to spawn us after a timer
             await UnityTimer.Delay(SPAWN_PLAYER_REQUEST_TIMER);
             RpcSystem.Instance.RequestPlayerSpawnServerRpc();

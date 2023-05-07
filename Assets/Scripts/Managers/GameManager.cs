@@ -1,21 +1,28 @@
 using System;
 using Unity.Services.Authentication;
+using UnityEngine;
 
 public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
     public static event Action<GameState> OnStateChange;
     public static GameState State { get; private set; }
+    private GameObject _mainCamera;
 
     protected override void Awake()
     {
         base.Awake();
         RpcSystem.OnGameStateChange += this.ChangeState;
+        SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+        SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
+        this._mainCamera = Camera.main.gameObject;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
         RpcSystem.OnGameStateChange -= this.ChangeState;
+        SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+        SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
     }
 
     public async override void OnNetworkSpawn()
@@ -35,6 +42,9 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
             await MultiplayerSystem.Instance.SetLobbyToPublic();
         }
     }
+
+    private void OnLocalPlayerSpawn() => this._mainCamera.SetActive(false);
+    private void OnLocalPlayerDeath() => this._mainCamera.SetActive(true);
 
     public void ChangeState(GameState newState)
     {
@@ -72,10 +82,6 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     }
 
     private void HandleGameStarted()
-    {
-    }
-
-    private void HandleInGame()
     {
     }
 
