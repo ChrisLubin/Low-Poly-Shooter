@@ -1,4 +1,5 @@
 using System;
+using Unity.Services.Authentication;
 
 public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
@@ -17,18 +18,21 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         RpcSystem.OnGameStateChange -= this.ChangeState;
     }
 
-    public override void OnNetworkSpawn()
+    public async override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        RpcSystem.Instance.PlayerGameSceneLoadedServerRpc();
-
-        if (MultiplayerSystem.IsMultiplayer)
-        {
-            this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
-        }
-        else
+        if (!MultiplayerSystem.IsMultiplayer)
         {
             this.ChangeState(GameState.GameStarting);
+            return;
+        }
+
+        RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(AuthenticationService.Instance.PlayerId, MultiplayerSystem.LocalPlayerName);
+        this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
+
+        if (this.IsHost)
+        {
+            await MultiplayerSystem.Instance.SetLobbyToPublic();
         }
     }
 
