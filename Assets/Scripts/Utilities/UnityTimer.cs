@@ -27,7 +27,6 @@ public class UnityTimer : MonoBehaviour
 
             if (timerData.Timer <= 0)
             {
-                timerData.Tcs.SetResult(true);
                 _timersToRemove.Add(timerData);
             }
         }
@@ -35,6 +34,7 @@ public class UnityTimer : MonoBehaviour
         foreach (TimerData timerData in _timersToRemove)
         {
             UnityTimer._timers.Remove(timerData);
+            timerData.Tcs.SetResult(true);
         }
     }
 

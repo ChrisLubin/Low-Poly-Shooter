@@ -157,10 +157,10 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
             return;
         }
 
-        spawnPointIndex = spawnPointIndex != -1 ? spawnPointIndex : UnityEngine.Random.Range(0, this._spawnPoints.Count - 1);
+        spawnPointIndex = spawnPointIndex != -1 ? spawnPointIndex : UnityEngine.Random.Range(0, this._spawnPoints.Count);
         Transform spawnPoint = this._spawnPoints[spawnPointIndex];
 
-        Transform playerTransform = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity, this._spawnedSoldiersParent);
+        Transform playerTransform = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity);
         playerTransform.rotation = spawnPoint.rotation;
         playerTransform.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
         this._logger.Log($"Spawned soldier for client ID {clientId}");
