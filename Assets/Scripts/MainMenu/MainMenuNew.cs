@@ -1,10 +1,6 @@
 ﻿using System.Collections;
 using TMPro;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
-using Unity.Networking.Transport.Relay;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -43,6 +39,7 @@ namespace SlimUI.ModernMenu
         [Tooltip("The UI Sub-Panel under KEY BINDINGS for GENERAL")]
         public GameObject PanelGeneral;
         public TextMeshPro VersionText;
+        public TMP_InputField PlayerNameInput;
 
         [Header("SFX")]
         [Tooltip("The GameObject holding the Audio Source component for the HOVER SOUND")]
@@ -90,11 +87,15 @@ namespace SlimUI.ModernMenu
         public TMP_Text finishedLoadingText;
         public bool requireInputForNextScene = false;
 
-        void Start()
+        private void Awake()
         {
             MultiplayerSystem.OnStateChange += this.OnMultiplayerStateChange;
+            this.PlayerNameInput.onValueChanged.AddListener(this.OnPlayerNameInputValueChange);
             CameraObject = transform.GetComponent<Animator>();
+        }
 
+        void Start()
+        {
             playMenu.SetActive(false);
             exitMenu.SetActive(false);
             multiplayerMenu.SetActive(false);
@@ -109,7 +110,16 @@ namespace SlimUI.ModernMenu
         public override void OnDestroy()
         {
             MultiplayerSystem.OnStateChange -= this.OnMultiplayerStateChange;
+            this.PlayerNameInput.onValueChanged.RemoveListener(this.OnPlayerNameInputValueChange);
             base.OnDestroy();
+        }
+
+        private void OnPlayerNameInputValueChange(string newValue)
+        {
+            string newValueTrimmed = newValue.Trim();
+            if (newValueTrimmed == "") { return; }
+
+            MultiplayerSystem.SetLocalPlayerName(newValueTrimmed);
         }
 
         private void OnMultiplayerStateChange(MultiplayerState state)

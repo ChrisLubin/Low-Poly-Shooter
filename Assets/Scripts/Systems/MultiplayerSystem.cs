@@ -37,6 +37,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         RpcSystem.OnMultiplayerStateChange += this.ChangeState;
         this.HostUnityId = new();
         this.ConnectedClientIds = new();
+        MultiplayerSystem.LocalPlayerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
     }
 
     public override void OnDestroy()
@@ -98,7 +99,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         MultiplayerSystem.OnStateChange?.Invoke(newState);
 
         RelayServerData relayServerData;
-        string playerName;
 
         switch (newState)
         {
@@ -121,8 +121,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 break;
             case MultiplayerState.CreatingLobby:
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
-                playerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
-                MultiplayerSystem.LocalPlayerName = playerName;
 
                 try
                 {
@@ -141,12 +139,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                         IsPrivate = true,
                         Player = new(null, null, null, createAllocation.AllocationId.ToString())
                         {
-                            Data = new() { { _LOBBY_PLAYER_NAME_KEY, new(PlayerDataObject.VisibilityOptions.Member, playerName) } },
+                            Data = new() { { _LOBBY_PLAYER_NAME_KEY, new(PlayerDataObject.VisibilityOptions.Member, MultiplayerSystem.LocalPlayerName) } },
                         },
                         Data = new() { { _LOBBY_RELAY_CODE_KEY, new DataObject(VisibilityOptions.Member, relayCode) } }
                     };
                     this._lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, _MAX_PLAYER_COUNT, createLobbyOptions);
-                    this._logger.Log($"Created private lobby {lobbyName} as {playerName}");
+                    this._logger.Log($"Created private lobby {lobbyName} as {MultiplayerSystem.LocalPlayerName}");
 
                     this.lobbyEventCallbacks = new LobbyEventCallbacks();
                     this.lobbyEventCallbacks.PlayerJoined += this._OnPlayerJoinedLobby;
@@ -168,17 +166,14 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 break;
             case MultiplayerState.JoiningLobby:
-                playerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
-                MultiplayerSystem.LocalPlayerName = playerName;
-
                 try
                 {
                     QuickJoinLobbyOptions joinLobbyOptions = new()
                     {
-                        Player = new() { Data = new() { { _LOBBY_PLAYER_NAME_KEY, new(PlayerDataObject.VisibilityOptions.Member, playerName) } } },
+                        Player = new() { Data = new() { { _LOBBY_PLAYER_NAME_KEY, new(PlayerDataObject.VisibilityOptions.Member, MultiplayerSystem.LocalPlayerName) } } },
                     };
                     this._lobby = await LobbyService.Instance.QuickJoinLobbyAsync(joinLobbyOptions);
-                    this._logger.Log($"Joined lobby {this._lobby.Name} as {playerName}");
+                    this._logger.Log($"Joined lobby {this._lobby.Name} as {MultiplayerSystem.LocalPlayerName}");
 
                     if (!this._lobby.Data.TryGetValue(_LOBBY_RELAY_CODE_KEY, out DataObject joinedLobbyRelayCodeData))
                     {
@@ -276,6 +271,14 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         {
             this._logger.Log($"You joined with a client ID of {clientId}.");
         }
+    }
+
+    public static void SetLocalPlayerName(string newPlayerName)
+    {
+        string newPlayerNameTrimmed = newPlayerName.Trim();
+        if (newPlayerNameTrimmed == "" || MultiplayerSystem.State != MultiplayerState.Connected) { return; }
+
+        MultiplayerSystem.LocalPlayerName = newPlayerNameTrimmed;
     }
 }
 
