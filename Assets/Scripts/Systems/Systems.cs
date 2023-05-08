@@ -6,6 +6,6 @@ public class Systems : PersistentSingleton<Systems>
     {
         base.Awake();
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = Debug.isDebugBuild ? 45 : 100;
+        Application.targetFrameRate = Debug.isDebugBuild ? 45 : 120;
     }
 }

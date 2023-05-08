@@ -16,6 +16,7 @@ using static Unity.Services.Lobbies.Models.DataObject;
 public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSystem>
 {
     public static event Action<MultiplayerState> OnStateChange;
+    public static event Action<LobbyExceptionReason> OnLobbyError;
     public static event Action OnError;
     public static bool IsMultiplayer { get; private set; } = false;
     public NetworkVariable<FixedString64Bytes> HostUnityId { get; private set; }
@@ -153,6 +154,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     this._logger.Log($"Subscribed to lobby events");
                     this.ChangeState(MultiplayerState.CreatedLobby);
                 }
+                catch (LobbyServiceException e)
+                {
+                    this._logger.Log(e.Message, Logger.LogLevel.Error);
+                    MultiplayerSystem.OnLobbyError?.Invoke(e.Reason);
+                    this.ChangeState(MultiplayerState.Connected);
+                }
                 catch (Exception e)
                 {
                     this._logger.Log(e.Message, Logger.LogLevel.Error);
@@ -192,6 +199,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     this._logger.Log($"Linked Relay allocation ID to player");
 
                     this.ChangeState(MultiplayerState.JoinedLobby);
+                }
+                catch (LobbyServiceException e)
+                {
+                    this._logger.Log(e.Message, Logger.LogLevel.Error);
+                    MultiplayerSystem.OnLobbyError?.Invoke(e.Reason);
+                    this.ChangeState(MultiplayerState.Connected);
                 }
                 catch (Exception e)
                 {

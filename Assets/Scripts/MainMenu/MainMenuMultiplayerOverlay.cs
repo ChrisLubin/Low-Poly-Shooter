@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.Services.Lobbies;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
     private void Awake()
     {
         MultiplayerSystem.OnStateChange += this.OnMultiplayerStateChanged;
+        MultiplayerSystem.OnLobbyError += this.OnLobbyError;
         MultiplayerSystem.OnError += this.OnMultiplayerError;
         this._okButton.onClick.AddListener(this.OnOkClick);
     }
@@ -18,6 +20,7 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
     private void OnDestroy()
     {
         MultiplayerSystem.OnStateChange -= this.OnMultiplayerStateChanged;
+        MultiplayerSystem.OnLobbyError -= this.OnLobbyError;
         MultiplayerSystem.OnError -= this.OnMultiplayerError;
         this._okButton.onClick.RemoveListener(this.OnOkClick);
     }
@@ -48,6 +51,25 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
                 this._okButton.gameObject.SetActive(true);
                 break;
             case MultiplayerState.JoiningLobby:
+                this._overlayStatusText.text = "Unable to Join Lobby";
+                this._okButton.gameObject.SetActive(true);
+                break;
+        }
+    }
+
+    private void OnLobbyError(LobbyExceptionReason errorCode)
+    {
+        switch (errorCode)
+        {
+            case LobbyExceptionReason.NoOpenLobbies:
+                this._overlayStatusText.text = "There Are No Available Lobbies";
+                this._okButton.gameObject.SetActive(true);
+                break;
+            case LobbyExceptionReason.RateLimited:
+                this._overlayStatusText.text = "You Are Trying To Join Too Fast... Slow Down.";
+                this._okButton.gameObject.SetActive(true);
+                break;
+            default:
                 this._overlayStatusText.text = "Unable to Join Lobby";
                 this._okButton.gameObject.SetActive(true);
                 break;
