@@ -11,6 +11,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using UnityEngine.SceneManagement;
 using static Unity.Services.Lobbies.Models.DataObject;
 
 public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSystem>
@@ -19,13 +20,12 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     public static event Action<LobbyExceptionReason> OnLobbyError;
     public static event Action OnError;
     public static bool IsMultiplayer { get; private set; } = false;
-    public NetworkVariable<FixedString64Bytes> HostUnityId { get; private set; }
-    public NetworkList<ulong> ConnectedClientIds { get; private set; } // Clients who are in the networked scene and fully loaded
+    public string HostUnityId { get; private set; }
+    public NetworkList<PlayerData> PlayerData { get; private set; }
     public static MultiplayerState State { get; private set; }
     private const int _MAX_PLAYER_COUNT = 7;
     public static string LocalPlayerName { get; private set; }
 
-    public static event Action<string, string> OnPlayerJoinedLobby;
     private const string _LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
     private const string _LOBBY_PLAYER_NAME_KEY = "PLAYER_NAME";
     private LobbyEventCallbacks lobbyEventCallbacks;
@@ -35,30 +35,9 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     {
         base.Awake();
         RpcSystem.OnMultiplayerStateChange += this.ChangeState;
-        this.HostUnityId = new();
-        this.ConnectedClientIds = new();
+        SceneManager.sceneLoaded += this.OnSceneLoaded;
+        this.PlayerData = new();
         MultiplayerSystem.LocalPlayerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
-    }
-
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-        RpcSystem.OnMultiplayerStateChange -= this.ChangeState;
-        if (NetworkManager.Singleton)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= this.OnClientRelayConnected;
-        }
-        this.DisposeLobby();
-    }
-
-    private void DisposeLobby()
-    {
-        if (this.lobbyEventCallbacks != null)
-        {
-            this.lobbyEventCallbacks.PlayerJoined -= this._OnPlayerJoinedLobby;
-        }
-        this.lobbyEventCallbacks = null;
-        this._lobby = null;
     }
 
     public override void OnNetworkSpawn()
@@ -66,7 +45,39 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         base.OnNetworkSpawn();
         if (!this.IsHost) { return; }
 
-        this.HostUnityId.Value = AuthenticationService.Instance.PlayerId;
+        RpcSystem.OnPlayerGameSceneLoaded += this.OnPlayerGameSceneLoaded;
+    }
+
+    public async override void OnDestroy()
+    {
+        base.OnDestroy();
+        RpcSystem.OnMultiplayerStateChange -= this.ChangeState;
+        SceneManager.sceneLoaded -= this.OnSceneLoaded;
+        await this.DisposeLobby();
+
+        if (!this.IsHost) { return; }
+        RpcSystem.OnPlayerGameSceneLoaded -= this.OnPlayerGameSceneLoaded;
+    }
+
+    private async Task DisposeLobby()
+    {
+        if (this.lobbyEventCallbacks != null)
+        {
+            this.lobbyEventCallbacks.PlayerJoined -= this.OnPlayerJoinedLobby;
+            this.lobbyEventCallbacks.PlayerLeft -= this.OnPlayerLeftLobby;
+        }
+        this.lobbyEventCallbacks = null;
+
+        if (this._lobby != null)
+        {
+            try
+            {
+                await LobbyService.Instance.RemovePlayerAsync(this._lobby.Id, AuthenticationService.Instance.PlayerId);
+                this._logger.Log("Successfully left the lobby");
+            }
+            catch (Exception) { this._logger.Log("Something went wrong when attempting to leave the lobby", Logger.LogLevel.Error); }
+        }
+        this._lobby = null;
     }
 
     private void Start() => this.ChangeState(MultiplayerState.NotConnected);
@@ -76,6 +87,13 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     {
         NetworkManager.Singleton.Shutdown();
         MultiplayerSystem.Instance.ChangeState(MultiplayerState.Connected);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode _)
+    {
+        if (scene.name != "MainMenuScene") { return; }
+
+        MultiplayerSystem.IsMultiplayer = false;
     }
 
     // Referenced in main menu buttons
@@ -103,7 +121,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         switch (newState)
         {
             case MultiplayerState.NotConnected:
-                NetworkManager.Singleton.OnClientConnectedCallback += this.OnClientRelayConnected;
                 string profileName = $"Player-{UnityEngine.Random.Range(1, 9999999)}";
                 InitializationOptions initOptions = new();
                 initOptions.SetProfile(profileName);
@@ -116,8 +133,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 break;
             case MultiplayerState.Connected:
                 AuthenticationService.Instance.SignedIn -= this.OnRelaySignIn;
-                MultiplayerSystem.IsMultiplayer = false;
-                this.DisposeLobby();
+                await this.DisposeLobby();
                 break;
             case MultiplayerState.CreatingLobby:
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
@@ -131,24 +147,25 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                     this._logger.Log($"Lobby Relay code: {relayCode}");
 
-                    NetworkManager.Singleton.StartHost();
-                    this._logger.Log("Started host");
+                    this.StartHost();
 
                     CreateLobbyOptions createLobbyOptions = new()
                     {
                         IsPrivate = true,
+                        Data = new() { { _LOBBY_RELAY_CODE_KEY, new DataObject(VisibilityOptions.Member, relayCode) } },
                         Player = new(null, null, null, createAllocation.AllocationId.ToString())
                         {
                             Data = new() { { _LOBBY_PLAYER_NAME_KEY, new(PlayerDataObject.VisibilityOptions.Member, MultiplayerSystem.LocalPlayerName) } },
                         },
-                        Data = new() { { _LOBBY_RELAY_CODE_KEY, new DataObject(VisibilityOptions.Member, relayCode) } }
                     };
                     this._lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, _MAX_PLAYER_COUNT, createLobbyOptions);
+                    this.HostUnityId = this._lobby.HostId;
                     this._logger.Log($"Created private lobby {lobbyName} as {MultiplayerSystem.LocalPlayerName}");
 
                     this.lobbyEventCallbacks = new LobbyEventCallbacks();
-                    this.lobbyEventCallbacks.PlayerJoined += this._OnPlayerJoinedLobby;
-                    await LobbyService.Instance.SubscribeToLobbyEventsAsync(this._lobby.Id, lobbyEventCallbacks);
+                    this.lobbyEventCallbacks.PlayerJoined += this.OnPlayerJoinedLobby;
+                    this.lobbyEventCallbacks.PlayerLeft += this.OnPlayerLeftLobby;
+                    await LobbyService.Instance.SubscribeToLobbyEventsAsync(this._lobby.Id, this.lobbyEventCallbacks);
                     this._logger.Log($"Subscribed to lobby events");
                     this.ChangeState(MultiplayerState.CreatedLobby);
                 }
@@ -173,6 +190,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                         Player = new() { Data = new() { { _LOBBY_PLAYER_NAME_KEY, new(PlayerDataObject.VisibilityOptions.Member, MultiplayerSystem.LocalPlayerName) } } },
                     };
                     this._lobby = await LobbyService.Instance.QuickJoinLobbyAsync(joinLobbyOptions);
+                    this.HostUnityId = this._lobby.HostId;
                     this._logger.Log($"Joined lobby {this._lobby.Name} as {MultiplayerSystem.LocalPlayerName}");
 
                     if (!this._lobby.Data.TryGetValue(_LOBBY_RELAY_CODE_KEY, out DataObject joinedLobbyRelayCodeData))
@@ -219,6 +237,30 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         }
     }
 
+    public void StartHost()
+    {
+        NetworkManager.Singleton.StartHost();
+        if (this.PlayerData.Count > 0)
+        {
+            this.PlayerData.Clear();
+            this.PlayerData.Initialize(this);
+        }
+        PlayerData hostPlayerData = new(AuthenticationService.Instance.PlayerId, 0, MultiplayerSystem.LocalPlayerName)
+        {
+            ClientId = 0
+        };
+        this.PlayerData.Add(hostPlayerData);
+        this._logger.Log("Started host");
+    }
+
+    public static void SetLocalPlayerName(string newPlayerName)
+    {
+        string newPlayerNameTrimmed = newPlayerName.Trim();
+        if (newPlayerNameTrimmed == "" || MultiplayerSystem.State != MultiplayerState.Connected) { return; }
+
+        MultiplayerSystem.LocalPlayerName = newPlayerNameTrimmed;
+    }
+
     public async Task SetLobbyToPublic()
     {
         if (!this.IsHost || this._lobby == null) { return; }
@@ -228,7 +270,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         this._logger.Log($"Set lobby to public");
     }
 
-    private void _OnPlayerJoinedLobby(List<LobbyPlayerJoined> joinedPlayers)
+    private void OnPlayerJoinedLobby(List<LobbyPlayerJoined> joinedPlayers)
     {
         if (!this.IsHost) { return; }
 
@@ -242,43 +284,66 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
             }
             else
             {
-                this._logger.Log($"{playerNameData.Value} joined!");
+                this._logger.Log($"{playerNameData.Value} joined the lobby. Total players: {this.PlayerData.Count + 1}");
                 playerName = playerNameData.Value;
             }
 
-            MultiplayerSystem.OnPlayerJoinedLobby?.Invoke(joinedPlayer.Player.Id, playerName);
+            this.PlayerData.Add(new(joinedPlayer.Player.Id, joinedPlayer.PlayerIndex, playerName));
         }
     }
 
-    private void OnClientRelayConnected(ulong clientId)
+    private void OnPlayerLeftLobby(List<int> leftPlayersIndex)
     {
-        if (this.IsHost)
+        if (!this.IsHost) { return; }
+        List<PlayerData> playersToRemove = new();
+
+        foreach (PlayerData playerData in this.PlayerData)
         {
-            this.ConnectedClientIds.Add(clientId);
+            if (!leftPlayersIndex.Contains(playerData.LobbyPlayerIndex)) { continue; }
+
+            playersToRemove.Add(playerData);
         }
 
-        if (this.IsHost && this.OwnerClientId == clientId)
+        while (playersToRemove.Count > 0)
         {
-            // Ignore when host first connects
-            return;
-        }
+            int indexToRemove = 0;
 
-        if (this.IsHost)
-        {
-            this._logger.Log($"Client ID {clientId} connected to you.");
-        }
-        else
-        {
-            this._logger.Log($"You joined with a client ID of {clientId}.");
+            for (int i = 0; i < this.PlayerData.Count; i++)
+            {
+                PlayerData tempPlayer = this.PlayerData[i];
+                if (tempPlayer.UnityId != playersToRemove[0].UnityId) { continue; }
+
+                indexToRemove = i;
+                this._logger.Log($"{tempPlayer.Username} left the lobby. Total players: {this.PlayerData.Count - 1}");
+                break;
+            }
+
+            this.PlayerData.RemoveAt(indexToRemove);
+            playersToRemove.RemoveAt(0);
         }
     }
 
-    public static void SetLocalPlayerName(string newPlayerName)
+    private void OnPlayerGameSceneLoaded(string joinedPlayerUnityId, string joinedPlayerUsername, ulong joinedPlayerClientId)
     {
-        string newPlayerNameTrimmed = newPlayerName.Trim();
-        if (newPlayerNameTrimmed == "" || MultiplayerSystem.State != MultiplayerState.Connected) { return; }
+        if (!this.IsHost) { return; }
+        bool didFindPlayer = false;
 
-        MultiplayerSystem.LocalPlayerName = newPlayerNameTrimmed;
+        for (int i = 0; i < this.PlayerData.Count; i++)
+        {
+            PlayerData playerData = this.PlayerData[i];
+            if (playerData.UnityId != joinedPlayerUnityId) { continue; }
+
+            didFindPlayer = true;
+            playerData.ClientId = joinedPlayerClientId;
+            playerData.Username = joinedPlayerUsername;
+            this.PlayerData[i] = playerData;
+            break;
+        }
+
+        if (!didFindPlayer)
+        {
+            this._logger.Log($"Coudn't find the player {joinedPlayerUsername} in the PlayerData list!", Logger.LogLevel.Error);
+        }
     }
 }
 
@@ -291,4 +356,44 @@ public enum MultiplayerState
     CreatedLobby,
     JoiningLobby,
     JoinedLobby,
+}
+
+[Serializable]
+public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
+{
+    public FixedString64Bytes UnityId;
+    public ulong ClientId;
+    public int LobbyPlayerIndex;
+    public FixedString64Bytes Username;
+    public const ulong UNREGISTERED_CLIENT_ID = 98277;
+
+    public PlayerData(FixedString64Bytes unityId, int lobbyPlayerIndex, FixedString64Bytes username)
+    {
+        this.UnityId = unityId;
+        this.ClientId = UNREGISTERED_CLIENT_ID;
+        this.LobbyPlayerIndex = lobbyPlayerIndex;
+        this.Username = username;
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        if (serializer.IsReader)
+        {
+            var reader = serializer.GetFastBufferReader();
+            reader.ReadValueSafe(out UnityId);
+            reader.ReadValueSafe(out ClientId);
+            reader.ReadValueSafe(out LobbyPlayerIndex);
+            reader.ReadValueSafe(out Username);
+        }
+        else
+        {
+            var writer = serializer.GetFastBufferWriter();
+            writer.WriteValueSafe(UnityId);
+            writer.WriteValueSafe(ClientId);
+            writer.WriteValueSafe(LobbyPlayerIndex);
+            writer.WriteValueSafe(Username);
+        }
+    }
+
+    public readonly bool Equals(PlayerData other) => other.Equals(this) && UnityId == other.UnityId && ClientId == other.ClientId && LobbyPlayerIndex == other.LobbyPlayerIndex && Username == other.Username;
 }

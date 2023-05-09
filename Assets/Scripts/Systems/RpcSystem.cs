@@ -4,7 +4,7 @@ using Unity.Netcode;
 
 public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
-    public static event Action<string, string> OnPlayerGameSceneLoaded;
+    public static event Action<string, string, ulong> OnPlayerGameSceneLoaded;
     public static event Action<ulong> OnPlayerShoot;
     public static event Action<ulong, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
     public static event Action<MultiplayerState> OnMultiplayerStateChange;
@@ -12,12 +12,10 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     public static event Action<ulong> OnPlayerRequestSpawn;
 
     [ServerRpc(RequireOwnership = false)]
-    public void PlayerGameSceneLoadedServerRpc(string playerUnityId, string playerName) => this.PlayerGameSceneLoadedClientRpc(playerUnityId, playerName);
-    [ClientRpc]
-    private void PlayerGameSceneLoadedClientRpc(string playerUnityId, string playerName)
+    public void PlayerGameSceneLoadedServerRpc(string playerUnityId, string playerUsername, ServerRpcParams serverRpcParams = default)
     {
-        this._logger.Log($"Player with name {playerName} has loaded their game scene");
-        RpcSystem.OnPlayerGameSceneLoaded?.Invoke(playerUnityId, playerName);
+        this._logger.Log($"{playerUsername} has loaded their game scene");
+        RpcSystem.OnPlayerGameSceneLoaded?.Invoke(playerUnityId, playerUsername, serverRpcParams.Receive.SenderClientId);
     }
 
     [ServerRpc]

@@ -60,8 +60,8 @@ public class ObjectPoolSystem : NetworkedStaticInstanceWithLogger<ObjectPoolSyst
             case GameState.GameStarting:
                 int bulletsToCachePerPlayer = 25;
                 int muzzleFlashToCachePerPlayer = bulletsToCachePerPlayer / 5;
-                int startingAmountBullet = bulletsToCachePerPlayer * MultiplayerSystem.Instance.ConnectedClientIds.Count;
-                int startingAmountMuzzleFlash = muzzleFlashToCachePerPlayer * MultiplayerSystem.Instance.ConnectedClientIds.Count;
+                int startingAmountBullet = bulletsToCachePerPlayer * MultiplayerSystem.Instance.PlayerData.Count;
+                int startingAmountMuzzleFlash = muzzleFlashToCachePerPlayer * MultiplayerSystem.Instance.PlayerData.Count;
                 this.InitPool(PoolType.Bullet, startingAmountBullet, startingAmountBullet, (int)(startingAmountBullet * 1.2f));
                 this.InitPool(PoolType.MuzzleFlash, startingAmountMuzzleFlash, startingAmountMuzzleFlash, (int)(startingAmountMuzzleFlash * 1.2f));
                 break;

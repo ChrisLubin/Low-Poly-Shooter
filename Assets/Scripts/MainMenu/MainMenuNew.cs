@@ -182,7 +182,7 @@ namespace SlimUI.ModernMenu
             multiplayerMenu.SetActive(false);
             mainCanvas.SetActive(false);
             loadingMenu.SetActive(true);
-            NetworkManager.Singleton.StartHost();
+            MultiplayerSystem.Instance.StartHost();
             LoadNetwork("GameScene");
         }
 
