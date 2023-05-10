@@ -57,6 +57,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         if (NetworkManager.Singleton)
         {
             NetworkManager.Singleton.OnClientDisconnectCallback -= this.OnClientRelayDisconnect;
+            NetworkManager.Singleton.Shutdown();
         }
         await this.DisposeLobby();
 
