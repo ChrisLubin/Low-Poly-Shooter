@@ -8,7 +8,8 @@ using UnityEngine.UI;
 
 public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMultiplayerWaitingOverlay>
 {
-    [SerializeField] private TextMeshProUGUI _waitForText;
+    [SerializeField] private TextMeshProUGUI _headerText;
+    [SerializeField] private TextMeshProUGUI _subheaderText;
     [SerializeField] private TextMeshProUGUI _playersListText;
     [SerializeField] private Button _startGameButton;
     [SerializeField] private Button _quitButton;
@@ -31,11 +32,15 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
             return;
         }
 
-        this._waitForText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
+        this._headerText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
         this.UpdatePlayerList();
         MultiplayerSystem.Instance.PlayerData.OnListChanged += this.OnPlayerDataChanged;
 
-        if (!this.IsHost) { return; }
+        if (!this.IsHost)
+        {
+            MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
+            return;
+        }
 
         this._startGameButton.gameObject.SetActive(true);
         this._startGameButton.onClick.AddListener(this.OnStartGameButtonClick);
@@ -50,7 +55,11 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
         if (!MultiplayerSystem.IsMultiplayer) { return; }
         MultiplayerSystem.Instance.PlayerData.OnListChanged -= this.OnPlayerDataChanged;
 
-        if (!this.IsHost) { return; }
+        if (!this.IsHost)
+        {
+            MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
+            return;
+        }
         this._startGameButton.onClick.RemoveListener(this.OnStartGameButtonClick);
     }
 
@@ -65,7 +74,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
         switch (state)
         {
             case GameState.GameStarting:
-                this._waitForText.text = "Starting game...";
+                this._headerText.text = "Starting game...";
                 this._startGameButton.interactable = false;
                 break;
             case GameState.GameStarted:
@@ -112,6 +121,13 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
         if (!this.IsHost) { return; }
 
         this._startGameButton.interactable = MultiplayerSystem.Instance.PlayerData.Count >= 2 && playersLoadingCount == 0;
+    }
+
+    private void OnHostDisconnect()
+    {
+        this._headerText.text = "The host has left the lobby. Please return to the main menu.";
+        this._subheaderText.text = "";
+        this._playersListText.text = "";
     }
 
     private void OnQuitButtonClick()

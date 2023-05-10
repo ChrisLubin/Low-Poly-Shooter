@@ -18,6 +18,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 {
     public static event Action<MultiplayerState> OnStateChange;
     public static event Action<LobbyExceptionReason> OnLobbyError;
+    public static event Action OnHostDisconnect;
     public static event Action OnError;
     public static bool IsMultiplayer { get; private set; } = false;
     public string HostUnityId { get; private set; }
@@ -53,6 +54,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         base.OnDestroy();
         RpcSystem.OnMultiplayerStateChange -= this.ChangeState;
         SceneManager.sceneLoaded -= this.OnSceneLoaded;
+        if (NetworkManager.Singleton)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= this.OnClientRelayDisconnect;
+        }
         await this.DisposeLobby();
 
         if (!this.IsHost) { return; }
@@ -121,6 +126,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         switch (newState)
         {
             case MultiplayerState.NotConnected:
+                NetworkManager.Singleton.OnClientDisconnectCallback += this.OnClientRelayDisconnect;
                 string profileName = $"Player-{UnityEngine.Random.Range(1, 9999999)}";
                 InitializationOptions initOptions = new();
                 initOptions.SetProfile(profileName);
@@ -211,6 +217,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     await LobbyService.Instance.UpdatePlayerAsync(this._lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
                     this._logger.Log($"Linked Relay allocation ID to player");
 
+                    this.lobbyEventCallbacks = new LobbyEventCallbacks();
+                    this.lobbyEventCallbacks.PlayerLeft += this.OnPlayerLeftLobby;
+                    await LobbyService.Instance.SubscribeToLobbyEventsAsync(this._lobby.Id, this.lobbyEventCallbacks);
+                    this._logger.Log($"Subscribed to lobby events");
                     this.ChangeState(MultiplayerState.JoinedLobby);
                 }
                 catch (LobbyServiceException e)
@@ -294,33 +304,70 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
     private void OnPlayerLeftLobby(List<int> leftPlayersIndex)
     {
-        if (!this.IsHost) { return; }
-        List<PlayerData> playersToRemove = new();
-
-        foreach (PlayerData playerData in this.PlayerData)
+        if (this.IsHost)
         {
-            if (!leftPlayersIndex.Contains(playerData.LobbyPlayerIndex)) { continue; }
+            List<PlayerData> playersToRemove = new();
 
-            playersToRemove.Add(playerData);
-        }
-
-        while (playersToRemove.Count > 0)
-        {
-            int indexToRemove = 0;
-
-            for (int i = 0; i < this.PlayerData.Count; i++)
+            foreach (PlayerData playerData in this.PlayerData)
             {
-                PlayerData tempPlayer = this.PlayerData[i];
-                if (tempPlayer.UnityId != playersToRemove[0].UnityId) { continue; }
+                if (!leftPlayersIndex.Contains(playerData.LobbyPlayerIndex)) { continue; }
 
-                indexToRemove = i;
-                this._logger.Log($"{tempPlayer.Username} left the lobby. Total players: {this.PlayerData.Count - 1}");
+                playersToRemove.Add(playerData);
+            }
+
+            while (playersToRemove.Count > 0)
+            {
+                int indexToRemove = 0;
+
+                for (int i = 0; i < this.PlayerData.Count; i++)
+                {
+                    PlayerData tempPlayer = this.PlayerData[i];
+                    if (tempPlayer.UnityId != playersToRemove[0].UnityId) { continue; }
+
+                    indexToRemove = i;
+                    this._logger.Log($"{tempPlayer.Username} left the lobby. Total players: {this.PlayerData.Count - 1}");
+                    break;
+                }
+
+                this.PlayerData.RemoveAt(indexToRemove);
+                playersToRemove.RemoveAt(0);
+            }
+        }
+        else
+        {
+            bool didHostLeave = false;
+
+            foreach (PlayerData playerData in this.PlayerData)
+            {
+                if (playerData.UnityId != this.HostUnityId) { continue; }
+
+                leftPlayersIndex.Contains(playerData.LobbyPlayerIndex);
+                didHostLeave = true;
                 break;
             }
 
-            this.PlayerData.RemoveAt(indexToRemove);
-            playersToRemove.RemoveAt(0);
+            if (!didHostLeave) { return; }
+            this._logger.Log("The host has disconnected from the lobby");
+            MultiplayerSystem.OnHostDisconnect?.Invoke();
         }
+    }
+
+    private void OnClientRelayDisconnect(ulong clientId)
+    {
+        if (this.IsHost) { return; }
+
+        bool didHostLeave = false;
+
+        foreach (PlayerData playerData in this.PlayerData)
+        {
+            if (playerData.UnityId != this.HostUnityId || playerData.ClientId != clientId) { continue; }
+            didHostLeave = true;
+            break;
+        }
+
+        if (!didHostLeave) { return; }
+        this._logger.Log("The host has disconnected from the Relay service");
+        MultiplayerSystem.OnHostDisconnect?.Invoke();
     }
 
     private void OnPlayerGameSceneLoaded(string joinedPlayerUnityId, string joinedPlayerUsername, ulong joinedPlayerClientId)
