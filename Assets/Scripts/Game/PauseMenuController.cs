@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,9 +7,11 @@ using UnityEngine.UI;
 public class PauseMenuController : NetworkBehaviour
 {
     [SerializeField] private Canvas _canvas;
+    [SerializeField] private TextMeshProUGUI _headerText;
     [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _quitButton;
 
+    private bool _didHostDisconnect = false;
     public static bool IsPaused { get; private set; } = false;
 
     private CursorLockMode _prevCursorLockMode;
@@ -18,6 +21,7 @@ public class PauseMenuController : NetworkBehaviour
     {
         this._resumeButton.onClick.AddListener(this.ToggleOpen);
         this._quitButton.onClick.AddListener(this.OnQuitClick);
+        MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
     }
 
     private void Start()
@@ -31,12 +35,15 @@ public class PauseMenuController : NetworkBehaviour
     {
         this._resumeButton.onClick.RemoveListener(this.ToggleOpen);
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
+        MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
         Time.timeScale = 1f;
         PauseMenuController.IsPaused = false;
     }
 
     private void Update()
     {
+        if (this._didHostDisconnect) { return; }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             this.ToggleOpen();
@@ -80,5 +87,17 @@ public class PauseMenuController : NetworkBehaviour
     {
         MultiplayerSystem.QuitMultiplayer();
         SceneManager.LoadScene("MainMenuScene");
+    }
+
+    private void OnHostDisconnect()
+    {
+        if (this.IsHost || GameManager.State == GameState.PlayerWaitingForHostToStart) { return; }
+
+        this._didHostDisconnect = true;
+        this._headerText.text = "The host has left the lobby. Please return to the main menu.";
+        this._resumeButton.gameObject.SetActive(false);
+
+        if (PauseMenuController.IsPaused) { return; }
+        this.ToggleOpen();
     }
 }
