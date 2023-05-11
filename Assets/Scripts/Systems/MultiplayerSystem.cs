@@ -272,6 +272,19 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         MultiplayerSystem.LocalPlayerName = newPlayerNameTrimmed;
     }
 
+    public string GetPlayerUsername(ulong clientId)
+    {
+        foreach (PlayerData playerData in this.PlayerData)
+        {
+            if (playerData.ClientId != clientId) { continue; }
+
+            return playerData.Username.ToString();
+        }
+
+        this._logger.Log($"Could not find the player with clientId {clientId}", Logger.LogLevel.Error);
+        return "";
+    }
+
     public async Task SetLobbyToPublic()
     {
         if (!this.IsHost || this._lobby == null) { return; }

@@ -10,6 +10,7 @@ public class SoldierDebugController : MonoBehaviour
     {
         if (!Debug.isDebugBuild)
         {
+            this._debugHealthText.gameObject.SetActive(false);
             this.enabled = false;
             return;
         }

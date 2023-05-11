@@ -102,6 +102,11 @@ PrefabInstance:
       propertyPath: _damageController
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 6608789364052759832, guid: c8da68aabce1c724091fdf4779198a68,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3396908969173115210, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 9189164359248743288, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
@@ -125,6 +130,7 @@ PrefabInstance:
     - {fileID: 1837996852871556149, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 1490572320250783304, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 3647622671833079134, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
+    - {fileID: 1037944116949542744, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
 --- !u!1 &242146586496770068 stripped
 GameObject:
