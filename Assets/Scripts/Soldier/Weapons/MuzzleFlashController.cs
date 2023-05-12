@@ -17,5 +17,10 @@ public class MuzzleFlashController : MonoBehaviour
         ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.MuzzleFlash, transform);
     }
 
-    private void Update() => transform.position = this._shootPoint.position;
+    private void Update()
+    {
+        if (this._shootPoint == null) { return; }
+
+        transform.position = this._shootPoint.position;
+    }
 }
