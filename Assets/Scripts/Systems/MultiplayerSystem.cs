@@ -143,6 +143,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 await this.DisposeLobby();
                 break;
             case MultiplayerState.CreatingLobby:
+                MultiplayerSystem.IsMultiplayer = true;
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
 
                 try
@@ -178,18 +179,22 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 catch (LobbyServiceException e)
                 {
+                    MultiplayerSystem.IsMultiplayer = false;
                     this._logger.Log(e.Message, Logger.LogLevel.Error);
                     MultiplayerSystem.OnLobbyError?.Invoke(e.Reason);
                     this.ChangeState(MultiplayerState.Connected);
                 }
                 catch (Exception e)
                 {
+                    MultiplayerSystem.IsMultiplayer = false;
                     this._logger.Log(e.Message, Logger.LogLevel.Error);
                     MultiplayerSystem.OnError?.Invoke();
                     this.ChangeState(MultiplayerState.Connected);
                 }
                 break;
             case MultiplayerState.JoiningLobby:
+                MultiplayerSystem.IsMultiplayer = true;
+
                 try
                 {
                     QuickJoinLobbyOptions joinLobbyOptions = new()
@@ -226,12 +231,14 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 catch (LobbyServiceException e)
                 {
+                    MultiplayerSystem.IsMultiplayer = false;
                     this._logger.Log(e.Message, Logger.LogLevel.Error);
                     MultiplayerSystem.OnLobbyError?.Invoke(e.Reason);
                     this.ChangeState(MultiplayerState.Connected);
                 }
                 catch (Exception e)
                 {
+                    MultiplayerSystem.IsMultiplayer = false;
                     this._logger.Log(e.Message, Logger.LogLevel.Error);
                     MultiplayerSystem.OnError?.Invoke();
                     this.ChangeState(MultiplayerState.Connected);
