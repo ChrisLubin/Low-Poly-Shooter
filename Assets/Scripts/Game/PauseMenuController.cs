@@ -10,6 +10,8 @@ public class PauseMenuController : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI _headerText;
     [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _quitButton;
+    [SerializeField] private Slider _frameRateSettingSlider;
+    [SerializeField] private TextMeshProUGUI _frameRateSettingValue;
 
     private bool _didHostDisconnect = false;
     public static bool IsPaused { get; private set; } = false;
@@ -22,6 +24,7 @@ public class PauseMenuController : NetworkBehaviour
         this._resumeButton.onClick.AddListener(this.ToggleOpen);
         this._quitButton.onClick.AddListener(this.OnQuitClick);
         MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
+        this._frameRateSettingSlider.onValueChanged.AddListener(this.OnFrameRateSettingSliderValueChange);
     }
 
     private void Start()
@@ -29,6 +32,7 @@ public class PauseMenuController : NetworkBehaviour
         this._resumeButton.gameObject.SetActive(false);
         this._quitButton.gameObject.SetActive(false);
         this._canvas.enabled = false;
+        this._frameRateSettingSlider.value = Application.targetFrameRate;
     }
 
     public override void OnDestroy()
@@ -36,6 +40,7 @@ public class PauseMenuController : NetworkBehaviour
         this._resumeButton.onClick.RemoveListener(this.ToggleOpen);
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
         MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
+        this._frameRateSettingSlider.onValueChanged.RemoveListener(this.OnFrameRateSettingSliderValueChange);
         Time.timeScale = 1f;
         PauseMenuController.IsPaused = false;
     }
@@ -99,5 +104,11 @@ public class PauseMenuController : NetworkBehaviour
 
         if (PauseMenuController.IsPaused) { return; }
         this.ToggleOpen();
+    }
+
+    private void OnFrameRateSettingSliderValueChange(float newValue)
+    {
+        Application.targetFrameRate = (int)newValue;
+        this._frameRateSettingValue.text = newValue.ToString();
     }
 }
