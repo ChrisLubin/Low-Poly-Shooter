@@ -66,7 +66,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.MuzzleFlash, out Transform muzzleFlash);
         muzzleFlash.transform.position = this._shootPoint.position;
         muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
-        muzzleFlash.GetComponent<MuzzleFlashController>().Init();
+        muzzleFlash.GetComponent<MuzzleFlashController>().Init(this._shootPoint);
 
         this.OnShoot?.Invoke();
     }
