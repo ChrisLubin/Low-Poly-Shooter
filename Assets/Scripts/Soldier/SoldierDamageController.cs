@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class SoldierDamageController : NetworkBehaviour
 {
+    private SoldierHealthController _healthController;
     [SerializeField] private Transform _bloodSplatterVfxPrefab;
 
-    public event Action<DamageType, int> OnDamageReceived;
+    public event Action<DamageType, int> OnLocalTakeDamage;
+    public event Action<DamageType, int> OnServerTakeDamage;
+    public event Action<DamageType, int> OnServerDamageReceived;
 
     [Serializable]
     public enum DamageType
@@ -14,6 +17,18 @@ public class SoldierDamageController : NetworkBehaviour
         Bullet,
         Grenade,
         Missile
+    }
+
+    private void Awake()
+    {
+        this._healthController = GetComponent<SoldierHealthController>();
+        this._healthController.OnHealthChange += this.OnHealthChange;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        this._healthController.OnHealthChange -= this.OnHealthChange;
     }
 
     public void TakeLocalDamage(DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer)
@@ -28,19 +43,24 @@ public class SoldierDamageController : NetworkBehaviour
         if (type == DamageType.Bullet)
         {
             // We shot another soldier locally
-            this.OnDamageReceived?.Invoke(type, damageAmount);
+            this.OnLocalTakeDamage?.Invoke(type, damageAmount);
         }
     }
 
     public void TakeServerDamage(DamageType type, int damageAmount)
     {
-        // Only take damage when another client says we have
-        if (!this.IsOwner) { return; }
+        if (!this.IsHost) { return; }
+        // Host sending damage to player
 
         if (type == DamageType.Bullet)
         {
-            // We got shot by another client
-            this.OnDamageReceived?.Invoke(type, damageAmount);
+            this.OnServerTakeDamage?.Invoke(type, damageAmount);
         }
+    }
+
+    private void OnHealthChange(HealthData oldHealthData, HealthData newHealthData)
+    {
+        // Clients reacting to host sending damage to player
+        this.OnServerDamageReceived?.Invoke(newHealthData.LatestDamageType, oldHealthData.Health - newHealthData.Health);
     }
 }

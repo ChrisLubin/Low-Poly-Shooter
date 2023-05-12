@@ -23,9 +23,9 @@ public class SoldierDeathController : NetworkBehaviour
         this._healthController.OnHealthChange -= this.OnHealthChange;
     }
 
-    private void OnHealthChange(int newHealth)
+    private void OnHealthChange(HealthData _, HealthData newHealthData)
     {
-        if (newHealth > SoldierHealthController.MIN_HEALTH) { return; }
+        if (newHealthData.Health > SoldierHealthController.MIN_HEALTH) { return; }
         this.gameObject.SetActive(false);
 
         Transform ragdollTransform = Instantiate(this._ragdollPrefab, transform.position, transform.rotation);

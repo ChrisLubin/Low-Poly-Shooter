@@ -32,9 +32,10 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierController.OnSpawn += this.OnSpawn;
         SoldierController.OnDeath += this.OnDeath;
         SoldierController.OnShoot += this.OnShoot;
-        SoldierController.OnDamageReceived += this.OnLocalDamageReceived;
+        SoldierController.OnLocalTakeDamage += this.OnLocalTakeDamage;
+        SoldierController.OnServerDamageReceived += this.OnServerDamageReceived;
         RpcSystem.OnPlayerShoot += this.OnServerShoot;
-        RpcSystem.OnPlayerDamageReceived += this.OnServerDamageReceived;
+        RpcSystem.OnPlayerTakeDamage += this.OnServerTakeDamage;
         RpcSystem.OnPlayerRequestSpawn += this.OnPlayerRequestSpawn;
         GameManager.OnStateChange += this.OnGameStateChange;
     }
@@ -51,9 +52,10 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierController.OnSpawn -= this.OnSpawn;
         SoldierController.OnDeath -= this.OnDeath;
         SoldierController.OnShoot -= this.OnShoot;
-        SoldierController.OnDamageReceived -= this.OnLocalDamageReceived;
+        SoldierController.OnLocalTakeDamage -= this.OnLocalTakeDamage;
+        SoldierController.OnServerDamageReceived -= this.OnServerDamageReceived;
         RpcSystem.OnPlayerShoot -= this.OnServerShoot;
-        RpcSystem.OnPlayerDamageReceived -= this.OnServerDamageReceived;
+        RpcSystem.OnPlayerTakeDamage -= this.OnServerTakeDamage;
         RpcSystem.OnPlayerRequestSpawn -= this.OnPlayerRequestSpawn;
         GameManager.OnStateChange -= this.OnGameStateChange;
     }
@@ -114,18 +116,23 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         player.Shoot();
     }
 
-    private void OnLocalDamageReceived(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnLocalTakeDamage(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
     {
         if (clientId == this._localClientId) { return; }
-        RpcSystem.Instance.OnPlayerDamageReceivedServerRpc(clientId, damageType, damageAmount);
+        RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientId, damageType, damageAmount);
+    }
+
+    private void OnServerTakeDamage(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    {
+        if (!this.IsHost || !this._playersMap.TryGetValue(clientId, out SoldierController player)) { return; }
+
+        player.TakeServerDamage(damageType, damageAmount);
     }
 
     private void OnServerDamageReceived(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
     {
-        if (!this._playersMap.TryGetValue(clientId, out SoldierController player)) { return; }
         if (clientId != this._localClientId) { return; }
 
-        player.TakeServerDamage(damageType, damageAmount);
         SoldierManager.OnLocalPlayerDamageReceived?.Invoke();
     }
 

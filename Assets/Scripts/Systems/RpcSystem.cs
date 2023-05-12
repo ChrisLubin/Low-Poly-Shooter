@@ -6,7 +6,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
     public static event Action<string, string, ulong> OnPlayerGameSceneLoaded;
     public static event Action<ulong> OnPlayerShoot;
-    public static event Action<ulong, SoldierDamageController.DamageType, int> OnPlayerDamageReceived;
+    public static event Action<ulong, SoldierDamageController.DamageType, int> OnPlayerTakeDamage;
     public static event Action<MultiplayerState> OnMultiplayerStateChange;
     public static event Action<GameState> OnGameStateChange;
     public static event Action<ulong> OnPlayerRequestSpawn;
@@ -48,21 +48,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     private void OnPlayerShootClientRpc(ulong clientId, ClientRpcParams _ = default) => RpcSystem.OnPlayerShoot?.Invoke(clientId);
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnPlayerDamageReceivedServerRpc(ulong damagedSoldierClientId, SoldierDamageController.DamageType damageType, int damageAmount)
-    {
-        // Only send to client that was damaged
-        ClientRpcParams rpcParams = new()
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[] { damagedSoldierClientId }
-            }
-        };
-
-        this.OnPlayerDamageReceivedClientRpc(damagedSoldierClientId, damageType, damageAmount, rpcParams);
-    }
-    [ClientRpc]
-    private void OnPlayerDamageReceivedClientRpc(ulong damagedSoldierClientId, SoldierDamageController.DamageType damageType, int damageAmount, ClientRpcParams _ = default) => RpcSystem.OnPlayerDamageReceived?.Invoke(damagedSoldierClientId, damageType, damageAmount);
+    public void OnPlayerTakeDamageServerRpc(ulong damagedSoldierClientId, SoldierDamageController.DamageType damageType, int damageAmount) => RpcSystem.OnPlayerTakeDamage?.Invoke(damagedSoldierClientId, damageType, damageAmount);
 
     [ServerRpc(RequireOwnership = false)]
     public void RequestPlayerSpawnServerRpc(ServerRpcParams serverRpcParams = default) => RpcSystem.OnPlayerRequestSpawn?.Invoke(serverRpcParams.Receive.SenderClientId);

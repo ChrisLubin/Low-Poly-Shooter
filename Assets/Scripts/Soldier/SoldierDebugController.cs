@@ -21,5 +21,5 @@ public class SoldierDebugController : MonoBehaviour
     }
 
     private void OnDestroy() => this._healthController.OnHealthChange -= this.OnHealthChange;
-    private void OnHealthChange(int newHealth) => this._debugHealthText.text = newHealth.ToString();
+    private void OnHealthChange(HealthData _, HealthData newHealthData) => this._debugHealthText.text = newHealthData.Health.ToString();
 }

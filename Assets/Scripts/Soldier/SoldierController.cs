@@ -12,13 +12,17 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     public static event Action<ulong, SoldierController> OnSpawn;
     public static event Action<ulong> OnDeath;
     public static event Action<ulong> OnShoot;
-    public static event Action<ulong, SoldierDamageController.DamageType, int> OnDamageReceived;
+    public static event Action<ulong, SoldierDamageController.DamageType, int> OnLocalTakeDamage;
+    public static event Action<ulong, SoldierDamageController.DamageType, int> OnServerTakeDamage;
+    public static event Action<ulong, SoldierDamageController.DamageType, int> OnServerDamageReceived;
 
     private void Awake()
     {
         this._deathController = GetComponent<SoldierDeathController>();
         this._damageController = GetComponent<SoldierDamageController>();
-        this._damageController.OnDamageReceived += this._OnDamageReceived;
+        this._damageController.OnLocalTakeDamage += this._OnLocalTakeDamage;
+        this._damageController.OnServerTakeDamage += this._OnServerTakeDamage;
+        this._damageController.OnServerDamageReceived += this._OnServerDamageReceived;
         this._deathController.OnDeath += this._OnDeath;
     }
 
@@ -38,12 +42,17 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     {
         base.OnDestroy();
         this._weaponController.OnShoot -= this._OnShoot;
-        this._damageController.OnDamageReceived -= this._OnDamageReceived;
+        this._damageController.OnLocalTakeDamage -= this._OnLocalTakeDamage;
+        this._damageController.OnServerTakeDamage -= this._OnServerTakeDamage;
+        this._damageController.OnServerDamageReceived -= this._OnServerDamageReceived;
+        this._deathController.OnDeath -= this._OnDeath;
     }
 
     public void TakeLocalDamage(SoldierDamageController.DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damageAmount, damagePoint, isDamageFromLocalPlayer);
     public void TakeServerDamage(SoldierDamageController.DamageType type, int damageAmount) => this._damageController.TakeServerDamage(type, damageAmount);
-    private void _OnDamageReceived(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnDamageReceived?.Invoke(this.OwnerClientId, type, damageAmount);
+    private void _OnLocalTakeDamage(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnLocalTakeDamage?.Invoke(this.OwnerClientId, type, damageAmount);
+    private void _OnServerTakeDamage(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnServerTakeDamage?.Invoke(this.OwnerClientId, type, damageAmount);
+    private void _OnServerDamageReceived(SoldierDamageController.DamageType type, int damageAmount) => SoldierController.OnServerDamageReceived?.Invoke(this.OwnerClientId, type, damageAmount);
 
     public void Shoot() => this._weaponController.Shoot();
     private void _OnShoot() => SoldierController.OnShoot?.Invoke(this.OwnerClientId);
