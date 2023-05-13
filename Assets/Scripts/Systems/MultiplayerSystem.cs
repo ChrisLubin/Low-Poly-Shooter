@@ -40,6 +40,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     protected override void Awake()
     {
         base.Awake();
+        GameManager.OnStateChange += this.OnGameStateChange;
         RpcSystem.OnMultiplayerStateChange += this.ChangeState;
         SceneManager.sceneLoaded += this.OnSceneLoaded;
         this.PlayerData = new();
@@ -57,6 +58,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     public async override void OnDestroy()
     {
         base.OnDestroy();
+        GameManager.OnStateChange -= this.OnGameStateChange;
         RpcSystem.OnMultiplayerStateChange -= this.ChangeState;
         SceneManager.sceneLoaded -= this.OnSceneLoaded;
         if (NetworkManager.Singleton)
@@ -94,7 +96,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
     private async void Update()
     {
-        if (!this.IsHost || this._lobby == null || GameManager.State != GameState.HostWaitingForPlayers || MultiplayerSystem.State != MultiplayerState.CreatedLobby) { return; }
+        if (!MultiplayerSystem.IsMultiplayer || !this.IsHost || this._lobby == null || GameManager.State != GameState.HostWaitingForPlayers || MultiplayerSystem.State != MultiplayerState.CreatedLobby) { return; }
         this._timeSinceLastLobbyHeartbeat += Time.deltaTime;
 
         if (this._timeSinceLastLobbyHeartbeat < _LOBBY_HEARTBEAT_INTERVAL) { return; }
@@ -118,6 +120,23 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         if (scene.name != "MainMenuScene") { return; }
 
         MultiplayerSystem.IsMultiplayer = false;
+    }
+
+    private async void OnGameStateChange(GameState state)
+    {
+        if (!MultiplayerSystem.IsMultiplayer || !this.IsHost || this._lobby == null || MultiplayerSystem.State != MultiplayerState.CreatedLobby) { return; }
+
+        switch (state)
+        {
+            case GameState.GameStarting:
+                await this.SetLobbyPrivacy(true);
+                break;
+            case GameState.HostWaitingForPlayers:
+                await this.SetLobbyPrivacy(false);
+                break;
+            default:
+                break;
+        }
     }
 
     // Referenced in main menu buttons
@@ -324,13 +343,13 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         return "";
     }
 
-    public async Task SetLobbyToPublic()
+    public async Task SetLobbyPrivacy(bool isPrivate)
     {
         if (!this.IsHost || this._lobby == null) { return; }
 
-        UpdateLobbyOptions updateLobbyOptions = new() { IsPrivate = false };
+        UpdateLobbyOptions updateLobbyOptions = new() { IsPrivate = isPrivate };
         await LobbyService.Instance.UpdateLobbyAsync(this._lobby.Id, updateLobbyOptions);
-        this._logger.Log($"Set lobby to public");
+        this._logger.Log($"Set lobby to {(isPrivate ? "private" : "public")}");
     }
 
     private void OnPlayerJoinedLobby(List<LobbyPlayerJoined> joinedPlayers)

@@ -25,7 +25,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
     }
 
-    public async override void OnNetworkSpawn()
+    public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         if (!MultiplayerSystem.IsMultiplayer)
@@ -36,11 +36,6 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 
         RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(AuthenticationService.Instance.PlayerId, MultiplayerSystem.LocalPlayerName);
         this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
-
-        if (this.IsHost)
-        {
-            await MultiplayerSystem.Instance.SetLobbyToPublic();
-        }
     }
 
     private void OnLocalPlayerSpawn() => this._mainCamera.SetActive(false);
