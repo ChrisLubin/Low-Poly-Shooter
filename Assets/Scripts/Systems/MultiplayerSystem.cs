@@ -11,6 +11,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using static Unity.Services.Lobbies.Models.DataObject;
 
@@ -22,8 +23,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     public static event Action OnHostDisconnect;
     public static event Action OnError;
     public static bool IsMultiplayer { get; private set; } = false;
-    public string HostUnityId { get; private set; }
-    public NetworkList<PlayerData> PlayerData { get; private set; }
     public static MultiplayerState State { get; private set; }
     private const int _MAX_PLAYER_COUNT = 7;
     public static string LocalPlayerName { get; private set; }
@@ -32,6 +31,11 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     private const string _LOBBY_PLAYER_NAME_KEY = "PLAYER_NAME";
     private LobbyEventCallbacks lobbyEventCallbacks;
     private Lobby _lobby;
+
+    public string HostUnityId { get; private set; }
+    public NetworkList<PlayerData> PlayerData { get; private set; }
+    private const float _LOBBY_HEARTBEAT_INTERVAL = 15f;
+    private float _timeSinceLastLobbyHeartbeat = 0f;
 
     protected override void Awake()
     {
@@ -85,6 +89,19 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
             catch (Exception) { this._logger.Log("Something went wrong when attempting to leave the lobby", Logger.LogLevel.Error); }
         }
         this._lobby = null;
+        this._timeSinceLastLobbyHeartbeat = 0f;
+    }
+
+    private async void Update()
+    {
+        if (!this.IsHost || this._lobby == null || GameManager.State != GameState.HostWaitingForPlayers || MultiplayerSystem.State != MultiplayerState.CreatedLobby) { return; }
+        this._timeSinceLastLobbyHeartbeat += Time.deltaTime;
+
+        if (this._timeSinceLastLobbyHeartbeat < _LOBBY_HEARTBEAT_INTERVAL) { return; }
+        this._timeSinceLastLobbyHeartbeat = 0f;
+
+        try { await LobbyService.Instance.SendHeartbeatPingAsync(this._lobby.Id); }
+        catch (LobbyServiceException e) { this._logger.Log(e.Message, Logger.LogLevel.Error); }
     }
 
     private void Start() => this.ChangeState(MultiplayerState.NotConnected);
