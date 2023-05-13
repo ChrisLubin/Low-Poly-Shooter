@@ -21,6 +21,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     public static event Action OnLocalPlayerDamageReceived;
     public static event Action OnLocalPlayerSpawn;
     public static event Action OnLocalPlayerDeath;
+    public static event Action<ulong, ulong> OnPlayerDeath;
 
     protected override void Awake()
     {
@@ -81,12 +82,13 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         }
     }
 
-    private async void OnDeath(ulong clientId)
+    private async void OnDeath(ulong deadClientId, ulong killerClientId)
     {
-        this._logger.Log($"Soldier for client ID {clientId} died");
-        this._playersMap.TryGetValue(clientId, out SoldierController player);
-        this._playersMap.Remove(clientId);
-        if (clientId == this._localClientId)
+        this._logger.Log($"{MultiplayerSystem.Instance.GetPlayerUsername(killerClientId)} killed {MultiplayerSystem.Instance.GetPlayerUsername(deadClientId)}");
+        this._playersMap.TryGetValue(deadClientId, out SoldierController player);
+        this._playersMap.Remove(deadClientId);
+        SoldierManager.OnPlayerDeath?.Invoke(deadClientId, killerClientId);
+        if (deadClientId == this._localClientId)
         {
             SoldierManager.OnLocalPlayerDeath?.Invoke();
             // Request server to spawn us after a timer
@@ -122,11 +124,11 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientId, damageType, damageAmount);
     }
 
-    private void OnServerTakeDamage(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnServerTakeDamage(ulong damagedClientId, ulong damagerClientId, SoldierDamageController.DamageType damageType, int damageAmount)
     {
-        if (!this.IsHost || !this._playersMap.TryGetValue(clientId, out SoldierController player)) { return; }
+        if (!this.IsHost || !this._playersMap.TryGetValue(damagedClientId, out SoldierController player)) { return; }
 
-        player.TakeServerDamage(damageType, damageAmount);
+        player.TakeServerDamage(damagerClientId, damageType, damageAmount);
     }
 
     private void OnServerDamageReceived(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
@@ -179,7 +181,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         Transform playerTransform = Instantiate(this._playerPrefab, spawnPoint.position, Quaternion.identity);
         playerTransform.rotation = spawnPoint.rotation;
         playerTransform.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
-        this._logger.Log($"Spawned soldier for client ID {clientId}");
+        this._logger.Log($"Spawned soldier for {MultiplayerSystem.Instance.GetPlayerUsername(clientId)}");
     }
 
     private void OnPlayerRequestSpawn(ulong clientId) => this.SpawnPlayer(clientId);

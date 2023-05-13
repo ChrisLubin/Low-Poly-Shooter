@@ -1,5 +1,6 @@
 using TMPro;
 using Unity.Services.Lobbies;
+using Unity.Services.Relay;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,7 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
     {
         MultiplayerSystem.OnStateChange += this.OnMultiplayerStateChanged;
         MultiplayerSystem.OnLobbyError += this.OnLobbyError;
+        MultiplayerSystem.OnRelayError += this.OnRelayError;
         MultiplayerSystem.OnError += this.OnMultiplayerError;
         this._okButton.onClick.AddListener(this.OnOkClick);
     }
@@ -21,6 +23,7 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
     {
         MultiplayerSystem.OnStateChange -= this.OnMultiplayerStateChanged;
         MultiplayerSystem.OnLobbyError -= this.OnLobbyError;
+        MultiplayerSystem.OnRelayError -= this.OnRelayError;
         MultiplayerSystem.OnError -= this.OnMultiplayerError;
         this._okButton.onClick.RemoveListener(this.OnOkClick);
     }
@@ -71,6 +74,21 @@ public class MainMenuMultiplayerOverlay : MonoBehaviour
                 break;
             default:
                 this._overlayStatusText.text = "Unable to Join Lobby";
+                this._okButton.gameObject.SetActive(true);
+                break;
+        }
+    }
+
+    private void OnRelayError(RelayExceptionReason errorCode)
+    {
+        switch (errorCode)
+        {
+            case RelayExceptionReason.JoinCodeNotFound:
+                this._overlayStatusText.text = "Unable to Connect to Host";
+                this._okButton.gameObject.SetActive(true);
+                break;
+            default:
+                this._overlayStatusText.text = "Unable to Connect to Host";
                 this._okButton.gameObject.SetActive(true);
                 break;
         }

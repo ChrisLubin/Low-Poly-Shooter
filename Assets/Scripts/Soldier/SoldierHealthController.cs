@@ -24,11 +24,11 @@ public class SoldierHealthController : NetworkBehaviour
         this._damageController.OnServerTakeDamage -= this.OnServerTakeDamage;
     }
 
-    private void OnServerTakeDamage(SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnServerTakeDamage(ulong damagerClientId, SoldierDamageController.DamageType damageType, int damageAmount)
     {
         if (this._currentHealth.Value.Health == MIN_HEALTH || !this.IsHost) { return; }
 
-        this._currentHealth.Value = this._currentHealth.Value.DecreaseHealth(damageAmount, damageType);
+        this._currentHealth.Value = this._currentHealth.Value.DecreaseHealth(damagerClientId, damageAmount, damageType);
     }
 
     private void _OnHealthChange(HealthData oldHealthData, HealthData newHealthData) => this.OnHealthChange?.Invoke(oldHealthData, newHealthData);
@@ -40,6 +40,7 @@ public struct HealthData : INetworkSerializable
     public int Health;
     public int _MAX_HEALTH;
     public int MIN_HEALTH;
+    public ulong LatestDamagerClientId;
     public SoldierDamageController.DamageType LatestDamageType;
 
     public HealthData(int maxHealth, int minHealth, SoldierDamageController.DamageType latestDamageType = SoldierDamageController.DamageType.Bullet)
@@ -47,12 +48,14 @@ public struct HealthData : INetworkSerializable
         this.Health = maxHealth;
         this._MAX_HEALTH = maxHealth;
         this.MIN_HEALTH = minHealth;
+        this.LatestDamagerClientId = 0;
         this.LatestDamageType = latestDamageType;
     }
 
-    public HealthData DecreaseHealth(int damageAmount, SoldierDamageController.DamageType damageType)
+    public HealthData DecreaseHealth(ulong damagerClientId, int damageAmount, SoldierDamageController.DamageType damageType)
     {
         this.Health = Math.Clamp(this.Health - damageAmount, this.MIN_HEALTH, this._MAX_HEALTH);
+        this.LatestDamagerClientId = damagerClientId;
         this.LatestDamageType = damageType;
         return this;
     }
@@ -63,12 +66,14 @@ public struct HealthData : INetworkSerializable
         {
             var reader = serializer.GetFastBufferReader();
             reader.ReadValueSafe(out Health);
+            reader.ReadValueSafe(out LatestDamagerClientId);
             reader.ReadValueSafe(out LatestDamageType);
         }
         else
         {
             var writer = serializer.GetFastBufferWriter();
             writer.WriteValueSafe(Health);
+            writer.WriteValueSafe(LatestDamagerClientId);
             writer.WriteValueSafe(LatestDamageType);
         }
     }

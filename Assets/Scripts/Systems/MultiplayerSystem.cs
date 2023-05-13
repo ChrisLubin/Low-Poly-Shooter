@@ -18,6 +18,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 {
     public static event Action<MultiplayerState> OnStateChange;
     public static event Action<LobbyExceptionReason> OnLobbyError;
+    public static event Action<RelayExceptionReason> OnRelayError;
     public static event Action OnHostDisconnect;
     public static event Action OnError;
     public static bool IsMultiplayer { get; private set; } = false;
@@ -184,6 +185,13 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     MultiplayerSystem.OnLobbyError?.Invoke(e.Reason);
                     this.ChangeState(MultiplayerState.Connected);
                 }
+                catch (RelayServiceException e)
+                {
+                    MultiplayerSystem.IsMultiplayer = false;
+                    this._logger.Log(e.Message, Logger.LogLevel.Error);
+                    MultiplayerSystem.OnRelayError?.Invoke(e.Reason);
+                    this.ChangeState(MultiplayerState.Connected);
+                }
                 catch (Exception e)
                 {
                     MultiplayerSystem.IsMultiplayer = false;
@@ -234,6 +242,13 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                     MultiplayerSystem.IsMultiplayer = false;
                     this._logger.Log(e.Message, Logger.LogLevel.Error);
                     MultiplayerSystem.OnLobbyError?.Invoke(e.Reason);
+                    this.ChangeState(MultiplayerState.Connected);
+                }
+                catch (RelayServiceException e)
+                {
+                    MultiplayerSystem.IsMultiplayer = false;
+                    this._logger.Log(e.Message, Logger.LogLevel.Error);
+                    MultiplayerSystem.OnRelayError?.Invoke(e.Reason);
                     this.ChangeState(MultiplayerState.Connected);
                 }
                 catch (Exception e)

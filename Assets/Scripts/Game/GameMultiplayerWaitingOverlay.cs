@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMultiplayerWaitingOverlay>
 {
+    [SerializeField] private Canvas _canvas;
     [SerializeField] private TextMeshProUGUI _headerText;
     [SerializeField] private TextMeshProUGUI _subheaderText;
     [SerializeField] private TextMeshProUGUI _playersListText;
@@ -32,6 +33,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
             return;
         }
 
+        this._canvas.enabled = true;
         this._headerText.text = $"Waiting For {(this.IsHost ? "Players" : "Host")} To {(this.IsHost ? "Join" : "Start The Match")}...";
         this.UpdatePlayerList();
         MultiplayerSystem.Instance.PlayerData.OnListChanged += this.OnPlayerDataChanged;

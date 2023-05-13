@@ -9,7 +9,7 @@ public class SoldierDeathController : NetworkBehaviour
     [SerializeField] private Transform _soldierRootBone;
     [SerializeField] private Transform _ragdollPrefab;
 
-    public event Action OnDeath;
+    public event Action<ulong> OnDeath;
 
     private void Awake()
     {
@@ -31,6 +31,6 @@ public class SoldierDeathController : NetworkBehaviour
         Transform ragdollTransform = Instantiate(this._ragdollPrefab, transform.position, transform.rotation);
         SoldierRagdollController ragdollController = ragdollTransform.GetComponent<SoldierRagdollController>();
         ragdollController.DoRagroll(this._soldierRootBone, this.IsOwner);
-        this.OnDeath?.Invoke();
+        this.OnDeath?.Invoke(newHealthData.LatestDamagerClientId);
     }
 }

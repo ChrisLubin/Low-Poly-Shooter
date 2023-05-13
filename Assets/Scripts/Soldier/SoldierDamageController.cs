@@ -8,7 +8,7 @@ public class SoldierDamageController : NetworkBehaviour
     [SerializeField] private Transform _bloodSplatterVfxPrefab;
 
     public event Action<DamageType, int> OnLocalTakeDamage;
-    public event Action<DamageType, int> OnServerTakeDamage;
+    public event Action<ulong, DamageType, int> OnServerTakeDamage;
     public event Action<DamageType, int> OnServerDamageReceived;
 
     [Serializable]
@@ -47,14 +47,14 @@ public class SoldierDamageController : NetworkBehaviour
         }
     }
 
-    public void TakeServerDamage(DamageType type, int damageAmount)
+    public void TakeServerDamage(ulong damagerClientId, DamageType type, int damageAmount)
     {
         if (!this.IsHost) { return; }
         // Host sending damage to player
 
         if (type == DamageType.Bullet)
         {
-            this.OnServerTakeDamage?.Invoke(type, damageAmount);
+            this.OnServerTakeDamage?.Invoke(damagerClientId, type, damageAmount);
         }
     }
 
