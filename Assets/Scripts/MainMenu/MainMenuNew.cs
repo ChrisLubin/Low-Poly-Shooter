@@ -105,6 +105,11 @@ namespace SlimUI.ModernMenu
 
             SetThemeColors();
             this.VersionText.text = $"{(Debug.isDebugBuild ? "DEV" : "PROD")} {this.VersionText.text}";
+            bool doesPlayerHaveDefaultName = MultiplayerSystem.LocalPlayerName.StartsWith("Player-");
+            if (!doesPlayerHaveDefaultName)
+            {
+                this.PlayerNameInput.text = MultiplayerSystem.LocalPlayerName;
+            }
         }
 
         public override void OnDestroy()
