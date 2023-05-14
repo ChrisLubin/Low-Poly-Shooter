@@ -19,6 +19,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
 
     public static event Action OnLocalPlayerShoot;
     public static event Action OnLocalPlayerDamageReceived;
+    public static event Action<HealthData> OnLocalPlayerHealthChange;
     public static event Action OnLocalPlayerSpawn;
     public static event Action OnLocalPlayerDeath;
     public static event Action<ulong, ulong> OnPlayerDeath;
@@ -35,6 +36,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierController.OnShoot += this.OnShoot;
         SoldierController.OnLocalTakeDamage += this.OnLocalTakeDamage;
         SoldierController.OnServerDamageReceived += this.OnServerDamageReceived;
+        SoldierController.OnHealthChange += this.OnHealthChange;
         RpcSystem.OnPlayerShoot += this.OnServerShoot;
         RpcSystem.OnPlayerTakeDamage += this.OnServerTakeDamage;
         RpcSystem.OnPlayerRequestSpawn += this.OnPlayerRequestSpawn;
@@ -55,6 +57,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         SoldierController.OnShoot -= this.OnShoot;
         SoldierController.OnLocalTakeDamage -= this.OnLocalTakeDamage;
         SoldierController.OnServerDamageReceived -= this.OnServerDamageReceived;
+        SoldierController.OnHealthChange -= this.OnHealthChange;
         RpcSystem.OnPlayerShoot -= this.OnServerShoot;
         RpcSystem.OnPlayerTakeDamage -= this.OnServerTakeDamage;
         RpcSystem.OnPlayerRequestSpawn -= this.OnPlayerRequestSpawn;
@@ -136,6 +139,13 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         if (clientId != this._localClientId) { return; }
 
         SoldierManager.OnLocalPlayerDamageReceived?.Invoke();
+    }
+
+    private void OnHealthChange(ulong clientId, HealthData newHealthData)
+    {
+        if (clientId != this._localClientId) { return; }
+
+        SoldierManager.OnLocalPlayerHealthChange?.Invoke(newHealthData);
     }
 
     public void SpawnPlayers()

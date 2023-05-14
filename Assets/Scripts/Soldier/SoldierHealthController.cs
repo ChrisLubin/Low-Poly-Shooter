@@ -6,9 +6,9 @@ public class SoldierHealthController : NetworkBehaviour
 {
     private SoldierDamageController _damageController;
 
-    private const int _MAX_HEALTH = 100;
+    public const int MAX_HEALTH = 100;
     public const int MIN_HEALTH = 0;
-    private NetworkVariable<HealthData> _currentHealth = new(new(_MAX_HEALTH, MIN_HEALTH));
+    private NetworkVariable<HealthData> _currentHealth = new(new(MAX_HEALTH, MIN_HEALTH));
 
     public event Action<HealthData, HealthData> OnHealthChange;
 
@@ -34,7 +34,7 @@ public class SoldierHealthController : NetworkBehaviour
 
     private void Update()
     {
-        if (!this.IsHost || this._currentHealth.Value.Health == _MAX_HEALTH) { return; }
+        if (!this.IsHost || this._currentHealth.Value.Health == MAX_HEALTH) { return; }
         this._timeSinceLastDamage += Time.deltaTime;
         this._timeSinceLastHealthRegeneration += Time.deltaTime;
 

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 {
+    private SoldierHealthController _healthController;
     private SoldierDamageController _damageController;
     private SoldierDeathController _deathController;
 
@@ -15,15 +16,18 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     public static event Action<ulong, SoldierDamageController.DamageType, int> OnLocalTakeDamage;
     public static event Action<ulong, SoldierDamageController.DamageType, int> OnServerTakeDamage;
     public static event Action<ulong, SoldierDamageController.DamageType, int> OnServerDamageReceived;
+    public static event Action<ulong, HealthData> OnHealthChange;
 
     private void Awake()
     {
+        this._healthController = GetComponent<SoldierHealthController>();
         this._deathController = GetComponent<SoldierDeathController>();
         this._damageController = GetComponent<SoldierDamageController>();
         this._damageController.OnLocalTakeDamage += this._OnLocalTakeDamage;
         this._damageController.OnServerTakeDamage += this._OnServerTakeDamage;
         this._damageController.OnServerDamageReceived += this._OnServerDamageReceived;
         this._deathController.OnDeath += this._OnDeath;
+        this._healthController.OnHealthChange += this._OnHealthChange;
     }
 
     public override void OnNetworkSpawn()
@@ -46,6 +50,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
         this._damageController.OnServerTakeDamage -= this._OnServerTakeDamage;
         this._damageController.OnServerDamageReceived -= this._OnServerDamageReceived;
         this._deathController.OnDeath -= this._OnDeath;
+        this._healthController.OnHealthChange -= this._OnHealthChange;
     }
 
     public void TakeLocalDamage(SoldierDamageController.DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damageAmount, damagePoint, isDamageFromLocalPlayer);
@@ -58,4 +63,5 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     private void _OnShoot() => SoldierController.OnShoot?.Invoke(this.OwnerClientId);
 
     private void _OnDeath(ulong killerClientId) => SoldierController.OnDeath?.Invoke(this.OwnerClientId, killerClientId);
+    private void _OnHealthChange(HealthData _, HealthData newHealthData) => SoldierController.OnHealthChange?.Invoke(this.OwnerClientId, newHealthData);
 }
