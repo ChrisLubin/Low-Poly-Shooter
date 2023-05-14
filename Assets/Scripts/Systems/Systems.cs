@@ -7,4 +7,11 @@ public class Systems : PersistentSingleton<Systems>
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = Debug.isDebugBuild ? 45 : 120;
     }
+
+    protected override void OnApplicationQuit()
+    {
+#if !UNITY_EDITOR
+    System.Diagnostics.Process.GetCurrentProcess().Kill();
+#endif
+    }
 }
