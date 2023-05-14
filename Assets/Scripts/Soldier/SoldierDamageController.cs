@@ -60,7 +60,9 @@ public class SoldierDamageController : NetworkBehaviour
 
     private void OnHealthChange(HealthData oldHealthData, HealthData newHealthData)
     {
+        if (newHealthData.Health >= oldHealthData.Health) { return; }
         // Clients reacting to host sending damage to player
+
         this.OnServerDamageReceived?.Invoke(newHealthData.LatestDamageType, oldHealthData.Health - newHealthData.Health);
     }
 }
