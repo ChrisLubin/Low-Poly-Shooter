@@ -23,6 +23,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         RpcSystem.OnGameStateChange -= this.ChangeState;
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
+        this.ChangeState(GameState.None);
     }
 
     public override void OnNetworkSpawn()
@@ -51,6 +52,8 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 
         switch (newState)
         {
+            case GameState.None:
+                break;
             case GameState.HostWaitingForPlayers:
                 break;
             case GameState.PlayerWaitingForHostToStart:

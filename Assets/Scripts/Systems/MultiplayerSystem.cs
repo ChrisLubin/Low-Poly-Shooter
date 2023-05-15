@@ -18,6 +18,7 @@ using static Unity.Services.Lobbies.Models.DataObject;
 public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSystem>
 {
     public static event Action<MultiplayerState> OnStateChange;
+    public static event Action<PlayerData> OnPlayerDisconnect;
     public static event Action<LobbyExceptionReason> OnLobbyError;
     public static event Action<RelayExceptionReason> OnRelayError;
     public static event Action OnHostDisconnect;
@@ -398,6 +399,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
                     indexToRemove = i;
                     this._logger.Log($"{tempPlayer.Username} left the lobby. Total players: {this.PlayerData.Count - 1}");
+                    MultiplayerSystem.OnPlayerDisconnect?.Invoke(tempPlayer);
                     break;
                 }
 
@@ -411,9 +413,10 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
             foreach (PlayerData playerData in this.PlayerData)
             {
-                if (playerData.UnityId != this.HostUnityId) { continue; }
+                if (!leftPlayersIndex.Contains(playerData.LobbyPlayerIndex)) { continue; }
+                MultiplayerSystem.OnPlayerDisconnect?.Invoke(playerData);
 
-                leftPlayersIndex.Contains(playerData.LobbyPlayerIndex);
+                if (playerData.UnityId != this.HostUnityId) { continue; }
                 didHostLeave = true;
                 break;
             }
@@ -426,18 +429,19 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
     private void OnClientRelayDisconnect(ulong clientId)
     {
-        if (this.IsHost) { return; }
-
         bool didHostLeave = false;
 
         foreach (PlayerData playerData in this.PlayerData)
         {
-            if (playerData.UnityId != this.HostUnityId || playerData.ClientId != clientId) { continue; }
+            if (playerData.ClientId != clientId) { continue; }
+            MultiplayerSystem.OnPlayerDisconnect?.Invoke(playerData);
+
+            if (playerData.UnityId != this.HostUnityId) { continue; }
             didHostLeave = true;
             break;
         }
 
-        if (!didHostLeave) { return; }
+        if (this.IsHost || !didHostLeave) { return; }
         this._logger.Log("The host has disconnected from the Relay service");
         MultiplayerSystem.OnHostDisconnect?.Invoke();
     }

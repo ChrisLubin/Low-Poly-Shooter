@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -14,12 +15,14 @@ public class KillFeedUIController : MonoBehaviour
 
     private void Awake()
     {
+        MultiplayerSystem.OnPlayerDisconnect += this.OnPlayerDisconnect;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
         this._OnKillFeedListChange += this.OnKillFeedListChange;
     }
 
     private void OnDestroy()
     {
+        MultiplayerSystem.OnPlayerDisconnect -= this.OnPlayerDisconnect;
         SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
         this._OnKillFeedListChange -= this.OnKillFeedListChange;
     }
@@ -51,7 +54,7 @@ public class KillFeedUIController : MonoBehaviour
 
         foreach (KillFeedItem item in this._killFeedItems)
         {
-            this._killFeedText.text += $"{item.KillerName} -> {item.KilledPlayerName}\n";
+            this._killFeedText.text += $"{item.Text}\n";
         }
     }
 
@@ -66,20 +69,28 @@ public class KillFeedUIController : MonoBehaviour
             this._killFeedItems.RemoveAt(this._killFeedItems.Count - 1);
         }
 
-        this._killFeedItems.Insert(0, new(killerPlayerName, deadPlayerName, _KILL_ITEM_DEFAULT_LIFE_SPAN));
+        this._killFeedItems.Insert(0, new($"{killerPlayerName} -> {deadPlayerName}", _KILL_ITEM_DEFAULT_LIFE_SPAN));
+        this._OnKillFeedListChange?.Invoke();
+    }
+
+    private void OnPlayerDisconnect(PlayerData player)
+    {
+        string playerLeftText = $"{player.Username} left";
+        bool isPlayerLeftInKillFeed = this._killFeedItems.Any(item => item.Text == playerLeftText);
+        if (isPlayerLeftInKillFeed) { return; }
+
+        this._killFeedItems.Add(new(playerLeftText, _KILL_ITEM_DEFAULT_LIFE_SPAN));
         this._OnKillFeedListChange?.Invoke();
     }
 
     private struct KillFeedItem
     {
-        public string KillerName { get; private set; }
-        public string KilledPlayerName { get; private set; }
+        public string Text { get; private set; }
         public float CurrentLifeSpan { get; private set; }
 
-        public KillFeedItem(string killerName, string killedPlayerName, float defaultLifeSpan)
+        public KillFeedItem(string text, float defaultLifeSpan)
         {
-            this.KillerName = killerName;
-            this.KilledPlayerName = killedPlayerName;
+            this.Text = text;
             this.CurrentLifeSpan = defaultLifeSpan;
         }
 
