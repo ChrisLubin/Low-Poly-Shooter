@@ -6,9 +6,6 @@ public class WeaponAnimationController : MonoBehaviour
     private WeaponController _weaponController;
 
     private const string _IS_ADS_PARAMETER_NAME = "IsADS";
-    private const int _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS = 500;
-    private const float _ADS_ANIMATION_SPEED_MULTIPLIER = 1.7f;
-    public const float ADS_ANIMATION_TIME_MILLISECONDS = _ADS_ANIMATION_DEFAULT_TIME_MILLISECONDS / _ADS_ANIMATION_SPEED_MULTIPLIER;
 
     private void Awake()
     {

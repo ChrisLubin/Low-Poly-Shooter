@@ -18,8 +18,6 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     [field: SerializeField] public float ReturnSpeed { get; private set; } = 6f;
 
     private bool _isADS = false;
-    private float _minTimeBetweenADS = WeaponAnimationController.ADS_ANIMATION_TIME_MILLISECONDS;
-    private float _timeSinceLastADS = Mathf.Infinity;
     public event Action<bool> OnADS;
 
     public event Action OnShoot;
@@ -40,16 +38,13 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 
     private void Update()
     {
-        if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
-        this._timeSinceLastADS += Time.deltaTime * 1000;
         if (PauseMenuController.IsPaused) { return; }
 
-        if (Input.GetMouseButtonDown(1) && this._timeSinceLastADS > this._minTimeBetweenADS)
-        {
-            this._timeSinceLastADS = 0f;
-            this._isADS = !this._isADS;
-            this.OnADS?.Invoke(this._isADS);
-        }
+        bool wasADS = this._isADS;
+        this._isADS = Input.GetMouseButton(1);
+
+        if (wasADS == this._isADS) { return; }
+        this.OnADS?.Invoke(this._isADS);
     }
 
     public void Shoot() => this._shootController.Shoot();
