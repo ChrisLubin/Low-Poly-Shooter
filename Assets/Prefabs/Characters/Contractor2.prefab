@@ -722,6 +722,8 @@ GameObject:
   - component: {fileID: 3396908969173115210}
   - component: {fileID: 1837996852871556149}
   - component: {fileID: 1037944116949542744}
+  - component: {fileID: 8695697814296109224}
+  - component: {fileID: 1346164607980416981}
   m_Layer: 7
   m_Name: Contractor2
   m_TagString: Untagged
@@ -992,6 +994,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerNameText: {fileID: 4866862475339131778}
+--- !u!114 &8695697814296109224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3395804636025468854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cf3382d91c7f024dacbd46524ef9a3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _abilityToEquip: 1
+--- !u!114 &1346164607980416981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3395804636025468854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11920dda7afebf1468436db0d0e11551, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _semiTransparentMaterial: {fileID: 2100000, guid: de6c76f55bb38904ba5a5d26bcef7d8e,
+    type: 2}
 --- !u!1 &3395817449617735310
 GameObject:
   m_ObjectHideFlags: 0
