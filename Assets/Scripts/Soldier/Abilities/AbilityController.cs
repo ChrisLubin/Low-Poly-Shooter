@@ -1,7 +1,7 @@
 using System;
-using Unity.Netcode;
+using UnityEngine;
 
-public abstract class AbilityController : NetworkBehaviour
+public abstract class AbilityController : MonoBehaviour
 {
     // Properties needed to be set by ability
     public Abilities Ability { get; protected set; }
