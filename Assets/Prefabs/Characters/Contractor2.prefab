@@ -901,7 +901,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a55bc9646c7d5b44189b1d5b2c1bfbe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerCamera: {fileID: 8007331112903200479}
+  _playerCamera: {fileID: 3413166565676438122}
+  _audioListener: {fileID: 2267612023176509371}
   _weaponController: {fileID: 5393219146533398}
 --- !u!114 &9030879020514382541
 MonoBehaviour:
@@ -7993,6 +7994,11 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 5967023710246181017, guid: 5f8f12d0dd37bfa42b00c0a28f479976,
+        type: 3}
+      propertyPath: _GUN_SHOT_AUDIO_VOLUME
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 7353478113595497723, guid: 5f8f12d0dd37bfa42b00c0a28f479976,
         type: 3}
       propertyPath: m_RootOrder
@@ -8013,7 +8019,16 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8352678731737743770, guid: 5f8f12d0dd37bfa42b00c0a28f479976,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 951099334
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8352678731737743770, guid: 5f8f12d0dd37bfa42b00c0a28f479976, type: 3}
+    - {fileID: 7869564590700677346, guid: 5f8f12d0dd37bfa42b00c0a28f479976, type: 3}
+    - {fileID: 4539767182687092295, guid: 5f8f12d0dd37bfa42b00c0a28f479976, type: 3}
+    - {fileID: 5285188303541009034, guid: 5f8f12d0dd37bfa42b00c0a28f479976, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 5f8f12d0dd37bfa42b00c0a28f479976, type: 3}
 --- !u!114 &5393219146533398 stripped
 MonoBehaviour:

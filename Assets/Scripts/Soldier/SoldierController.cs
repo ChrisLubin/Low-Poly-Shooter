@@ -7,7 +7,8 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     private SoldierDamageController _damageController;
     private SoldierDeathController _deathController;
 
-    [SerializeField] private GameObject _playerCamera;
+    [SerializeField] private Camera _playerCamera;
+    [SerializeField] private AudioListener _audioListener;
     [SerializeField] private WeaponController _weaponController;
 
     public static event Action<ulong, SoldierController> OnSpawn;
@@ -38,7 +39,8 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     protected override void OnOwnerNetworkSpawn()
     {
-        this._playerCamera.GetComponent<Camera>().enabled = true;
+        this._playerCamera.enabled = true;
+        this._audioListener.enabled = true;
         this._weaponController.OnShoot += this._OnShoot;
     }
 

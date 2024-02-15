@@ -9,6 +9,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     [SerializeField] private Transform _bulletPrefab;
     [SerializeField] private Transform _muzzleFlashVfxPrefab;
     [SerializeField] private Transform _shootPoint;
+    [SerializeField] private AudioClip _gunShotAudioClip;
 
     private const float _BULLET_BLOOM_OFFSET = 0.1f;
     private float _bulletSpeed;
@@ -18,6 +19,8 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     private float _minTimeBetweenShots;
     private float _timeSinceLastShot = Mathf.Infinity;
     public event Action OnShoot;
+
+    private const float _GUN_SHOT_AUDIO_VOLUME = 0.15f;
 
     private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -68,6 +71,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
         muzzleFlash.GetComponent<MuzzleFlashController>().Init(this._shootPoint);
 
+        AudioSource.PlayClipAtPoint(this._gunShotAudioClip, this._shootPoint.position, _GUN_SHOT_AUDIO_VOLUME);
         this.OnShoot?.Invoke();
     }
 

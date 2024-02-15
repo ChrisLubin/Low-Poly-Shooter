@@ -167,6 +167,12 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.09443013, y: 0.27624157, z: 1.0305375}
   m_Center: {x: 0.00080395676, y: 0.042135734, z: 0.20487414}
+--- !u!81 &1061204580384931916 stripped
+AudioListener:
+  m_CorrespondingSourceObject: {fileID: 2267612023176509371, guid: c8da68aabce1c724091fdf4779198a68,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279597268257454071}
+  m_PrefabAsset: {fileID: 0}
 --- !u!20 &4511491956000023965 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3413166565676438122, guid: c8da68aabce1c724091fdf4779198a68,
@@ -636,6 +642,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ragdollRootBone: {fileID: 4532949643699747521}
   _camera: {fileID: 4511491956000023965}
+  _audioListener: {fileID: 1061204580384931916}
 --- !u!1 &4531439207829789405 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3395974827745701162, guid: c8da68aabce1c724091fdf4779198a68,
