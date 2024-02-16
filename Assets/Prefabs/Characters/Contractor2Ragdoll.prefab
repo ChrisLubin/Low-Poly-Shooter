@@ -131,6 +131,8 @@ PrefabInstance:
     - {fileID: 1490572320250783304, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 3647622671833079134, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
     - {fileID: 1037944116949542744, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
+    - {fileID: 8695697814296109224, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
+    - {fileID: 1346164607980416981, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c8da68aabce1c724091fdf4779198a68, type: 3}
 --- !u!1 &242146586496770068 stripped
 GameObject:
@@ -628,6 +630,22 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1279597268257454071}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4498122355825882557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4531281742633861185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &7426434145114076192
 MonoBehaviour:
   m_ObjectHideFlags: 0

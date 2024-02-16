@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class PlayerAbilityManager : NetworkBehaviorAutoDisable<PlayerAbilityManager>
 {
+    private SoldierDeathController _deathController;
+
     [SerializeField] private Abilities _abilityOnSpawn;
     private AbilityController[] _allAbilities;
     private AbilityController _equippedAbilityController;
+
     private NetworkVariable<Abilities> _equippedAbility = new(Abilities.None, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private NetworkVariable<bool> _isAbilityActive = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private void Awake()
     {
+        this._deathController = GetComponent<SoldierDeathController>();
         this._allAbilities = GetComponents<AbilityController>();
+        this._deathController.OnDeath += this.OnDeath;
         this._equippedAbility.OnValueChanged += this.OnAbilityChanged;
         this._isAbilityActive.OnValueChanged += this.OnAbilityActiveChanged;
     }
@@ -20,6 +25,7 @@ public class PlayerAbilityManager : NetworkBehaviorAutoDisable<PlayerAbilityMana
     public override void OnDestroy()
     {
         base.OnDestroy();
+        this._deathController.OnDeath -= this.OnDeath;
         this._equippedAbility.OnValueChanged -= this.OnAbilityChanged;
         this._isAbilityActive.OnValueChanged -= this.OnAbilityActiveChanged;
     }
@@ -103,6 +109,12 @@ public class PlayerAbilityManager : NetworkBehaviorAutoDisable<PlayerAbilityMana
         if (isActive)
             this.ActiveAbility();
         else
+            this.DeactiveAbility();
+    }
+
+    private void OnDeath(ulong _)
+    {
+        if (this._equippedAbilityController != null && this._equippedAbilityController.IsActive)
             this.DeactiveAbility();
     }
 }

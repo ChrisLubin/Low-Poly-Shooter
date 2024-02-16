@@ -17,6 +17,7 @@ public class SoldierRagdollController : MonoBehaviour
         // Remove this and make SPAWN_PLAYER_REQUEST_TIMER private after doing Cinemachine fix and also auto remove auto spawn and add button that user clicks to spawn
         await UnityTimer.Delay(SoldierManager.SPAWN_PLAYER_REQUEST_TIMER);
         this._camera.enabled = false;
+        this._audioListener.enabled = false;
     }
 
     private void MatchAllChildTransform(Transform root, Transform clone)
