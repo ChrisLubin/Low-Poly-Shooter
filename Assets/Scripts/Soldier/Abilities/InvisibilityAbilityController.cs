@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class InvisibilityAbility : AbilityController
+public class InvisibilityAbilityController : AbilityController
 {
     [SerializeField] private Material _semiTransparentMaterial;
     private Renderer[] _meshes;
@@ -11,10 +11,6 @@ public class InvisibilityAbility : AbilityController
     {
         this.Ability = Abilities.Invisibility;
         this._meshes = GetComponentsInChildren<Renderer>();
-    }
-
-    private void Start()
-    {
         this._originalMaterials = this._meshes.Select(mesh => mesh.materials[0]).ToArray();
     }
 
