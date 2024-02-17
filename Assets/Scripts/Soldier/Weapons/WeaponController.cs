@@ -18,6 +18,7 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     [field: SerializeField] public float ReturnSpeed { get; private set; } = 6f;
 
     private bool _isADS = false;
+    public bool IsADS => this._isADS;
     public event Action<bool> OnADS;
 
     public event Action OnShoot;
