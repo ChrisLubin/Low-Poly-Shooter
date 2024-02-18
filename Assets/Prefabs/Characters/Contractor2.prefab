@@ -993,7 +993,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _soldierRootBone: {fileID: 3398616007911099702}
-  _ragdollPrefab: {fileID: 4537163431751777623, guid: 898c9c37227403148badf0b48666cc90,
+  _ragdollPrefab: {fileID: 3401683323565591200, guid: cbba5f816ea629340bade5fe58b0c8f2,
     type: 3}
 --- !u!114 &1037944116949542744
 MonoBehaviour:
