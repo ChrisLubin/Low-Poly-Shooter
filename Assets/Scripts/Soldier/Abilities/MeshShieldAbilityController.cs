@@ -3,6 +3,7 @@ using UnityEngine;
 public class MeshShieldAbilityController : AbilityController
 {
     private SoldierCameraController _cameraController;
+    private WeaponController _weaponController;
 
     [SerializeField] private Transform _shield;
 
@@ -11,6 +12,7 @@ public class MeshShieldAbilityController : AbilityController
         this.Ability = Abilities.MeshShield;
 
         this._cameraController = GetComponent<SoldierCameraController>();
+        this._weaponController = GetComponentInChildren<WeaponController>();
     }
 
     public override void Activate()
@@ -21,6 +23,7 @@ public class MeshShieldAbilityController : AbilityController
             this._cameraController.EnableThirdPersonCamera();
 
         this._shield.gameObject.SetActive(true);
+        this._weaponController.gameObject.SetActive(false);
     }
 
     public override void Deactivate()
@@ -31,5 +34,6 @@ public class MeshShieldAbilityController : AbilityController
             this._cameraController.EnableFirstPersonCamera();
 
         this._shield.gameObject.SetActive(false);
+        this._weaponController.gameObject.SetActive(true);
     }
 }
