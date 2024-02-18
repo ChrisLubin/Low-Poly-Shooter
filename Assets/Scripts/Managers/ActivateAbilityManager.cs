@@ -16,6 +16,9 @@ public class ActivateAbilityManager : NetworkBehaviour
         this._deathController = GetComponent<SoldierDeathController>();
         this._deathController.OnDeath += this.OnDeath;
         this._isAbilityActive.OnValueChanged += this.OnIsAbilityActiveChanged;
+
+        foreach (AbilityController ability in this._selectAbilityManager.AllAbilities)
+            ability.OnInternallyDeactivated += this.OnAbilityInternallyDeactivated;
     }
 
     public override void OnDestroy()
@@ -23,6 +26,9 @@ public class ActivateAbilityManager : NetworkBehaviour
         base.OnDestroy();
         this._deathController.OnDeath -= this.OnDeath;
         this._isAbilityActive.OnValueChanged -= this.OnIsAbilityActiveChanged;
+
+        foreach (AbilityController ability in this._selectAbilityManager.AllAbilities)
+            ability.OnInternallyDeactivated -= this.OnAbilityInternallyDeactivated;
     }
 
     private void Update()
@@ -84,5 +90,13 @@ public class ActivateAbilityManager : NetworkBehaviour
 
         if (this._selectAbilityManager.SelectedAbilityController != null && this._selectAbilityManager.SelectedAbilityController.IsActive)
             this.DeactiveAbility();
+    }
+
+    private void OnAbilityInternallyDeactivated()
+    {
+        if (!this.IsOwner) { return; }
+
+        if (this._isAbilityActive.Value)
+            this._isAbilityActive.Value = false;
     }
 }

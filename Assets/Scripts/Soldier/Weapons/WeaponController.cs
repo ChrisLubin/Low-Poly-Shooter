@@ -26,6 +26,7 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     private void Awake()
     {
         this._shootController = GetComponent<WeaponShootController>();
+        this._shootController.OnShoot += this.OnShoot;
         this._shootController.Init(this._bulletSpeed, this._bulletDamage, this._roundsPerMinute, this._bloomMaxAngle);
     }
 

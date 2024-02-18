@@ -8,9 +8,9 @@ public class SelectAbilityManager : NetworkBehaviour
     private ActivateAbilityManager _activateAbilityManager;
 
     [SerializeField] private Abilities _abilityOnSpawn;
-    private AbilityController[] _allAbilities;
     private NetworkVariable<Abilities> _selectedAbility = new(Abilities.None, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    public AbilityController[] AllAbilities { get; private set; }
     public Abilities SelectedAbility => this._selectedAbility.Value;
     public AbilityController SelectedAbilityController { get; private set; }
     public event Action<Abilities> OnLocalPlayerSelectedAbilityChanged;
@@ -18,7 +18,7 @@ public class SelectAbilityManager : NetworkBehaviour
     private void Awake()
     {
         this._activateAbilityManager = GetComponent<ActivateAbilityManager>();
-        this._allAbilities = GetComponents<AbilityController>();
+        this.AllAbilities = GetComponents<AbilityController>();
         this._selectedAbility.OnValueChanged += this.OnSelectedAbilityChanged;
     }
 
@@ -54,7 +54,7 @@ public class SelectAbilityManager : NetworkBehaviour
     {
         if (this.IsOwner && this._selectedAbility.Value == ability) { return; }
 
-        this.SelectedAbilityController = this._allAbilities.FirstOrDefault(controller => controller.Ability == ability);
+        this.SelectedAbilityController = this.AllAbilities.FirstOrDefault(controller => controller.Ability == ability);
 
         if (this.IsOwner)
             this._selectedAbility.Value = ability;
@@ -75,7 +75,7 @@ public class SelectAbilityManager : NetworkBehaviour
     {
         abilityIndex = 0;
 
-        for (int i = 1; i <= this._allAbilities.Length; i++)
+        for (int i = 1; i <= this.AllAbilities.Length; i++)
         {
             if (!Input.GetKeyDown(KeyCode.Alpha0 + i)) { continue; }
 

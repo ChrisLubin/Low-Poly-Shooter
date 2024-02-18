@@ -1,8 +1,12 @@
 using System.Linq;
 using UnityEngine;
+using static SoldierDamageController;
 
 public class InvisibilityAbilityController : AbilityController
 {
+    private SoldierDamageController _damageController;
+    private WeaponController _weaponController;
+
     [SerializeField] private Material _semiTransparentMaterial;
     private Renderer[] _meshes;
     private Material[] _originalMaterials;
@@ -10,8 +14,20 @@ public class InvisibilityAbilityController : AbilityController
     private void Awake()
     {
         this.Ability = Abilities.Invisibility;
+        this._damageController = GetComponent<SoldierDamageController>();
+        this._damageController.OnNonLocalPlayerShotByLocalPlayer += this.OnNonLocalPlayerShotByLocalPlayer;
+        this._damageController.OnServerDamageReceived += this.OnPlayerReceivedServerDamage;
+        this._weaponController = GetComponentInChildren<WeaponController>();
+        this._weaponController.OnShoot += this.OnPlayerDidShoot;
         this._meshes = GetComponentsInChildren<Renderer>();
         this._originalMaterials = this._meshes.Select(mesh => mesh.materials[0]).ToArray();
+    }
+
+    private void OnDestroy()
+    {
+        this._damageController.OnNonLocalPlayerShotByLocalPlayer -= this.OnNonLocalPlayerShotByLocalPlayer;
+        this._damageController.OnServerDamageReceived -= this.OnPlayerReceivedServerDamage;
+        this._weaponController.OnShoot -= this.OnPlayerDidShoot;
     }
 
     public override void Activate()
@@ -42,5 +58,21 @@ public class InvisibilityAbilityController : AbilityController
 
             renderer.materials = materialArray;
         }
+    }
+
+    private void OnNonLocalPlayerShotByLocalPlayer(DamageType _, int __) => this.TryInternallyDeactivate();
+    private void OnPlayerReceivedServerDamage(DamageType _, int __) => this.TryInternallyDeactivate();
+    private void OnPlayerDidShoot() => this.TryInternallyDeactivate();
+
+    private bool TryInternallyDeactivate()
+    {
+        if (this.IsActive)
+        {
+            this.Deactivate();
+            base.DeactivateInternally();
+            return true;
+        }
+
+        return false;
     }
 }

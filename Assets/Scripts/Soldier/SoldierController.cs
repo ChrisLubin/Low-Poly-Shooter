@@ -23,7 +23,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
         this._healthController = GetComponent<SoldierHealthController>();
         this._deathController = GetComponent<SoldierDeathController>();
         this._damageController = GetComponent<SoldierDamageController>();
-        this._damageController.OnLocalTakeDamage += this._OnLocalTakeDamage;
+        this._damageController.OnNonLocalPlayerShotByLocalPlayer += this._OnLocalTakeDamage;
         this._damageController.OnServerTakeDamage += this._OnServerTakeDamage;
         this._damageController.OnServerDamageReceived += this._OnServerDamageReceived;
         this._deathController.OnDeath += this._OnDeath;
@@ -46,7 +46,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     {
         base.OnDestroy();
         this._weaponController.OnShoot -= this._OnShoot;
-        this._damageController.OnLocalTakeDamage -= this._OnLocalTakeDamage;
+        this._damageController.OnNonLocalPlayerShotByLocalPlayer -= this._OnLocalTakeDamage;
         this._damageController.OnServerTakeDamage -= this._OnServerTakeDamage;
         this._damageController.OnServerDamageReceived -= this._OnServerDamageReceived;
         this._deathController.OnDeath -= this._OnDeath;

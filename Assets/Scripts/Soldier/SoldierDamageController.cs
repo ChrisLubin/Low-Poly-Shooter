@@ -7,7 +7,7 @@ public class SoldierDamageController : NetworkBehaviour
     private SoldierHealthController _healthController;
     [SerializeField] private Transform _bloodSplatterVfxPrefab;
 
-    public event Action<DamageType, int> OnLocalTakeDamage;
+    public event Action<DamageType, int> OnNonLocalPlayerShotByLocalPlayer;
     public event Action<ulong, DamageType, int> OnServerTakeDamage;
     public event Action<DamageType, int> OnServerDamageReceived;
 
@@ -34,17 +34,14 @@ public class SoldierDamageController : NetworkBehaviour
     public void TakeLocalDamage(DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer)
     {
         if (!this.IsOwner)
-        {
             Instantiate(this._bloodSplatterVfxPrefab, damagePoint, Quaternion.identity, transform);
-        }
+
         // Only take damage when another client says we have
         if (!isDamageFromLocalPlayer) { return; }
 
+        // We shot another soldier locally
         if (type == DamageType.Bullet)
-        {
-            // We shot another soldier locally
-            this.OnLocalTakeDamage?.Invoke(type, damageAmount);
-        }
+            this.OnNonLocalPlayerShotByLocalPlayer?.Invoke(type, damageAmount);
     }
 
     public void TakeServerDamage(ulong damagerClientId, DamageType type, int damageAmount)
@@ -53,9 +50,7 @@ public class SoldierDamageController : NetworkBehaviour
         // Host sending damage to player
 
         if (type == DamageType.Bullet)
-        {
             this.OnServerTakeDamage?.Invoke(damagerClientId, type, damageAmount);
-        }
     }
 
     private void OnHealthChange(HealthData oldHealthData, HealthData newHealthData)
