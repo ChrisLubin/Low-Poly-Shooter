@@ -40,4 +40,5 @@ public enum Abilities
     None,
     Invisibility,
     MeshShield,
+    ReconSenses,
 }

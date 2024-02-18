@@ -799,11 +799,12 @@ GameObject:
   - component: {fileID: 3396908969173115210}
   - component: {fileID: 1837996852871556149}
   - component: {fileID: 1037944116949542744}
+  - component: {fileID: 4277087072740611663}
   - component: {fileID: 168241652215410556}
   - component: {fileID: 8695697814296109224}
   - component: {fileID: 1346164607980416981}
-  - component: {fileID: 4161002275521030208}
-  - component: {fileID: 4277087072740611663}
+  - component: {fileID: 8066130845130789447}
+  - component: {fileID: 3730299446852699180}
   m_Layer: 8
   m_Name: Contractor2
   m_TagString: Untagged
@@ -1088,6 +1089,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerNameText: {fileID: 4866862475339131778}
   _healthText: {fileID: 8229859840068025027}
+--- !u!114 &4277087072740611663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3395804636025468854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c201e93cb1bbed479adb149a43eadaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _predatorMissilePrefab: {fileID: 2255255474441088359, guid: 88bf78954330b3d469f61db1e9b0df59,
+    type: 3}
 --- !u!114 &168241652215410556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1130,7 +1145,7 @@ MonoBehaviour:
   _toggleAbilityAudioVolume: 0.2
   _semiTransparentMaterial: {fileID: 2100000, guid: de6c76f55bb38904ba5a5d26bcef7d8e,
     type: 2}
---- !u!114 &4161002275521030208
+--- !u!114 &8066130845130789447
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1146,7 +1161,7 @@ MonoBehaviour:
     type: 3}
   _toggleAbilityAudioVolume: 0.1
   _shield: {fileID: 6104344289685204042}
---- !u!114 &4277087072740611663
+--- !u!114 &3730299446852699180
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1155,11 +1170,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3395804636025468854}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c201e93cb1bbed479adb149a43eadaf, type: 3}
+  m_Script: {fileID: 11500000, guid: 04af96e9f19fc6346b46491a5530cb0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _predatorMissilePrefab: {fileID: 2255255474441088359, guid: 88bf78954330b3d469f61db1e9b0df59,
-    type: 3}
+  _abilityToggledAudioClip: {fileID: 0}
+  _toggleAbilityAudioVolume: 0.5
+  _enemySilhoutteRenderer: {fileID: -2345226267504738207, guid: c40be3174f62c4acf8c1216858c64956,
+    type: 2}
 --- !u!1 &3395817449617735310
 GameObject:
   m_ObjectHideFlags: 0
