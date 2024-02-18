@@ -20,27 +20,24 @@ public class BulletController : MonoBehaviour
 
     private void Start()
     {
-        if (this.WillCollideNextFrame(out Vector3 collidePosition, out SoldierController soldier, Constants.LayerNames.Soldier))
-        {
-            this.OnSoldierWillCollide(collidePosition, soldier);
-        }
+        if (this.WillCollideNextFrame(out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
+            this.OnWillCollide(collidePosition, damageable);
     }
 
     private void FixedUpdate()
     {
-        if (this.WillCollideNextFrame(out Vector3 collidePosition, out SoldierController soldier, Constants.LayerNames.Soldier))
+        if (this.WillCollideNextFrame(out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
         {
-            this.OnSoldierWillCollide(collidePosition, soldier);
+            this.OnWillCollide(collidePosition, damageable);
             return;
         }
+
         this._timeSinceCreation += Time.fixedDeltaTime;
         transform.position = this.GetNextPosition();
         this.transform.localScale = Vector3.one;
 
         if (this._timeSinceCreation > this._maxLifeSpan)
-        {
             ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.Bullet, transform);
-        }
     }
 
     private Vector3 GetNextPosition() => transform.position + transform.forward * this._speed * Time.fixedDeltaTime;
@@ -59,15 +56,16 @@ public class BulletController : MonoBehaviour
             hit.collider.TryGetComponent(out collideObject);
             return true;
         }
+
         return false;
     }
 
-    private async void OnSoldierWillCollide(Vector3 collidePosition, SoldierController soldier)
+    private async void OnWillCollide(Vector3 collidePosition, IDamageable damageable)
     {
         // Set transform to collision point then wait a frame before taking action
         transform.position = collidePosition;
         await UnityTimer.Delay(0);
-        soldier.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
+        damageable.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
         ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.Bullet, transform);
     }
 }

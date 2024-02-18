@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
+public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>, IDamageable
 {
     private SoldierHealthController _healthController;
     private SoldierDamageController _damageController;
