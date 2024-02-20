@@ -7,6 +7,9 @@ public class InvisibilityAbilityController : AbilityController
     private SoldierDamageController _damageController;
     private WeaponController _weaponController;
 
+    [SerializeField] private AudioClip _abilityToggledAudioClip;
+    private const float _TOGGLE_ABILITY_AUDIO_VOLUME = 0.2f;
+
     [SerializeField] private Material _semiTransparentMaterial;
     private Renderer[] _meshes;
     private Material[] _originalMaterials;
@@ -32,6 +35,9 @@ public class InvisibilityAbilityController : AbilityController
 
     public override void Activate()
     {
+        if (!this.IsActive)
+            AudioSource.PlayClipAtPoint(this._abilityToggledAudioClip, transform.position, _TOGGLE_ABILITY_AUDIO_VOLUME);
+
         base.Activate();
 
         this.ChangeMeshes(true);
@@ -39,6 +45,9 @@ public class InvisibilityAbilityController : AbilityController
 
     public override void Deactivate()
     {
+        if (this.IsActive)
+            AudioSource.PlayClipAtPoint(this._abilityToggledAudioClip, transform.position, _TOGGLE_ABILITY_AUDIO_VOLUME);
+
         base.Deactivate();
 
         this.ChangeMeshes(false);

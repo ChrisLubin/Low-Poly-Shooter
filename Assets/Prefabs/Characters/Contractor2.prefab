@@ -1048,6 +1048,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11920dda7afebf1468436db0d0e11551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _abilityToggledAudioClip: {fileID: 8300000, guid: 2562c4640aa104b4ea9efc7f1d7e9346,
+    type: 3}
   _semiTransparentMaterial: {fileID: 2100000, guid: de6c76f55bb38904ba5a5d26bcef7d8e,
     type: 2}
 --- !u!114 &4161002275521030208
