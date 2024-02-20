@@ -9,9 +9,24 @@ public abstract class AbilityController : MonoBehaviour
     public bool IsActive { get; protected set; }
     public event Action OnInternallyDeactivated;
 
+    [SerializeField] private AudioClip _abilityToggledAudioClip;
+    [SerializeField] private float _toggleAbilityAudioVolume = 0.5f;
+
     public virtual bool CanActivate() => !this.IsActive;
-    public virtual void Activate() => this.IsActive = true;
-    public virtual void Deactivate() => this.IsActive = false;
+    public virtual void Activate()
+    {
+        if (!this.IsActive && this._abilityToggledAudioClip != null)
+            AudioSource.PlayClipAtPoint(this._abilityToggledAudioClip, transform.position, this._toggleAbilityAudioVolume);
+
+        this.IsActive = true;
+    }
+    public virtual void Deactivate()
+    {
+        if (this.IsActive && this._abilityToggledAudioClip != null)
+            AudioSource.PlayClipAtPoint(this._abilityToggledAudioClip, transform.position, this._toggleAbilityAudioVolume);
+
+        this.IsActive = false;
+    }
 
     protected void DeactivateInternally()
     {

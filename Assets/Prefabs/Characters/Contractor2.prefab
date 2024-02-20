@@ -1050,6 +1050,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilityToggledAudioClip: {fileID: 8300000, guid: 2562c4640aa104b4ea9efc7f1d7e9346,
     type: 3}
+  _toggleAbilityAudioVolume: 0.2
   _semiTransparentMaterial: {fileID: 2100000, guid: de6c76f55bb38904ba5a5d26bcef7d8e,
     type: 2}
 --- !u!114 &4161002275521030208
@@ -1064,6 +1065,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abae3842c78db7d4699da91e0b604c77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _abilityToggledAudioClip: {fileID: 8300000, guid: 4fdb44def63c0c14db65565e42aed3e9,
+    type: 3}
+  _toggleAbilityAudioVolume: 0.1
   _shield: {fileID: 6104344289685204042}
 --- !u!1 &3395817449617735310
 GameObject:
