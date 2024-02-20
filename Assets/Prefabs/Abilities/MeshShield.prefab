@@ -111,3 +111,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eb73c63b1c54ae4bab1be1422e9cf44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _bulletImpactAudioClip: {fileID: 8300000, guid: 9e2a43a692a08ae42bbacef576c90957,
+    type: 3}
