@@ -2,10 +2,13 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 
-public class SoldierDamageController : NetworkBehaviour
+public class SoldierDamageController : NetworkBehaviour, IDamageable
 {
     private SoldierHealthController _healthController;
     [SerializeField] private Transform _bloodSplatterVfxPrefab;
+    [SerializeField] private AudioClip _bulletFleshImpactAudioClip;
+
+    private const float _BULLET_IMPACT_AUDIO_VOLUME = 0.3f;
 
     public event Action<DamageType, int> OnNonLocalPlayerShotByLocalPlayer;
     public event Action<ulong, DamageType, int> OnServerTakeDamage;
@@ -41,7 +44,10 @@ public class SoldierDamageController : NetworkBehaviour
 
         // We shot another soldier locally
         if (type == DamageType.Bullet)
+        {
+            AudioSource.PlayClipAtPoint(this._bulletFleshImpactAudioClip, damagePoint, _BULLET_IMPACT_AUDIO_VOLUME);
             this.OnNonLocalPlayerShotByLocalPlayer?.Invoke(type, damageAmount);
+        }
     }
 
     public void TakeServerDamage(ulong damagerClientId, DamageType type, int damageAmount)
@@ -57,6 +63,9 @@ public class SoldierDamageController : NetworkBehaviour
     {
         if (newHealthData.Health >= oldHealthData.Health) { return; }
         // Clients reacting to host sending damage to player
+
+        if (newHealthData.LatestDamagerClientId != NetworkManager.Singleton.LocalClientId)
+            AudioSource.PlayClipAtPoint(this._bulletFleshImpactAudioClip, transform.position, _BULLET_IMPACT_AUDIO_VOLUME);
 
         this.OnServerDamageReceived?.Invoke(newHealthData.LatestDamageType, oldHealthData.Health - newHealthData.Health);
     }

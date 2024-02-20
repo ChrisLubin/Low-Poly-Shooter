@@ -947,6 +947,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bloodSplatterVfxPrefab: {fileID: 4179378053120898, guid: 5c0bef95182fd5447aac2392a32c713e,
     type: 3}
+  _bulletFleshImpactAudioClip: {fileID: 8300000, guid: 1c59941eac11e314397b790baf1ff172,
+    type: 3}
+  test: 5
 --- !u!114 &9155006118573193979
 MonoBehaviour:
   m_ObjectHideFlags: 0
