@@ -949,7 +949,6 @@ MonoBehaviour:
     type: 3}
   _bulletFleshImpactAudioClip: {fileID: 8300000, guid: 1c59941eac11e314397b790baf1ff172,
     type: 3}
-  test: 5
 --- !u!114 &9155006118573193979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8097,7 +8096,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
