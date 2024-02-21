@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
 {
     [SerializeField] private GameObject _uiContainer;
+    [SerializeField] private TextMeshProUGUI _selectedAbilityText;
     [SerializeField] private Color _notSelectedOutlineColor;
     [SerializeField] private Color _selectedOutlineColor;
 
@@ -35,6 +37,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     {
         this.ResetOutlines();
 
+        this._selectedAbilityText.text = newAbility.ToString();
         if (this.AbilityOutlineMap.TryGetValue(newAbility, out Outline outline))
             outline.effectColor = this._selectedOutlineColor;
         else
