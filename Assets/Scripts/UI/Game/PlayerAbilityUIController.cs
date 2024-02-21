@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
 {
+    [SerializeField] private GameObject _uiContainer;
     [SerializeField] private Color _notSelectedOutlineColor;
     [SerializeField] private Color _selectedOutlineColor;
 
@@ -13,6 +14,8 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     protected override void Awake()
     {
         base.Awake();
+        SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+        SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged += this.OnLocalPlayerSelectedAbilityChanged;
     }
 
@@ -23,6 +26,8 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
 
     private void OnDestroy()
     {
+        SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+        SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged -= this.OnLocalPlayerSelectedAbilityChanged;
     }
 
@@ -41,4 +46,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
         foreach (KeyValuePair<Abilities, Outline> pair in this.AbilityOutlineMap)
             pair.Value.effectColor = this._notSelectedOutlineColor;
     }
+
+    private void OnLocalPlayerSpawn() => this._uiContainer.gameObject.SetActive(true);
+    private void OnLocalPlayerDeath() => this._uiContainer.gameObject.SetActive(false);
 }
