@@ -31,6 +31,8 @@ public class Logger
         }
     }
 
+    public void Log(int message, LogLevel logLevel = LogLevel.Info) => this.Log(message.ToString(), logLevel);
+
     public enum LogLevel
     {
         Info = 0,
@@ -43,9 +45,9 @@ public abstract class WithLogger<T> : MonoBehaviour where T : MonoBehaviour
 {
     protected Logger _logger;
 
-    private void Awake()
+    protected virtual void Awake()
     {
-        this._logger = new Logger((this as T).ToString());
+        this._logger = new Logger(GetType().Name);
     }
 }
 
@@ -56,7 +58,7 @@ public abstract class StaticInstanceWithLogger<T> : StaticInstance<T> where T : 
     protected override void Awake()
     {
         base.Awake();
-        this._logger = new Logger((this as T).ToString());
+        this._logger = new Logger(GetType().Name);
     }
 }
 
@@ -66,8 +68,28 @@ public abstract class NetworkBehaviourWithLogger<T> : NetworkBehaviour where T :
 
     protected virtual void Awake()
     {
-        this._logger = new Logger((this as T).ToString());
+        this._logger = new Logger(GetType().Name);
     }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        this.ResetLogger();
+    }
+
+    public override void OnGainedOwnership()
+    {
+        base.OnGainedOwnership();
+        this.ResetLogger();
+    }
+
+    public override void OnLostOwnership()
+    {
+        base.OnLostOwnership();
+        this.ResetLogger();
+    }
+
+    private void ResetLogger() => this._logger = new Logger($"{GetType().Name} - {this.OwnerClientId}");
 }
 
 public abstract class NetworkedStaticInstanceWithLogger<T> : NetworkedStaticInstance<T> where T : NetworkBehaviour
@@ -77,6 +99,6 @@ public abstract class NetworkedStaticInstanceWithLogger<T> : NetworkedStaticInst
     protected override void Awake()
     {
         base.Awake();
-        this._logger = new Logger((this as T).ToString());
+        this._logger = new Logger(GetType().Name);
     }
 }

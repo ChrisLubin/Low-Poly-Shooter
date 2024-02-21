@@ -7,13 +7,14 @@ public class SelectAbilityManager : NetworkBehaviour
 {
     private ActivateAbilityManager _activateAbilityManager;
 
-    [SerializeField] private Abilities _abilityOnSpawn;
+    private static Abilities _lastSelectedAbility;
+    [SerializeField] private Abilities _abilityOnFirstSpawn;
     private NetworkVariable<Abilities> _selectedAbility = new(Abilities.None, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public AbilityController[] AllAbilities { get; private set; }
     public Abilities SelectedAbility => this._selectedAbility.Value;
     public AbilityController SelectedAbilityController { get; private set; }
-    public event Action<Abilities> OnLocalPlayerSelectedAbilityChanged;
+    public static event Action<Abilities> OnLocalPlayerSelectedAbilityChanged;
 
     private void Awake()
     {
@@ -33,7 +34,12 @@ public class SelectAbilityManager : NetworkBehaviour
         base.OnNetworkSpawn();
 
         if (this.IsOwner)
-            this.SelectAbility(this._abilityOnSpawn);
+        {
+            if (_lastSelectedAbility == Abilities.None)
+                this.SelectAbility(this._abilityOnFirstSpawn);
+            else
+                this.SelectAbility(_lastSelectedAbility);
+        }
         else
             this.SelectAbility(this.SelectedAbility);
     }
@@ -64,7 +70,8 @@ public class SelectAbilityManager : NetworkBehaviour
     {
         if (this.IsOwner)
         {
-            this.OnLocalPlayerSelectedAbilityChanged?.Invoke(newAbility);
+            _lastSelectedAbility = newAbility;
+            OnLocalPlayerSelectedAbilityChanged?.Invoke(newAbility);
             return;
         }
 
