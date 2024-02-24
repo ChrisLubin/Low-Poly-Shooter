@@ -6,16 +6,16 @@ public class SoldierRagdollController : MonoBehaviour
     [SerializeField] private Transform _ragdollRootBone;
     [SerializeField] private CinemachineVirtualCamera _camera;
 
-    public async void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
+    private void Awake() => SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+    private void OnDestroy() => SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+
+    public void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
     {
         this.MatchAllChildTransform(originalRootBone, this._ragdollRootBone);
 
         if (!isLocalPlayer) { return; }
 
         this._camera.enabled = true;
-        // Remove this and make SPAWN_PLAYER_REQUEST_TIMER private after doing Cinemachine fix and also auto remove auto spawn and add button that user clicks to spawn
-        await UnityTimer.Delay(SoldierManager.SPAWN_PLAYER_REQUEST_TIMER);
-        this._camera.enabled = false;
     }
 
     private void MatchAllChildTransform(Transform root, Transform clone)
@@ -33,4 +33,6 @@ public class SoldierRagdollController : MonoBehaviour
             MatchAllChildTransform(originalChild, cloneChild);
         }
     }
+
+    private void OnLocalPlayerSpawn() => this._camera.enabled = false;
 }

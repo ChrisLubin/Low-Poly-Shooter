@@ -15,7 +15,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     private ulong _localClientId;
     private bool _hasSpawnedPlayers = false;
     private const int _DEAD_PLAYER_DESPAWN_TIMER = 5000;
-    public const int SPAWN_PLAYER_REQUEST_TIMER = 3000; // Make private after doing Cinemachine fix
+    private const int _SPAWN_PLAYER_REQUEST_TIMER = 3000;
 
     public static event Action OnLocalPlayerShoot;
     public static event Action OnLocalPlayerDamageReceived;
@@ -98,7 +98,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         {
             SoldierManager.OnLocalPlayerDeath?.Invoke();
             // Request server to spawn us after a timer
-            await UnityTimer.Delay(SPAWN_PLAYER_REQUEST_TIMER);
+            await UnityTimer.Delay(_SPAWN_PLAYER_REQUEST_TIMER);
             RpcSystem.Instance.RequestPlayerSpawnServerRpc();
         }
 
