@@ -96,7 +96,7 @@ public class PauseMenuController : NetworkBehaviour
 
     private void OnHostDisconnect()
     {
-        if (this.IsHost || GameManager.State == GameState.PlayerWaitingForHostToStart) { return; }
+        if (this.IsHost || GameManager.State == GameState.PlayerWaitingForHostToStart || GameManager.State == GameState.GameOver) { return; }
 
         this._didHostDisconnect = true;
         this._headerText.text = "The host has left the lobby. Please return to the main menu.";

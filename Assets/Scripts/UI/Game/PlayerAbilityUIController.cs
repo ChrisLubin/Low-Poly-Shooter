@@ -16,6 +16,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     protected override void Awake()
     {
         base.Awake();
+        GameManager.OnStateChange += this.OnGameStateChange;
         SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged += this.OnLocalPlayerSelectedAbilityChanged;
@@ -28,9 +29,22 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
 
     private void OnDestroy()
     {
+        GameManager.OnStateChange -= this.OnGameStateChange;
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged -= this.OnLocalPlayerSelectedAbilityChanged;
+    }
+
+    private void OnGameStateChange(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.GameOver:
+                this._uiContainer.gameObject.SetActive(false);
+                break;
+            default:
+                break;
+        }
     }
 
     private void OnLocalPlayerSelectedAbilityChanged(Abilities newAbility)

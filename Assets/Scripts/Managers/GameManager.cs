@@ -7,7 +7,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
     public static event Action<GameState> OnStateChange;
     public static GameState State { get; private set; }
-    private GameObject _mainCamera;
+    private Camera _mainCamera;
     [SerializeField] private AudioListener _mainCameraAudioListener;
 
     protected override void Awake()
@@ -16,7 +16,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         RpcSystem.OnGameStateChange += this.ChangeState;
         SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
-        this._mainCamera = Camera.main.gameObject;
+        this._mainCamera = Camera.main;
     }
 
     public override void OnDestroy()
@@ -41,8 +41,8 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
     }
 
-    private void OnLocalPlayerSpawn() => this._mainCamera.SetActive(false);
-    private void OnLocalPlayerDeath() => this._mainCamera.SetActive(true);
+    private void OnLocalPlayerSpawn() => this._mainCamera.gameObject.SetActive(false);
+    private void OnLocalPlayerDeath() => this._mainCamera.gameObject.SetActive(true);
 
     public void ChangeState(GameState newState)
     {
@@ -68,11 +68,8 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
             case GameState.GameStarted:
                 this.HandleGameStarted();
                 break;
-            case GameState.Win:
-                this.HandleWin();
-                break;
-            case GameState.Lose:
-                this.HandleLose();
+            case GameState.GameOver:
+                this.HandleGameOver();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -99,12 +96,15 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         CozyWeather.instance.perennialProfile.pauseTime = false;
     }
 
-    private void HandleWin()
+    private void HandleGameOver()
     {
-    }
+        this._mainCamera.gameObject.SetActive(true);
+        this._mainCameraAudioListener.enabled = true;
 
-    private void HandleLose()
-    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        CozyWeather.instance.cozyCamera = this._mainCamera;
     }
 }
 
@@ -116,6 +116,5 @@ public enum GameState
     PlayerWaitingForHostToStart,
     GameStarting,
     GameStarted,
-    Win,
-    Lose,
+    GameOver
 }

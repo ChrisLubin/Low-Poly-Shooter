@@ -73,6 +73,9 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
             case GameState.GameStarting:
                 this.SpawnPlayers();
                 break;
+            case GameState.GameOver:
+                this.DespawnPlayers();
+                break;
         }
     }
 
@@ -194,5 +197,19 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         this._logger.Log($"Spawned soldier for {MultiplayerSystem.Instance.GetPlayerUsername(clientId)}");
     }
 
-    private void OnPlayerRequestSpawn(ulong clientId) => this.SpawnPlayer(clientId);
+    private void OnPlayerRequestSpawn(ulong clientId)
+    {
+        if (GameManager.State == GameState.GameOver) { return; }
+
+        this.SpawnPlayer(clientId);
+    }
+
+    public void DespawnPlayers()
+    {
+        if (!this.IsHost) { return; }
+        this._logger.Log("Despawning soldiers");
+
+        foreach (SoldierController soldier in this._playersMap.Values)
+            soldier.GetComponent<NetworkObject>().Despawn();
+    }
 }
