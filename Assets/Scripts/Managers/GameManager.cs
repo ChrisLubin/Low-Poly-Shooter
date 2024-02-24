@@ -1,4 +1,5 @@
 using System;
+using DistantLands.Cozy;
 using Unity.Services.Authentication;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public static event Action<GameState> OnStateChange;
     public static GameState State { get; private set; }
     private GameObject _mainCamera;
+    [SerializeField] private AudioListener _mainCameraAudioListener;
 
     protected override void Awake()
     {
@@ -55,8 +57,10 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
             case GameState.None:
                 break;
             case GameState.HostWaitingForPlayers:
+                HandleHostWaitingForPlayers();
                 break;
             case GameState.PlayerWaitingForHostToStart:
+                HandlePlayerWaitingForHostToStart();
                 break;
             case GameState.GameStarting:
                 this.HandleGameStarting();
@@ -75,12 +79,24 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         }
     }
 
+    private void HandleHostWaitingForPlayers()
+    {
+        CozyWeather.instance.perennialProfile.pauseTime = true;
+    }
+
+    private void HandlePlayerWaitingForHostToStart()
+    {
+        CozyWeather.instance.perennialProfile.pauseTime = true;
+    }
+
     private void HandleGameStarting()
     {
     }
 
     private void HandleGameStarted()
     {
+        this._mainCameraAudioListener.enabled = false;
+        CozyWeather.instance.perennialProfile.pauseTime = false;
     }
 
     private void HandleWin()
