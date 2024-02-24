@@ -2289,7 +2289,7 @@ MonoBehaviour:
       m_Mode: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    floatVal: 0.079
+    floatVal: 0
     curveVal:
       serializedVersion: 2
       m_Curve:
@@ -3583,7 +3583,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   textureAmount:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}

@@ -35,5 +35,5 @@ MonoBehaviour:
     borderHeight: 0.5
     borderVariation: 0.94
     borderEffect: 1
-  fogDensity: 1.03
+  fogDensity: 0.1
   FX: []

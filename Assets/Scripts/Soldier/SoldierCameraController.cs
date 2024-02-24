@@ -1,3 +1,4 @@
+using DistantLands.Cozy;
 using UnityEngine;
 
 public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraController>
@@ -13,6 +14,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     protected override void OnOwnerNetworkSpawn()
     {
         this._firstPersonCamera.enabled = true;
+        CozyWeather.instance.cozyCamera = this._firstPersonCamera;
 
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
@@ -33,11 +35,13 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     {
         this._firstPersonCamera.enabled = true;
         this._thirdPersonCamera.enabled = false;
+        CozyWeather.instance.cozyCamera = this._firstPersonCamera;
     }
 
     public void EnableThirdPersonCamera()
     {
         this._firstPersonCamera.enabled = false;
         this._thirdPersonCamera.enabled = true;
+        CozyWeather.instance.cozyCamera = this._thirdPersonCamera;
     }
 }

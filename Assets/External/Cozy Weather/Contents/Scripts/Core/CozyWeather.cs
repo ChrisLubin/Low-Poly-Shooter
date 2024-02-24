@@ -686,10 +686,6 @@ namespace DistantLands.Cozy
         {
             if (lockToCamera != LockToCameraStyle.DontLockToCamera)
             {
-
-                if (lockToCamera == LockToCameraStyle.useMainCamera)
-                    cozyCamera = Camera.main;
-
                 if (cozyCamera != null)
                 {
                     transform.position = cozyCamera.transform.position;
@@ -710,9 +706,6 @@ namespace DistantLands.Cozy
         {
             if (lockToCamera != LockToCameraStyle.DontLockToCamera)
             {
-                if (lockToCamera == LockToCameraStyle.useMainCamera)
-                    cozyCamera = Camera.main;
-
                 if (cozyCamera != null)
                 {
                     if (Application.isPlaying)
