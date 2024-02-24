@@ -1,11 +1,15 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI.TableUI;
+using System.Linq;
 
 public class ScoreboardController : NetworkBehaviour
 {
     [SerializeField] private Canvas _canvas;
     [SerializeField] private TableUI _table;
+
+    private RowData[] _rows;
 
     private const int _PLAYER_NAME_COLUMN_INDEX = 0;
     private const int _PLAYER_KILLS_COLUMN_INDEX = 1;
@@ -32,9 +36,7 @@ public class ScoreboardController : NetworkBehaviour
 
         if (!MultiplayerSystem.IsMultiplayer)
         {
-            this.gameObject.SetActive(false);
             this._canvas.enabled = false;
-            this.enabled = false;
             return;
         }
     }
@@ -48,7 +50,12 @@ public class ScoreboardController : NetworkBehaviour
         SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
     }
 
-    private void Update() => this._canvas.enabled = Input.GetKey(KeyCode.Tab) && (GameManager.State == GameState.GameStarting || GameManager.State == GameState.GameStarted);
+    private void Update()
+    {
+        if (!MultiplayerSystem.IsMultiplayer) { return; }
+
+        this._canvas.enabled = Input.GetKey(KeyCode.Tab) && (GameManager.State == GameState.GameStarting || GameManager.State == GameState.GameStarted);
+    }
 
     private void OnGameStateChange(GameState state)
     {
@@ -64,32 +71,75 @@ public class ScoreboardController : NetworkBehaviour
 
     private void OnPlayerDeath(ulong deadClientId, ulong killerClientId)
     {
-        string killerPlayerName = MultiplayerSystem.Instance.GetPlayerUsername(killerClientId);
-        string deadPlayerName = MultiplayerSystem.Instance.GetPlayerUsername(deadClientId);
-
-        for (int i = 1; i < this._table.Rows; i++)
+        for (int i = 0; i < this._rows.Length; i++)
         {
-            string rowPlayerName = this._table.GetCell(i, _PLAYER_NAME_COLUMN_INDEX).text;
-            if (rowPlayerName != deadPlayerName && rowPlayerName != killerPlayerName) { continue; }
-            string rowPlayerKills = this._table.GetCell(i, _PLAYER_KILLS_COLUMN_INDEX).text;
-            string rowPlayerDeaths = this._table.GetCell(i, _PLAYER_DEATHS_COLUMN_INDEX).text;
+            RowData row = this._rows[i];
 
-            this._table.GetCell(i, _PLAYER_KILLS_COLUMN_INDEX).text = rowPlayerName == killerPlayerName ? (int.Parse(rowPlayerKills) + 1).ToString() : rowPlayerKills;
-            this._table.GetCell(i, _PLAYER_DEATHS_COLUMN_INDEX).text = rowPlayerName == deadPlayerName ? (int.Parse(rowPlayerDeaths) + 1).ToString() : rowPlayerDeaths;
+            if (row.ClientId == deadClientId)
+            {
+                row.Deaths++;
+                this._rows[i] = row;
+            }
+            else if (row.ClientId == killerClientId)
+            {
+                row.Kills++;
+                this._rows[i] = row;
+            }
         }
+
+        this.UpdateScoreboard();
     }
 
     private void InitPlayerRows()
     {
-        // Init player rows
+        List<RowData> rows = new();
+
         foreach (PlayerData player in MultiplayerSystem.Instance.PlayerData)
         {
-            this._table.Rows++;
-            int lastRowIndex = this._table.Rows - 1;
+            string usernameDisplay = player.Username.ToString();
 
-            this._table.GetCell(lastRowIndex, _PLAYER_NAME_COLUMN_INDEX).text = player.Username.ToString();
-            this._table.GetCell(lastRowIndex, _PLAYER_KILLS_COLUMN_INDEX).text = "0";
-            this._table.GetCell(lastRowIndex, _PLAYER_DEATHS_COLUMN_INDEX).text = "0";
+            if (NetworkManager.Singleton.LocalClientId == player.ClientId)
+                usernameDisplay += " (You)";
+
+            rows.Add(new(usernameDisplay, player.ClientId, 0, 0));
+        }
+
+        this._rows = rows.ToArray();
+
+        this.UpdateScoreboard();
+    }
+
+    private void UpdateScoreboard()
+    {
+        // Sort by kills
+        this._rows = this._rows.OrderByDescending<RowData, int>((row) => row.Kills).ToArray();
+
+        for (int i = 0; i < this._rows.Length; i++)
+        {
+            if (this._table.Rows <= i + 1)
+                this._table.Rows++;
+
+            RowData row = this._rows[i];
+
+            this._table.GetCell(i + 1, _PLAYER_NAME_COLUMN_INDEX).text = row.UsernameDisplay;
+            this._table.GetCell(i + 1, _PLAYER_KILLS_COLUMN_INDEX).text = row.Kills.ToString();
+            this._table.GetCell(i + 1, _PLAYER_DEATHS_COLUMN_INDEX).text = row.Deaths.ToString();
+        }
+    }
+
+    private struct RowData
+    {
+        public string UsernameDisplay { get; private set; }
+        public ulong ClientId { get; private set; }
+        public int Kills;
+        public int Deaths;
+
+        public RowData(string usernameDisplay, ulong clientId, int kills, int deaths)
+        {
+            this.UsernameDisplay = usernameDisplay;
+            this.ClientId = clientId;
+            this.Kills = kills;
+            this.Deaths = deaths;
         }
     }
 }
