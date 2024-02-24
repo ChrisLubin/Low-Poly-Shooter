@@ -26,7 +26,7 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
     public static bool IsMultiplayer { get; private set; } = false;
     public static MultiplayerState State { get; private set; }
     private const int _MAX_PLAYER_COUNT = 7;
-    public static string LocalPlayerName { get; private set; }
+    public static string LocalPlayerName { get; private set; } = "";
 
     private const string _LOBBY_RELAY_CODE_KEY = "RELAY_CODE";
     private const string _LOBBY_PLAYER_NAME_KEY = "PLAYER_NAME";
@@ -45,7 +45,6 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
         RpcSystem.OnMultiplayerStateChange += this.ChangeState;
         SceneManager.sceneLoaded += this.OnSceneLoaded;
         this.PlayerData = new();
-        MultiplayerSystem.LocalPlayerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
     }
 
     public override void OnNetworkSpawn()
@@ -181,6 +180,9 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 await this.DisposeLobby();
                 break;
             case MultiplayerState.CreatingLobby:
+                if (MultiplayerSystem.LocalPlayerName == "")
+                    MultiplayerSystem.LocalPlayerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
+
                 MultiplayerSystem.IsMultiplayer = true;
                 string lobbyName = $"{UnityEngine.Random.Range(1, 9999999)}";
 
@@ -238,6 +240,8 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
                 }
                 break;
             case MultiplayerState.JoiningLobby:
+                if (MultiplayerSystem.LocalPlayerName == "")
+                    MultiplayerSystem.LocalPlayerName = $"Player-{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}{UnityEngine.Random.Range(1, 10)}";
                 MultiplayerSystem.IsMultiplayer = true;
 
                 try
@@ -325,10 +329,9 @@ public class MultiplayerSystem : NetworkedStaticInstanceWithLogger<MultiplayerSy
 
     public static void SetLocalPlayerName(string newPlayerName)
     {
-        string newPlayerNameTrimmed = newPlayerName.Trim();
-        if (newPlayerNameTrimmed == "" || MultiplayerSystem.State != MultiplayerState.Connected) { return; }
+        if (MultiplayerSystem.State != MultiplayerState.Connected) { return; }
 
-        MultiplayerSystem.LocalPlayerName = newPlayerNameTrimmed;
+        MultiplayerSystem.LocalPlayerName = newPlayerName.Trim();
     }
 
     public string GetPlayerUsername(ulong clientId)

@@ -105,11 +105,8 @@ namespace SlimUI.ModernMenu
 
             SetThemeColors();
             this.VersionText.text = $"{(Debug.isDebugBuild ? "DEV" : "PROD")} {this.VersionText.text}";
-            bool doesPlayerHaveDefaultName = MultiplayerSystem.LocalPlayerName.StartsWith("Player-");
-            if (!doesPlayerHaveDefaultName)
-            {
+            if (MultiplayerSystem.LocalPlayerName != "")
                 this.PlayerNameInput.text = MultiplayerSystem.LocalPlayerName;
-            }
         }
 
         public override void OnDestroy()
@@ -119,13 +116,7 @@ namespace SlimUI.ModernMenu
             base.OnDestroy();
         }
 
-        private void OnPlayerNameInputValueChange(string newValue)
-        {
-            string newValueTrimmed = newValue.Trim();
-            if (newValueTrimmed == "") { return; }
-
-            MultiplayerSystem.SetLocalPlayerName(newValueTrimmed);
-        }
+        private void OnPlayerNameInputValueChange(string newValue) => MultiplayerSystem.SetLocalPlayerName(newValue.Trim());
 
         private void OnMultiplayerStateChange(MultiplayerState state)
         {
