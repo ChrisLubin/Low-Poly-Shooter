@@ -17,6 +17,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     {
         base.Awake();
         GameManager.OnStateChange += this.OnGameStateChange;
+        MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
         SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged += this.OnLocalPlayerSelectedAbilityChanged;
@@ -30,6 +31,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     private void OnDestroy()
     {
         GameManager.OnStateChange -= this.OnGameStateChange;
+        MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged -= this.OnLocalPlayerSelectedAbilityChanged;
@@ -66,4 +68,5 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
 
     private void OnLocalPlayerSpawn() => this._uiContainer.gameObject.SetActive(true);
     private void OnLocalPlayerDeath() => this._uiContainer.gameObject.SetActive(false);
+    private void OnHostDisconnect() => this._uiContainer.gameObject.SetActive(false);
 }

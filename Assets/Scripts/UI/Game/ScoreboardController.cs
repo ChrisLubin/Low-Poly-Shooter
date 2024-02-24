@@ -14,6 +14,8 @@ public class ScoreboardController : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI _headerText;
     [SerializeField] private Button _quitButton;
 
+    private bool _didHostDisconnect = false;
+
     private RowData[] _rows;
 
     private const int _PLAYER_NAME_COLUMN_INDEX = 0;
@@ -27,6 +29,7 @@ public class ScoreboardController : NetworkBehaviour
 
         GameManager.OnStateChange += this.OnGameStateChange;
         MultiplayerSystem.OnPlayerDisconnect += this.OnPlayerDisconnect;
+        MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
         this._quitButton.onClick.AddListener(this.OnQuitClick);
     }
@@ -58,6 +61,7 @@ public class ScoreboardController : NetworkBehaviour
 
         GameManager.OnStateChange -= this.OnGameStateChange;
         MultiplayerSystem.OnPlayerDisconnect -= this.OnPlayerDisconnect;
+        MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
         SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
     }
@@ -66,7 +70,7 @@ public class ScoreboardController : NetworkBehaviour
     {
         if (!MultiplayerSystem.IsMultiplayer) { return; }
 
-        this._canvas.enabled = GameManager.State == GameState.GameOver || Input.GetKey(KeyCode.Tab) && (GameManager.State == GameState.GameStarting || GameManager.State == GameState.GameStarted);
+        this._canvas.enabled = GameManager.State == GameState.GameOver || this._didHostDisconnect || Input.GetKey(KeyCode.Tab) && (GameManager.State == GameState.GameStarting || GameManager.State == GameState.GameStarted);
     }
 
     private void OnGameStateChange(GameState state)
@@ -170,6 +174,19 @@ public class ScoreboardController : NetworkBehaviour
         }
 
         this.UpdateScoreboard();
+    }
+
+    private void OnHostDisconnect()
+    {
+        if (this.IsHost || GameManager.State == GameState.PlayerWaitingForHostToStart || GameManager.State == GameState.GameOver) { return; }
+
+        this._didHostDisconnect = true;
+        this._headerText.fontSize = 50;
+        this._headerText.text = "The host has left the lobby. Please return to the main menu.";
+        this._quitButton.gameObject.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private struct RowData

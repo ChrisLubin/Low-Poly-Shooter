@@ -13,7 +13,6 @@ public class PauseMenuController : NetworkBehaviour
     [SerializeField] private Slider _frameRateSettingSlider;
     [SerializeField] private TextMeshProUGUI _frameRateSettingValue;
 
-    private bool _didHostDisconnect = false;
     public static bool IsPaused { get; private set; } = false;
 
     private CursorLockMode _prevCursorLockMode;
@@ -23,7 +22,6 @@ public class PauseMenuController : NetworkBehaviour
     {
         this._resumeButton.onClick.AddListener(this.ToggleOpen);
         this._quitButton.onClick.AddListener(this.OnQuitClick);
-        MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
         this._frameRateSettingSlider.onValueChanged.AddListener(this.OnFrameRateSettingSliderValueChange);
     }
 
@@ -39,7 +37,6 @@ public class PauseMenuController : NetworkBehaviour
     {
         this._resumeButton.onClick.RemoveListener(this.ToggleOpen);
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
-        MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
         this._frameRateSettingSlider.onValueChanged.RemoveListener(this.OnFrameRateSettingSliderValueChange);
         Time.timeScale = 1f;
         PauseMenuController.IsPaused = false;
@@ -47,12 +44,8 @@ public class PauseMenuController : NetworkBehaviour
 
     private void Update()
     {
-        if (this._didHostDisconnect) { return; }
-
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             this.ToggleOpen();
-        }
     }
 
     private void ToggleOpen()
@@ -64,9 +57,7 @@ public class PauseMenuController : NetworkBehaviour
             Cursor.visible = this._prevCursorVisibility;
 
             if (!MultiplayerSystem.IsMultiplayer)
-            {
                 Time.timeScale = 1f;
-            }
         }
         else
         {
@@ -77,9 +68,7 @@ public class PauseMenuController : NetworkBehaviour
             Cursor.visible = true;
 
             if (!MultiplayerSystem.IsMultiplayer)
-            {
                 Time.timeScale = 0f;
-            }
         }
 
         PauseMenuController.IsPaused = !PauseMenuController.IsPaused;
@@ -92,18 +81,6 @@ public class PauseMenuController : NetworkBehaviour
     {
         MultiplayerSystem.QuitMultiplayer();
         SceneManager.LoadScene("MainMenuScene");
-    }
-
-    private void OnHostDisconnect()
-    {
-        if (this.IsHost || GameManager.State == GameState.PlayerWaitingForHostToStart || GameManager.State == GameState.GameOver) { return; }
-
-        this._didHostDisconnect = true;
-        this._headerText.text = "The host has left the lobby. Please return to the main menu.";
-        this._resumeButton.gameObject.SetActive(false);
-
-        if (PauseMenuController.IsPaused) { return; }
-        this.ToggleOpen();
     }
 
     private void OnFrameRateSettingSliderValueChange(float newValue)
