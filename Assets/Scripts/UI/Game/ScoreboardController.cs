@@ -26,6 +26,7 @@ public class ScoreboardController : NetworkBehaviour
         if (!MultiplayerSystem.IsMultiplayer) { return; }
 
         GameManager.OnStateChange += this.OnGameStateChange;
+        MultiplayerSystem.OnPlayerDisconnect += this.OnPlayerDisconnect;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
         this._quitButton.onClick.AddListener(this.OnQuitClick);
     }
@@ -56,6 +57,7 @@ public class ScoreboardController : NetworkBehaviour
         if (!MultiplayerSystem.IsMultiplayer) { return; }
 
         GameManager.OnStateChange -= this.OnGameStateChange;
+        MultiplayerSystem.OnPlayerDisconnect -= this.OnPlayerDisconnect;
         SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
     }
@@ -117,14 +119,7 @@ public class ScoreboardController : NetworkBehaviour
         List<RowData> rows = new();
 
         foreach (PlayerData player in MultiplayerSystem.Instance.PlayerData)
-        {
-            string usernameDisplay = player.Username.ToString();
-
-            if (NetworkManager.Singleton.LocalClientId == player.ClientId)
-                usernameDisplay += " (You)";
-
-            rows.Add(new(usernameDisplay, player.ClientId, 0, 0));
-        }
+            rows.Add(new(player.Username.ToString(), player.ClientId, 0, 0));
 
         this._rows = rows.ToArray();
 
@@ -142,8 +137,14 @@ public class ScoreboardController : NetworkBehaviour
                 this._table.Rows++;
 
             RowData row = this._rows[i];
+            string usernameDisplay = row.Username;
 
-            this._table.GetCell(i + 1, _PLAYER_NAME_COLUMN_INDEX).text = row.UsernameDisplay;
+            if (NetworkManager.Singleton.LocalClientId == row.ClientId)
+                usernameDisplay += " (You)";
+            else if (row.DidLeave)
+                usernameDisplay += " (Left)";
+
+            this._table.GetCell(i + 1, _PLAYER_NAME_COLUMN_INDEX).text = usernameDisplay;
             this._table.GetCell(i + 1, _PLAYER_KILLS_COLUMN_INDEX).text = row.Kills.ToString();
             this._table.GetCell(i + 1, _PLAYER_DEATHS_COLUMN_INDEX).text = row.Deaths.ToString();
         }
@@ -155,19 +156,37 @@ public class ScoreboardController : NetworkBehaviour
         SceneManager.LoadScene("MainMenuScene");
     }
 
+    private void OnPlayerDisconnect(PlayerData player)
+    {
+        if (GameManager.State == GameState.GameOver) { return; }
+
+        for (int i = 0; i < this._rows.Length; i++)
+        {
+            RowData row = this._rows[i];
+
+            if (row.ClientId != player.ClientId || row.DidLeave) { continue; }
+            row.DidLeave = true;
+            this._rows[i] = row;
+        }
+
+        this.UpdateScoreboard();
+    }
+
     private struct RowData
     {
-        public string UsernameDisplay { get; private set; }
+        public string Username;
         public ulong ClientId { get; private set; }
         public int Kills;
         public int Deaths;
+        public bool DidLeave;
 
-        public RowData(string usernameDisplay, ulong clientId, int kills, int deaths)
+        public RowData(string username, ulong clientId, int kills, int deaths)
         {
-            this.UsernameDisplay = usernameDisplay;
+            this.Username = username;
             this.ClientId = clientId;
             this.Kills = kills;
             this.Deaths = deaths;
+            this.DidLeave = false;
         }
     }
 }
