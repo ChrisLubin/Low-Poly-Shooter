@@ -28,8 +28,8 @@ public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovem
         Vector3 right = transform.TransformDirection(Vector3.right);
 
         float movementSpeed = this._weaponController.IsADS ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
-        float curSpeedX = !PauseMenuController.IsPaused ? movementSpeed * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = !PauseMenuController.IsPaused ? movementSpeed * Input.GetAxis("Horizontal") : 0;
+        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver ? 0 : movementSpeed * Input.GetAxis("Vertical");
+        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver ? 0 : movementSpeed * Input.GetAxis("Horizontal");
         float movementDirectionY = this._moveDirection.y;
         this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 

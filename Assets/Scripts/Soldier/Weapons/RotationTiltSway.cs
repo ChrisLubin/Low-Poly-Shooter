@@ -31,7 +31,7 @@ public class RotationTiltSway : NetworkBehaviorAutoDisable<RotationTiltSway>
 
     void Update()
     {
-        if (PauseMenuController.IsPaused) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
 
         CalculateSway();
 

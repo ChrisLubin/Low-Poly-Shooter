@@ -6,14 +6,23 @@ public class SoldierRagdollController : MonoBehaviour
     [SerializeField] private Transform _ragdollRootBone;
     [SerializeField] private CinemachineVirtualCamera _camera;
 
-    private void Awake() => SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
-    private void OnDestroy() => SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+    private void Awake()
+    {
+        GameManager.OnStateChange += this.OnGameStateChange;
+        SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+
+    }
+    private void OnDestroy()
+    {
+        GameManager.OnStateChange -= this.OnGameStateChange;
+        SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+    }
 
     public void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
     {
         this.MatchAllChildTransform(originalRootBone, this._ragdollRootBone);
 
-        if (!isLocalPlayer) { return; }
+        if (!isLocalPlayer || GameManager.State == GameState.GameOver) { return; }
 
         this._camera.enabled = true;
     }
@@ -35,4 +44,16 @@ public class SoldierRagdollController : MonoBehaviour
     }
 
     private void OnLocalPlayerSpawn() => this._camera.enabled = false;
+
+    private void OnGameStateChange(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.GameOver:
+                this._camera.enabled = false;
+                break;
+            default:
+                break;
+        }
+    }
 }

@@ -11,7 +11,7 @@ public class XYSway : NetworkBehaviorAutoDisable<XYSway>
 
     private void UpdateSway()
     {
-        if (PauseMenuController.IsPaused) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
 
         float mouseXAxisDelta = Input.GetAxis("Mouse X");
         float mouseYAxisDelta = Input.GetAxis("Mouse Y");

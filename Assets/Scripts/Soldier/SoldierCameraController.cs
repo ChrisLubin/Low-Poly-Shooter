@@ -11,6 +11,17 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     private float _rotationX = 0;
     public new bool IsLocalPlayer => this.IsOwner;
 
+    private void Awake()
+    {
+        GameManager.OnStateChange += this.OnGameStateChange;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        GameManager.OnStateChange -= this.OnGameStateChange;
+    }
+
     protected override void OnOwnerNetworkSpawn()
     {
         CinemachineController.SetBlendDuration(2f);
@@ -23,7 +34,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
 
     private void Update()
     {
-        if (PauseMenuController.IsPaused) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
 
         this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed;
         this._rotationX = Mathf.Clamp(this._rotationX, -this._lookXLimit, this._lookXLimit);
@@ -41,5 +52,18 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     {
         this._firstPersonCamera.enabled = false;
         this._thirdPersonCamera.enabled = true;
+    }
+
+    private void OnGameStateChange(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.GameOver:
+                this._firstPersonCamera.enabled = false;
+                this._thirdPersonCamera.enabled = false;
+                break;
+            default:
+                break;
+        }
     }
 }
