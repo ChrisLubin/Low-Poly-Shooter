@@ -7,7 +7,6 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     private SoldierDamageController _damageController;
     private SoldierDeathController _deathController;
 
-    [SerializeField] private AudioListener _audioListener;
     [SerializeField] private WeaponController _weaponController;
 
     public static event Action<ulong, SoldierController> OnSpawn;
@@ -38,7 +37,6 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     protected override void OnOwnerNetworkSpawn()
     {
-        this._audioListener.enabled = true;
         this._weaponController.OnShoot += this._OnShoot;
     }
 

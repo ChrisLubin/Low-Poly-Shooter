@@ -7,24 +7,17 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 {
     public static event Action<GameState> OnStateChange;
     public static GameState State { get; private set; }
-    private Camera _mainCamera;
-    [SerializeField] private AudioListener _mainCameraAudioListener;
 
     protected override void Awake()
     {
         base.Awake();
         RpcSystem.OnGameStateChange += this.ChangeState;
-        SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
-        SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
-        this._mainCamera = Camera.main;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
         RpcSystem.OnGameStateChange -= this.ChangeState;
-        SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
-        SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         this.ChangeState(GameState.None);
     }
 
@@ -40,9 +33,6 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(AuthenticationService.Instance.PlayerId, MultiplayerSystem.LocalPlayerName);
         this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
     }
-
-    private void OnLocalPlayerSpawn() => this._mainCamera.gameObject.SetActive(false);
-    private void OnLocalPlayerDeath() => this._mainCamera.gameObject.SetActive(true);
 
     public void ChangeState(GameState newState)
     {
@@ -92,19 +82,13 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 
     private void HandleGameStarted()
     {
-        this._mainCameraAudioListener.enabled = false;
         CozyWeather.instance.perennialProfile.pauseTime = false;
     }
 
     private void HandleGameOver()
     {
-        this._mainCamera.gameObject.SetActive(true);
-        this._mainCameraAudioListener.enabled = true;
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        CozyWeather.instance.cozyCamera = this._mainCamera;
     }
 }
 

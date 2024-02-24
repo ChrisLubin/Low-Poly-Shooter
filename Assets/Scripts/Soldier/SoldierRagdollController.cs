@@ -1,10 +1,10 @@
+using Cinemachine;
 using UnityEngine;
 
 public class SoldierRagdollController : MonoBehaviour
 {
     [SerializeField] private Transform _ragdollRootBone;
-    [SerializeField] private Camera _camera;
-    [SerializeField] private AudioListener _audioListener;
+    [SerializeField] private CinemachineVirtualCamera _camera;
 
     public async void DoRagroll(Transform originalRootBone, bool isLocalPlayer)
     {
@@ -13,11 +13,9 @@ public class SoldierRagdollController : MonoBehaviour
         if (!isLocalPlayer) { return; }
 
         this._camera.enabled = true;
-        this._audioListener.enabled = true;
         // Remove this and make SPAWN_PLAYER_REQUEST_TIMER private after doing Cinemachine fix and also auto remove auto spawn and add button that user clicks to spawn
         await UnityTimer.Delay(SoldierManager.SPAWN_PLAYER_REQUEST_TIMER);
         this._camera.enabled = false;
-        this._audioListener.enabled = false;
     }
 
     private void MatchAllChildTransform(Transform root, Transform clone)

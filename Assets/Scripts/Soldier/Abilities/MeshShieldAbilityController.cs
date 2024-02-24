@@ -1,3 +1,4 @@
+using Cinemachine;
 using UnityEngine;
 
 public class MeshShieldAbilityController : AbilityController
@@ -20,7 +21,11 @@ public class MeshShieldAbilityController : AbilityController
         base.Activate();
 
         if (this._cameraController.IsLocalPlayer)
+        {
+            CinemachineController.SetBlendDuration(0.5f);
             this._cameraController.EnableThirdPersonCamera();
+
+        }
 
         this._shield.gameObject.SetActive(true);
         this._weaponController.gameObject.SetActive(false);
@@ -31,7 +36,10 @@ public class MeshShieldAbilityController : AbilityController
         base.Deactivate();
 
         if (this._cameraController.IsLocalPlayer)
+        {
+            CinemachineController.SetBlendDuration(0.5f);
             this._cameraController.EnableFirstPersonCamera();
+        }
 
         this._shield.gameObject.SetActive(false);
         this._weaponController.gameObject.SetActive(true);
