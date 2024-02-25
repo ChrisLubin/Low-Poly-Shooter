@@ -12,6 +12,11 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     [SerializeField] private AudioClip _winningSong;
     [SerializeField] private AudioClip _losingSong;
 
+    private const float _WINNING_SONG_MIN_VOLUME = 0.015f;
+    private const float _WINNING_SONG_MAX_VOLUME = 0.09f;
+    private const float _LOSING_SONG_MIN_VOLUME = 0.06f;
+    private const float _LOSING_SONG_MAX_VOLUME = 0.25f;
+
     protected override void Awake()
     {
         base.Awake();
@@ -40,6 +45,17 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
 
         RpcSystem.Instance.PlayerGameSceneLoadedServerRpc(AuthenticationService.Instance.PlayerId, MultiplayerSystem.LocalPlayerName);
         this.ChangeState(this.IsHost ? GameState.HostWaitingForPlayers : GameState.PlayerWaitingForHostToStart);
+    }
+
+    private void Update()
+    {
+        if (!this._audioSource.isPlaying) { return; }
+
+        // Make end game song louder as game gets closer to ending
+        if (this._audioSource.clip == this._winningSong)
+            this._audioSource.volume = Mathf.Lerp(_WINNING_SONG_MIN_VOLUME, _WINNING_SONG_MAX_VOLUME, Mathf.InverseLerp(ScoreboardController.NEARING_END_GAME_PERCENT_THRESHOLD, 1f, ScoreboardController.GetGamePercentDone()));
+        else if (this._audioSource.clip == this._losingSong)
+            this._audioSource.volume = Mathf.Lerp(_LOSING_SONG_MIN_VOLUME, _LOSING_SONG_MAX_VOLUME, Mathf.InverseLerp(ScoreboardController.NEARING_END_GAME_PERCENT_THRESHOLD, 1f, ScoreboardController.GetGamePercentDone()));
     }
 
     public void ChangeState(GameState newState)

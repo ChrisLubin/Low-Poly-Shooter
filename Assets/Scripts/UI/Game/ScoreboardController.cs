@@ -24,7 +24,7 @@ public class ScoreboardController : NetworkBehaviour
     private const int _PLAYER_KILLS_COLUMN_INDEX = 1;
     private const int _PLAYER_DEATHS_COLUMN_INDEX = 2;
     private const int _KILLS_NEEDED_TO_WIN = 25;
-    private const float _NEARING_END_GAME_PERCENT_THRESHOLD = 0.79f; // 0 - 1 range
+    public const float NEARING_END_GAME_PERCENT_THRESHOLD = 0.79f; // 0 - 1 range
 
     public static event Action OnGameNearingEndReached;
 
@@ -115,7 +115,7 @@ public class ScoreboardController : NetworkBehaviour
                 row.Kills++;
                 ScoreboardController._rows[i] = row;
 
-                if (!this._isGameNearingEnd && ((float)row.Kills / (float)_KILLS_NEEDED_TO_WIN) >= _NEARING_END_GAME_PERCENT_THRESHOLD)
+                if (!this._isGameNearingEnd && ((float)row.Kills / (float)_KILLS_NEEDED_TO_WIN) >= NEARING_END_GAME_PERCENT_THRESHOLD)
                 {
                     this._isGameNearingEnd = true;
                     ScoreboardController.OnGameNearingEndReached?.Invoke();
@@ -205,6 +205,14 @@ public class ScoreboardController : NetworkBehaviour
 
         int highestPlayerKills = ScoreboardController._rows[0].Kills;
         return ScoreboardController._rows.Any(row => row.ClientId == NetworkManager.Singleton.LocalClientId && row.Kills == highestPlayerKills);
+    }
+
+    // 0 - 1 range
+    public static float GetGamePercentDone()
+    {
+        if (!MultiplayerSystem.IsMultiplayer || ScoreboardController._rows.Length == 0) { return 0f; }
+
+        return (float)ScoreboardController._rows[0].Kills / (float)_KILLS_NEEDED_TO_WIN;
     }
 
     private struct RowData
