@@ -133,7 +133,7 @@ public class ScoreboardController : NetworkBehaviour
         List<RowData> rows = new();
 
         foreach (PlayerData player in MultiplayerSystem.Instance.PlayerData)
-            rows.Add(new(player.Username.ToString(), player.ClientId, 19, 0)); // Remove 19 before commit
+            rows.Add(new(player.Username.ToString(), player.ClientId, 0, 0));
 
         ScoreboardController._rows = rows.ToArray();
 
