@@ -10,6 +10,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
 {
     [SerializeField] private Canvas _canvas;
     [SerializeField] private TextMeshProUGUI _headerText;
+    [SerializeField] private TextMeshProUGUI _objectiveText;
     [SerializeField] private TextMeshProUGUI _subheaderText;
     [SerializeField] private TextMeshProUGUI _playersListText;
     [SerializeField] private Button _startGameButton;
@@ -128,6 +129,7 @@ public class GameMultiplayerWaitingOverlay : NetworkBehaviourWithLogger<GameMult
     private void OnHostDisconnect()
     {
         this._headerText.text = "The host has left the lobby. Please return to the main menu.";
+        this._objectiveText.text = "";
         this._subheaderText.text = "";
         this._playersListText.text = "";
     }
