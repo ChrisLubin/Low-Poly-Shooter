@@ -37,7 +37,7 @@ public class ScoreboardController : NetworkBehaviour
         MultiplayerSystem.OnPlayerDisconnect += this.OnPlayerDisconnect;
         MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
-        this._muteMusicToggle.onValueChanged.AddListener(this.MuteMusicToggleClick);
+        this._muteMusicToggle.onValueChanged.AddListener(this.OnMuteMusicToggleClick);
         this._quitButton.onClick.AddListener(this.OnQuitClick);
     }
 
@@ -70,7 +70,7 @@ public class ScoreboardController : NetworkBehaviour
         MultiplayerSystem.OnPlayerDisconnect -= this.OnPlayerDisconnect;
         MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
         SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
-        this._muteMusicToggle.onValueChanged.RemoveListener(this.MuteMusicToggleClick);
+        this._muteMusicToggle.onValueChanged.RemoveListener(this.OnMuteMusicToggleClick);
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
     }
 
@@ -175,7 +175,7 @@ public class ScoreboardController : NetworkBehaviour
         SceneManager.LoadScene("MainMenuScene");
     }
 
-    private void MuteMusicToggleClick(bool _) => EndGameMusicManager.ToggleMute();
+    private void OnMuteMusicToggleClick(bool _) => EndGameMusicManager.ToggleMute();
 
     private void OnPlayerDisconnect(PlayerData player)
     {

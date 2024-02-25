@@ -12,6 +12,7 @@ public class PauseMenuController : NetworkBehaviour
     [SerializeField] private Button _quitButton;
     [SerializeField] private Slider _frameRateSettingSlider;
     [SerializeField] private TextMeshProUGUI _frameRateSettingValue;
+    [SerializeField] private Toggle _muteMusicToggle;
 
     public static bool IsPaused { get; private set; } = false;
 
@@ -23,6 +24,7 @@ public class PauseMenuController : NetworkBehaviour
         this._resumeButton.onClick.AddListener(this.ToggleOpen);
         this._quitButton.onClick.AddListener(this.OnQuitClick);
         this._frameRateSettingSlider.onValueChanged.AddListener(this.OnFrameRateSettingSliderValueChange);
+        this._muteMusicToggle.onValueChanged.AddListener(this.OnMuteMusicToggleClick);
     }
 
     private void Start()
@@ -38,6 +40,7 @@ public class PauseMenuController : NetworkBehaviour
         this._resumeButton.onClick.RemoveListener(this.ToggleOpen);
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
         this._frameRateSettingSlider.onValueChanged.RemoveListener(this.OnFrameRateSettingSliderValueChange);
+        this._muteMusicToggle.onValueChanged.RemoveListener(this.OnMuteMusicToggleClick);
         Time.timeScale = 1f;
         PauseMenuController.IsPaused = false;
     }
@@ -46,6 +49,9 @@ public class PauseMenuController : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             this.ToggleOpen();
+
+        this._muteMusicToggle.gameObject.SetActive(EndGameMusicManager.IsPlayingMusic());
+        this._muteMusicToggle.SetIsOnWithoutNotify(EndGameMusicManager.IsMuted());
     }
 
     private void ToggleOpen()
@@ -82,6 +88,8 @@ public class PauseMenuController : NetworkBehaviour
         MultiplayerSystem.QuitMultiplayer();
         SceneManager.LoadScene("MainMenuScene");
     }
+
+    private void OnMuteMusicToggleClick(bool _) => EndGameMusicManager.ToggleMute();
 
     private void OnFrameRateSettingSliderValueChange(float newValue)
     {
