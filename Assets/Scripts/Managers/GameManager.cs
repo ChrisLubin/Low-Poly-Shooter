@@ -17,6 +17,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         base.Awake();
         RpcSystem.OnGameStateChange += this.ChangeState;
         ScoreboardController.OnGameNearingEndReached += this.OnGameNearingEndReached;
+        SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
     }
 
     public override void OnDestroy()
@@ -24,6 +25,7 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         base.OnDestroy();
         RpcSystem.OnGameStateChange -= this.ChangeState;
         ScoreboardController.OnGameNearingEndReached -= this.OnGameNearingEndReached;
+        SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
         this.ChangeState(GameState.None);
     }
 
@@ -102,6 +104,24 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
         this._audioSource.clip = ScoreboardController.IsLocalPlayerInFirstPlace() ? this._winningSong : this._losingSong;
         this._audioSource.Play();
         this._logger.Log($"The game is nearing end so playing {(ScoreboardController.IsLocalPlayerInFirstPlace() ? "winning" : "losing")} song!");
+    }
+
+    private void OnPlayerDeath(ulong _, ulong __)
+    {
+        if (!this._audioSource.isPlaying) { return; }
+
+        if (this._audioSource.clip == this._losingSong && ScoreboardController.IsLocalPlayerInFirstPlace())
+        {
+            this._logger.Log("Local player gained the lead in end game.");
+            this._audioSource.clip = this._winningSong;
+            this._audioSource.Play();
+        }
+        else if (this._audioSource.clip == this._winningSong && !ScoreboardController.IsLocalPlayerInFirstPlace())
+        {
+            this._logger.Log("Local player lost lead in end game.");
+            this._audioSource.clip = this._losingSong;
+            this._audioSource.Play();
+        }
     }
 }
 

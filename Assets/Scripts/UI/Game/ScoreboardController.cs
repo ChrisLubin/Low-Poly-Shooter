@@ -43,7 +43,7 @@ public class ScoreboardController : NetworkBehaviour
     {
         this._headerText.text = $"First To {_KILLS_NEEDED_TO_WIN} Wins!";
 
-        // Needed so table package works correctly
+        // Needed so table asset works correctly
         this._canvas.enabled = true;
         this._canvas.enabled = false;
     }
