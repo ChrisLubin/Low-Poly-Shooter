@@ -13,6 +13,7 @@ public class ScoreboardController : NetworkBehaviour
     [SerializeField] private Canvas _canvas;
     [SerializeField] private TableUI _table;
     [SerializeField] private TextMeshProUGUI _headerText;
+    [SerializeField] private Toggle _muteMusicToggle;
     [SerializeField] private Button _quitButton;
 
     private bool _didHostDisconnect = false;
@@ -36,6 +37,7 @@ public class ScoreboardController : NetworkBehaviour
         MultiplayerSystem.OnPlayerDisconnect += this.OnPlayerDisconnect;
         MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
+        this._muteMusicToggle.onValueChanged.AddListener(this.MuteMusicToggleClick);
         this._quitButton.onClick.AddListener(this.OnQuitClick);
     }
 
@@ -68,6 +70,7 @@ public class ScoreboardController : NetworkBehaviour
         MultiplayerSystem.OnPlayerDisconnect -= this.OnPlayerDisconnect;
         MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
         SoldierManager.OnPlayerDeath -= this.OnPlayerDeath;
+        this._muteMusicToggle.onValueChanged.RemoveListener(this.MuteMusicToggleClick);
         this._quitButton.onClick.RemoveListener(this.OnQuitClick);
     }
 
@@ -76,6 +79,8 @@ public class ScoreboardController : NetworkBehaviour
         if (!MultiplayerSystem.IsMultiplayer) { return; }
 
         this._canvas.enabled = GameManager.State == GameState.GameOver || this._didHostDisconnect || Input.GetKey(KeyCode.Tab) && (GameManager.State == GameState.GameStarting || GameManager.State == GameState.GameStarted);
+        this._muteMusicToggle.gameObject.SetActive(EndGameMusicManager.IsPlayingMusic() && (GameManager.State == GameState.GameOver || this._didHostDisconnect));
+        this._muteMusicToggle.SetIsOnWithoutNotify(EndGameMusicManager.IsMuted());
     }
 
     private void OnGameStateChange(GameState state)
@@ -169,6 +174,8 @@ public class ScoreboardController : NetworkBehaviour
         MultiplayerSystem.QuitMultiplayer();
         SceneManager.LoadScene("MainMenuScene");
     }
+
+    private void MuteMusicToggleClick(bool _) => EndGameMusicManager.ToggleMute();
 
     private void OnPlayerDisconnect(PlayerData player)
     {

@@ -17,9 +17,12 @@ public class EndGameMusicManager : WithLogger<EndGameMusicManager>
     private float _winningSongTime = 0f;
     private float _losingSongTime = 0f;
 
+    private static AudioSource _AUDIO_SOURCE;
+
     protected override void Awake()
     {
         base.Awake();
+        EndGameMusicManager._AUDIO_SOURCE = this._audioSource;
         ScoreboardController.OnGameNearingEndReached += this.OnGameNearingEndReached;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
     }
@@ -116,4 +119,8 @@ public class EndGameMusicManager : WithLogger<EndGameMusicManager>
 
         this._isFadingInAndOut = false;
     }
+
+    public static bool IsPlayingMusic() => EndGameMusicManager._AUDIO_SOURCE.isPlaying;
+    public static bool ToggleMute() => EndGameMusicManager._AUDIO_SOURCE.mute = !EndGameMusicManager._AUDIO_SOURCE.mute;
+    public static bool IsMuted() => EndGameMusicManager._AUDIO_SOURCE.mute;
 }
