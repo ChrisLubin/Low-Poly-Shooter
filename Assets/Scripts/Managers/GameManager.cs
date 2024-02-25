@@ -8,16 +8,22 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public static event Action<GameState> OnStateChange;
     public static GameState State { get; private set; }
 
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _winningSong;
+    [SerializeField] private AudioClip _losingSong;
+
     protected override void Awake()
     {
         base.Awake();
         RpcSystem.OnGameStateChange += this.ChangeState;
+        ScoreboardController.OnGameNearingEndReached += this.OnGameNearingEndReached;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
         RpcSystem.OnGameStateChange -= this.ChangeState;
+        ScoreboardController.OnGameNearingEndReached -= this.OnGameNearingEndReached;
         this.ChangeState(GameState.None);
     }
 
@@ -89,6 +95,13 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+    private void OnGameNearingEndReached()
+    {
+        this._audioSource.clip = ScoreboardController.IsLocalPlayerInFirstPlace() ? this._winningSong : this._losingSong;
+        this._audioSource.Play();
+        this._logger.Log($"The game is nearing end so playing {(ScoreboardController.IsLocalPlayerInFirstPlace() ? "winning" : "losing")} song!");
     }
 }
 

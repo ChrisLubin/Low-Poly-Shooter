@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class ScoreboardController : NetworkBehaviour
 {
@@ -15,13 +16,17 @@ public class ScoreboardController : NetworkBehaviour
     [SerializeField] private Button _quitButton;
 
     private bool _didHostDisconnect = false;
+    private bool _isGameNearingEnd = false;
 
-    private RowData[] _rows;
+    private static RowData[] _rows = new RowData[0];
 
     private const int _PLAYER_NAME_COLUMN_INDEX = 0;
     private const int _PLAYER_KILLS_COLUMN_INDEX = 1;
     private const int _PLAYER_DEATHS_COLUMN_INDEX = 2;
     private const int _KILLS_NEEDED_TO_WIN = 25;
+    private const float _NEARING_END_GAME_PERCENT_THRESHOLD = 0.79f; // 0 - 1 range
+
+    public static event Action OnGameNearingEndReached;
 
     private void Awake()
     {
@@ -82,12 +87,12 @@ public class ScoreboardController : NetworkBehaviour
                 break;
             case GameState.GameOver:
                 this._quitButton.gameObject.SetActive(true);
-                ulong winningPlayerClientId = this._rows[0].ClientId;
+                ulong winningPlayerClientId = ScoreboardController._rows[0].ClientId;
 
                 if (winningPlayerClientId == NetworkManager.Singleton.LocalClientId)
                     this._headerText.text = $"You Won!";
                 else
-                    this._headerText.text = $"{MultiplayerSystem.Instance.GetPlayerUsername(this._rows[0].ClientId)} Won!";
+                    this._headerText.text = $"{MultiplayerSystem.Instance.GetPlayerUsername(ScoreboardController._rows[0].ClientId)} Won!";
                 break;
             default:
                 break;
@@ -96,20 +101,25 @@ public class ScoreboardController : NetworkBehaviour
 
     private void OnPlayerDeath(ulong deadClientId, ulong killerClientId)
     {
-        for (int i = 0; i < this._rows.Length; i++)
+        for (int i = 0; i < ScoreboardController._rows.Length; i++)
         {
-            RowData row = this._rows[i];
+            RowData row = ScoreboardController._rows[i];
 
             if (row.ClientId == deadClientId)
             {
                 row.Deaths++;
-                this._rows[i] = row;
+                ScoreboardController._rows[i] = row;
             }
             else if (row.ClientId == killerClientId)
             {
                 row.Kills++;
-                this._rows[i] = row;
+                ScoreboardController._rows[i] = row;
 
+                if (!this._isGameNearingEnd && ((float)row.Kills / (float)_KILLS_NEEDED_TO_WIN) >= _NEARING_END_GAME_PERCENT_THRESHOLD)
+                {
+                    this._isGameNearingEnd = true;
+                    ScoreboardController.OnGameNearingEndReached?.Invoke();
+                }
                 if (this.IsHost && row.Kills == _KILLS_NEEDED_TO_WIN)
                     RpcSystem.Instance.ChangeGameStateServerRpc(GameState.GameOver);
             }
@@ -123,9 +133,9 @@ public class ScoreboardController : NetworkBehaviour
         List<RowData> rows = new();
 
         foreach (PlayerData player in MultiplayerSystem.Instance.PlayerData)
-            rows.Add(new(player.Username.ToString(), player.ClientId, 0, 0));
+            rows.Add(new(player.Username.ToString(), player.ClientId, 19, 0)); // Remove 19 before commit
 
-        this._rows = rows.ToArray();
+        ScoreboardController._rows = rows.ToArray();
 
         this.UpdateScoreboard();
     }
@@ -133,14 +143,14 @@ public class ScoreboardController : NetworkBehaviour
     private void UpdateScoreboard()
     {
         // Sort by kills
-        this._rows = this._rows.OrderByDescending<RowData, int>((row) => row.Kills).ToArray();
+        ScoreboardController._rows = ScoreboardController._rows.OrderByDescending<RowData, int>((row) => row.Kills).ToArray();
 
-        for (int i = 0; i < this._rows.Length; i++)
+        for (int i = 0; i < ScoreboardController._rows.Length; i++)
         {
             if (this._table.Rows <= i + 1)
                 this._table.Rows++;
 
-            RowData row = this._rows[i];
+            RowData row = ScoreboardController._rows[i];
             string usernameDisplay = row.Username;
 
             if (NetworkManager.Singleton.LocalClientId == row.ClientId)
@@ -164,13 +174,13 @@ public class ScoreboardController : NetworkBehaviour
     {
         if (GameManager.State == GameState.GameOver) { return; }
 
-        for (int i = 0; i < this._rows.Length; i++)
+        for (int i = 0; i < ScoreboardController._rows.Length; i++)
         {
-            RowData row = this._rows[i];
+            RowData row = ScoreboardController._rows[i];
 
             if (row.ClientId != player.ClientId || row.DidLeave) { continue; }
             row.DidLeave = true;
-            this._rows[i] = row;
+            ScoreboardController._rows[i] = row;
         }
 
         this.UpdateScoreboard();
@@ -187,6 +197,14 @@ public class ScoreboardController : NetworkBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+    public static bool IsLocalPlayerInFirstPlace()
+    {
+        if (!MultiplayerSystem.IsMultiplayer || ScoreboardController._rows.Length == 0) { return false; }
+
+        int highestPlayerKills = ScoreboardController._rows[0].Kills;
+        return ScoreboardController._rows.Any(row => row.ClientId == NetworkManager.Singleton.LocalClientId && row.Kills == highestPlayerKills);
     }
 
     private struct RowData
