@@ -8,6 +8,9 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     public static event Action<GameState> OnStateChange;
     public static GameState State { get; private set; }
 
+    [SerializeField] private AudioSource _soundEffectAudioSource;
+    [SerializeField] private AudioClip _missionFailedAudioClip;
+
     protected override void Awake()
     {
         base.Awake();
@@ -89,6 +92,12 @@ public class GameManager : NetworkedStaticInstanceWithLogger<GameManager>
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        if (MultiplayerSystem.IsMultiplayer && !ScoreboardController.IsLocalPlayerInFirstPlace())
+        {
+            this._soundEffectAudioSource.clip = this._missionFailedAudioClip;
+            this._soundEffectAudioSource.Play();
+        }
     }
 }
 
