@@ -59,6 +59,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
         switch (state)
         {
             case GameState.GameOver:
+                CinemachineController.SetBlendDuration(4f);
                 this._firstPersonCamera.enabled = false;
                 this._thirdPersonCamera.enabled = false;
                 break;
