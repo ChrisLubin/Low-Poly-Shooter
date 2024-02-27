@@ -20,13 +20,13 @@ public class BulletController : MonoBehaviour
 
     private void Start()
     {
-        if (this.WillCollideNextFrame(out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
+        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
             this.OnWillCollide(collidePosition, damageable);
     }
 
     private void FixedUpdate()
     {
-        if (this.WillCollideNextFrame(out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
+        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
         {
             this.OnWillCollide(collidePosition, damageable);
             return;
@@ -41,24 +41,6 @@ public class BulletController : MonoBehaviour
     }
 
     private Vector3 GetNextPosition() => transform.position + transform.forward * this._speed * Time.fixedDeltaTime;
-
-    private bool WillCollideNextFrame<T>(out Vector3 collidePosition, out T collideObject, string layerName)
-    {
-        collidePosition = Vector3.zero;
-        collideObject = default(T);
-        Vector3 nextPosition = this.GetNextPosition();
-        Debug.DrawLine(transform.position, nextPosition, Color.black, 2f);
-
-        if (Physics.Linecast(transform.position, nextPosition, out RaycastHit hit, LayerMask.GetMask(layerName)))
-        {
-            Debug.DrawLine(transform.position, hit.point, Color.red, 2f);
-            collidePosition = hit.point;
-            hit.collider.TryGetComponent(out collideObject);
-            return true;
-        }
-
-        return false;
-    }
 
     private async void OnWillCollide(Vector3 collidePosition, IDamageable damageable)
     {

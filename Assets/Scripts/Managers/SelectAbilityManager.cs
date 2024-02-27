@@ -3,7 +3,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
-public class SelectAbilityManager : NetworkBehaviour
+public class SelectAbilityManager : NetworkBehaviorAutoDisableWithLogger<SelectAbilityManager>
 {
     private ActivateAbilityManager _activateAbilityManager;
 
@@ -16,8 +16,9 @@ public class SelectAbilityManager : NetworkBehaviour
     public AbilityController SelectedAbilityController { get; private set; }
     public static event Action<Abilities> OnLocalPlayerSelectedAbilityChanged;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         this._activateAbilityManager = GetComponent<ActivateAbilityManager>();
         this.AllAbilities = GetComponents<AbilityController>();
         this._selectedAbility.OnValueChanged += this.OnSelectedAbilityChanged;
@@ -46,10 +47,10 @@ public class SelectAbilityManager : NetworkBehaviour
 
     private void Update()
     {
-        if (!this.IsOwner || !this.IsKeyDownForAnAbility(out int abilityIndex)) { return; }
+        if (!this.IsOwner || PauseMenuController.IsPaused || SoldierKillStreakController.IS_USING_KILL_STREAK || !this.IsKeyDownForAnAbility(out int abilityIndex)) { return; }
         if (this._activateAbilityManager.IsAbilityActive)
         {
-            Debug.LogWarning("Can't switch abilities while one is active!");
+            this._logger.Log("Can't switch abilities while one is active!", Logger.LogLevel.Warning);
             return;
         }
 

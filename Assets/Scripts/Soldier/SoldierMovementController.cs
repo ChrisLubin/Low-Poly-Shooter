@@ -28,12 +28,12 @@ public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovem
         Vector3 right = transform.TransformDirection(Vector3.right);
 
         float movementSpeed = this._weaponController.IsADS ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
-        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver ? 0 : movementSpeed * Input.GetAxis("Vertical");
-        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver ? 0 : movementSpeed * Input.GetAxis("Horizontal");
+        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : movementSpeed * Input.GetAxis("Vertical");
+        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : movementSpeed * Input.GetAxis("Horizontal");
         float movementDirectionY = this._moveDirection.y;
         this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
-        if (Input.GetButton("Jump") && this._characterController.isGrounded)
+        if (!PauseMenuController.IsPaused && !SoldierKillStreakController.IS_USING_KILL_STREAK && Input.GetButton("Jump") && this._characterController.isGrounded)
             this._moveDirection.y = this._jumpSpeed;
         else
             this._moveDirection.y = movementDirectionY;

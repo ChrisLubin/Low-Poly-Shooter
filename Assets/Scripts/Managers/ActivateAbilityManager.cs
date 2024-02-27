@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class ActivateAbilityManager : NetworkBehaviour
+public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<ActivateAbilityManager>
 {
     private SelectAbilityManager _selectAbilityManager;
     private SoldierDeathController _deathController;
@@ -10,8 +10,9 @@ public class ActivateAbilityManager : NetworkBehaviour
 
     public bool IsAbilityActive => this._isAbilityActive.Value;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         this._selectAbilityManager = GetComponent<SelectAbilityManager>();
         this._deathController = GetComponent<SoldierDeathController>();
         this._deathController.OnDeath += this.OnDeath;
@@ -33,10 +34,10 @@ public class ActivateAbilityManager : NetworkBehaviour
 
     private void Update()
     {
-        if (!this.IsOwner || !Input.GetKeyDown(KeyCode.Q)) { return; }
+        if (!this.IsOwner || PauseMenuController.IsPaused || SoldierKillStreakController.IS_USING_KILL_STREAK || !Input.GetKeyDown(KeyCode.Q)) { return; }
         if (this._selectAbilityManager.SelectedAbilityController == null)
         {
-            Debug.LogWarning("Player has no selected ability!");
+            this._logger.Log("Player has no selected ability!", Logger.LogLevel.Warning);
             return;
         }
 
@@ -50,7 +51,7 @@ public class ActivateAbilityManager : NetworkBehaviour
     {
         if (this._selectAbilityManager.SelectedAbilityController == null)
         {
-            Debug.LogWarning("Player has no selected ability!");
+            this._logger.Log("Player has no selected ability!", Logger.LogLevel.Warning);
             return;
         }
 
@@ -64,7 +65,7 @@ public class ActivateAbilityManager : NetworkBehaviour
     {
         if (this._selectAbilityManager.SelectedAbilityController == null)
         {
-            Debug.LogWarning("Player has no selected ability!");
+            this._logger.Log("Player has no selected ability!", Logger.LogLevel.Warning);
             return;
         }
 

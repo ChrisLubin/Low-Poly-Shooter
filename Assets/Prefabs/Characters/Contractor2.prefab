@@ -771,6 +771,7 @@ GameObject:
   - component: {fileID: 8695697814296109224}
   - component: {fileID: 1346164607980416981}
   - component: {fileID: 4161002275521030208}
+  - component: {fileID: 4277087072740611663}
   m_Layer: 8
   m_Name: Contractor2
   m_TagString: Untagged
@@ -1112,6 +1113,20 @@ MonoBehaviour:
     type: 3}
   _toggleAbilityAudioVolume: 0.1
   _shield: {fileID: 6104344289685204042}
+--- !u!114 &4277087072740611663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3395804636025468854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c201e93cb1bbed479adb149a43eadaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _predatorMissilePrefab: {fileID: 2255255474441088359, guid: 88bf78954330b3d469f61db1e9b0df59,
+    type: 3}
 --- !u!1 &3395817449617735310
 GameObject:
   m_ObjectHideFlags: 0

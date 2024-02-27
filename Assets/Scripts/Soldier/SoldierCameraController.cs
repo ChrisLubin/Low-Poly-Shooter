@@ -34,7 +34,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
 
     private void Update()
     {
-        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
         this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed;
         this._rotationX = Mathf.Clamp(this._rotationX, -this._lookXLimit, this._lookXLimit);

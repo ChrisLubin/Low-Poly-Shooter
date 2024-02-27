@@ -40,7 +40,7 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 
     private void Update()
     {
-        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
         bool wasADS = this._isADS;
         this._isADS = Input.GetMouseButton(1);

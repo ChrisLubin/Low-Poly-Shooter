@@ -11,7 +11,7 @@ public class XYSway : NetworkBehaviorAutoDisable<XYSway>
 
     private void UpdateSway()
     {
-        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
         float mouseXAxisDelta = Input.GetAxis("Mouse X");
         float mouseYAxisDelta = Input.GetAxis("Mouse Y");

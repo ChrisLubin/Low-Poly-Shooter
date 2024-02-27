@@ -31,7 +31,7 @@ public class RotationTiltSway : NetworkBehaviorAutoDisable<RotationTiltSway>
 
     void Update()
     {
-        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver) { return; }
+        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
         CalculateSway();
 
