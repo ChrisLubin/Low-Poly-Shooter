@@ -10,7 +10,12 @@ public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMiss
     private NetworkObject _networkObject;
 
     [SerializeField] private CinemachineVirtualCamera _camera;
-    [SerializeField] private float _speed = 1f;
+    [SerializeField] private float _movementSpeed = 50f;
+
+    [SerializeField] private float _lookLimit = 100f;
+    [SerializeField] private float _lookSpeed = 0.2f;
+    private float _rotationX = 0;
+    private float _rotationZ = 0;
 
     private static float _CAMERA_EXIT_TRANSITION_TIME = 2f;
     public static event Action OnLocalPlayerPredatorMissileExploded;
@@ -34,10 +39,16 @@ public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMiss
             return;
         }
 
+        this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed;
+        this._rotationX = Mathf.Clamp(this._rotationX, -this._lookLimit, this._lookLimit);
+        this._rotationZ += Input.GetAxis("Mouse X") * this._lookSpeed;
+        this._rotationZ = Mathf.Clamp(this._rotationZ, -this._lookLimit, this._lookLimit);
+        transform.localRotation = Quaternion.Euler(this._rotationX, 0, this._rotationZ);
+
         transform.position = this.GetNextPosition();
     }
 
-    private Vector3 GetNextPosition() => transform.position + this._speed * Time.deltaTime * -transform.up;
+    private Vector3 GetNextPosition() => transform.position + this._movementSpeed * Time.deltaTime * -transform.up;
 
     private void OnCollision(Vector3 collisionPosition)
     {
