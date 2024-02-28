@@ -62,4 +62,41 @@ public static class Helpers
 
         return false;
     }
+
+    public static bool TrySphereCastAll<T>(Vector3 position, float radius, out CastAllData<T>[] castAllData, string layerName)
+    {
+        castAllData = new CastAllData<T>[0];
+        RaycastHit[] hits = Physics.SphereCastAll(position, radius, Vector3.forward, 0.0001f, LayerMask.GetMask(layerName));
+
+        if (hits.Length == 0)
+            return false;
+
+        List<CastAllData<T>> castAllDataList = new();
+
+        foreach (RaycastHit hit in hits)
+        {
+            T hitObject = hit.collider.GetComponentInParent<T>();
+            if (hitObject == null && !hit.collider.TryGetComponent(out hitObject)) { continue; }
+
+            castAllDataList.Add(new(hit.point, hitObject));
+        }
+
+        if (castAllDataList.Count() == 0)
+            return false;
+
+        castAllData = castAllDataList.ToArray();
+        return true;
+    }
+}
+
+public struct CastAllData<T>
+{
+    public Vector3 HitPosition;
+    public T HitObject;
+
+    public CastAllData(Vector3 hitPosition, T hitObject)
+    {
+        this.HitPosition = hitPosition;
+        this.HitObject = hitObject;
+    }
 }

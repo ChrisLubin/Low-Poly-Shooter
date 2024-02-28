@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMissileController>
+public class PredatorMissileMovementController : NetworkBehaviorAutoDisable<PredatorMissileMovementController>
 {
     private NetworkObject _networkObject;
 
@@ -18,7 +18,7 @@ public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMiss
     private float _rotationZ = 0;
 
     private static float _CAMERA_EXIT_TRANSITION_TIME = 2f;
-    public static event Action OnLocalPlayerPredatorMissileExploded;
+    public event Action<Vector3> OnExploded;
 
     private void Awake()
     {
@@ -35,7 +35,7 @@ public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMiss
     {
         if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition))
         {
-            this.OnCollision(collidePosition);
+            this.OnExplode(collidePosition);
             return;
         }
 
@@ -50,20 +50,20 @@ public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMiss
 
     private Vector3 GetNextPosition() => transform.position + this._movementSpeed * Time.deltaTime * -transform.up;
 
-    private void OnCollision(Vector3 collisionPosition)
+    private void OnExplode(Vector3 explodePosition)
     {
         gameObject.SetActive(false);
+        this.OnExploded?.Invoke(explodePosition);
 
         if (this.IsOwner)
         {
             CinemachineController.SetBlendDuration(_CAMERA_EXIT_TRANSITION_TIME);
-            PredatorMissileController.OnLocalPlayerPredatorMissileExploded?.Invoke();
-            this.OnCollisionServerRpc(collisionPosition);
+            this.OnExplodeServerRpc(explodePosition);
         }
     }
 
     [ServerRpc]
-    private void OnCollisionServerRpc(Vector3 collisionPosition, ServerRpcParams serverRpcParams = default)
+    private void OnExplodeServerRpc(Vector3 explodePosition, ServerRpcParams serverRpcParams = default)
     {
         ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
 
@@ -78,15 +78,15 @@ public class PredatorMissileController : NetworkBehaviorAutoDisable<PredatorMiss
 
 #pragma warning disable CS4014
         this.DespawnWithDelay(_CAMERA_EXIT_TRANSITION_TIME + 0.5f);
-        this.OnCollisionClientRpc(collisionPosition, rpcParams);
+        this.OnExplodeClientRpc(explodePosition, rpcParams);
     }
 
     [ClientRpc]
-    private void OnCollisionClientRpc(Vector3 collisionPosition, ClientRpcParams _ = default)
+    private void OnExplodeClientRpc(Vector3 explodePosition, ClientRpcParams _ = default)
     {
         if (this.IsOwner) { return; }
 
-        this.OnCollision(collisionPosition);
+        this.OnExplode(explodePosition);
     }
 
     private async UniTask DespawnWithDelay(float delay)

@@ -10,17 +10,9 @@ public class SoldierDamageController : NetworkBehaviour, IDamageable
 
     private const float _BULLET_IMPACT_AUDIO_VOLUME = 0.3f;
 
-    public event Action<DamageType, int> OnNonLocalPlayerShotByLocalPlayer;
+    public event Action<DamageType, int> OnPlayerDamagedByLocalPlayer;
     public event Action<ulong, DamageType, int> OnServerTakeDamage;
     public event Action<DamageType, int> OnServerDamageReceived;
-
-    [Serializable]
-    public enum DamageType
-    {
-        Bullet,
-        Grenade,
-        Missile
-    }
 
     private void Awake()
     {
@@ -44,10 +36,9 @@ public class SoldierDamageController : NetworkBehaviour, IDamageable
 
         // We shot another soldier locally
         if (type == DamageType.Bullet)
-        {
             AudioSource.PlayClipAtPoint(this._bulletFleshImpactAudioClip, damagePoint, _BULLET_IMPACT_AUDIO_VOLUME);
-            this.OnNonLocalPlayerShotByLocalPlayer?.Invoke(type, damageAmount);
-        }
+
+        this.OnPlayerDamagedByLocalPlayer?.Invoke(type, damageAmount);
     }
 
     public void TakeServerDamage(ulong damagerClientId, DamageType type, int damageAmount)
@@ -55,8 +46,7 @@ public class SoldierDamageController : NetworkBehaviour, IDamageable
         if (!this.IsHost) { return; }
         // Host sending damage to player
 
-        if (type == DamageType.Bullet)
-            this.OnServerTakeDamage?.Invoke(damagerClientId, type, damageAmount);
+        this.OnServerTakeDamage?.Invoke(damagerClientId, type, damageAmount);
     }
 
     private void OnHealthChange(HealthData oldHealthData, HealthData newHealthData)
@@ -64,9 +54,18 @@ public class SoldierDamageController : NetworkBehaviour, IDamageable
         if (newHealthData.Health >= oldHealthData.Health) { return; }
         // Clients reacting to host sending damage to player
 
-        if (newHealthData.LatestDamagerClientId != NetworkManager.Singleton.LocalClientId)
+        if (newHealthData.LatestDamageType == DamageType.Bullet && newHealthData.LatestDamagerClientId != NetworkManager.Singleton.LocalClientId)
             AudioSource.PlayClipAtPoint(this._bulletFleshImpactAudioClip, transform.position, _BULLET_IMPACT_AUDIO_VOLUME);
 
         this.OnServerDamageReceived?.Invoke(newHealthData.LatestDamageType, oldHealthData.Health - newHealthData.Health);
     }
+}
+
+[Serializable]
+public enum DamageType
+{
+    None,
+    Bullet,
+    Grenade,
+    Missile
 }

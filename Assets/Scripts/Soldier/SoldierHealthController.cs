@@ -43,7 +43,7 @@ public class SoldierHealthController : NetworkBehaviour
         this._timeSinceLastHealthRegeneration = 0f;
     }
 
-    private void OnServerTakeDamage(ulong damagerClientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnServerTakeDamage(ulong damagerClientId, DamageType damageType, int damageAmount)
     {
         if (this._currentHealth.Value.Health == MIN_HEALTH || !this.IsHost) { return; }
 
@@ -62,9 +62,9 @@ public struct HealthData : INetworkSerializable
     public int _MAX_HEALTH;
     public int MIN_HEALTH;
     public ulong LatestDamagerClientId;
-    public SoldierDamageController.DamageType LatestDamageType;
+    public DamageType LatestDamageType;
 
-    public HealthData(int maxHealth, int minHealth, SoldierDamageController.DamageType latestDamageType = SoldierDamageController.DamageType.Bullet)
+    public HealthData(int maxHealth, int minHealth, DamageType latestDamageType = DamageType.None)
     {
         this.Health = maxHealth;
         this._MAX_HEALTH = maxHealth;
@@ -79,7 +79,7 @@ public struct HealthData : INetworkSerializable
         return this;
     }
 
-    public HealthData DecreaseHealth(ulong damagerClientId, int damageAmount, SoldierDamageController.DamageType damageType)
+    public HealthData DecreaseHealth(ulong damagerClientId, int damageAmount, DamageType damageType)
     {
         this.Health = Math.Clamp(this.Health - damageAmount, this.MIN_HEALTH, this._MAX_HEALTH);
         this.LatestDamagerClientId = damagerClientId;

@@ -47,7 +47,7 @@ public class BulletController : MonoBehaviour
         // Set transform to collision point then wait a frame before taking action
         transform.position = collidePosition;
         await UnityTimer.Delay(0);
-        damageable.TakeLocalDamage(SoldierDamageController.DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
+        damageable.TakeLocalDamage(DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
         ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.Bullet, transform);
     }
 }

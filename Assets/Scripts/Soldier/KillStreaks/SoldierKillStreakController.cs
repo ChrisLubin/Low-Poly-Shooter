@@ -12,14 +12,14 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
     {
         base.Awake();
         GameManager.OnStateChange += this.OnGameStateChange;
-        PredatorMissileController.OnLocalPlayerPredatorMissileExploded += this.OnLocalPlayerPredatorMissileExploded;
+        PredatorMissileDamageController.OnLocalPlayerMissileExploded += this.OnLocalPlayerMissileExploded;
     }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
         GameManager.OnStateChange -= this.OnGameStateChange;
-        PredatorMissileController.OnLocalPlayerPredatorMissileExploded -= this.OnLocalPlayerPredatorMissileExploded;
+        PredatorMissileDamageController.OnLocalPlayerMissileExploded -= this.OnLocalPlayerMissileExploded;
     }
 
     private void Update()
@@ -51,5 +51,5 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
         this._logger.Log($"Spawned predator missile for {MultiplayerSystem.Instance.GetPlayerUsername(this.OwnerClientId)}");
     }
 
-    private void OnLocalPlayerPredatorMissileExploded() => SoldierKillStreakController.IS_USING_KILL_STREAK = false;
+    private void OnLocalPlayerMissileExploded() => SoldierKillStreakController.IS_USING_KILL_STREAK = false;
 }

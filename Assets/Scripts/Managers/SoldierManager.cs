@@ -123,20 +123,20 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         player.Shoot();
     }
 
-    private void OnLocalTakeDamage(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnLocalTakeDamage(ulong clientId, DamageType damageType, int damageAmount)
     {
-        if (clientId == this._localClientId) { return; }
+        if (clientId == this._localClientId && damageType == DamageType.Bullet) { return; }
         RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientId, damageType, damageAmount);
     }
 
-    private void OnServerTakeDamage(ulong damagedClientId, ulong damagerClientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnServerTakeDamage(ulong damagedClientId, ulong damagerClientId, DamageType damageType, int damageAmount)
     {
         if (!this.IsHost || !this._playersMap.TryGetValue(damagedClientId, out SoldierController player)) { return; }
 
         player.TakeServerDamage(damagerClientId, damageType, damageAmount);
     }
 
-    private void OnServerDamageReceived(ulong clientId, SoldierDamageController.DamageType damageType, int damageAmount)
+    private void OnServerDamageReceived(ulong clientId, DamageType damageType, int damageAmount)
     {
         if (clientId != this._localClientId) { return; }
 

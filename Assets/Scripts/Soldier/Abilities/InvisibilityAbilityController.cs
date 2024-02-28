@@ -15,7 +15,7 @@ public class InvisibilityAbilityController : AbilityController
     {
         this.Ability = Abilities.Invisibility;
         this._damageController = GetComponent<SoldierDamageController>();
-        this._damageController.OnNonLocalPlayerShotByLocalPlayer += this.OnNonLocalPlayerShotByLocalPlayer;
+        this._damageController.OnPlayerDamagedByLocalPlayer += this.OnPlayerDamagedByLocalPlayer;
         this._damageController.OnServerDamageReceived += this.OnPlayerReceivedServerDamage;
         this._weaponController = GetComponentInChildren<WeaponController>();
         this._weaponController.OnShoot += this.OnPlayerDidShoot;
@@ -25,7 +25,7 @@ public class InvisibilityAbilityController : AbilityController
 
     private void OnDestroy()
     {
-        this._damageController.OnNonLocalPlayerShotByLocalPlayer -= this.OnNonLocalPlayerShotByLocalPlayer;
+        this._damageController.OnPlayerDamagedByLocalPlayer -= this.OnPlayerDamagedByLocalPlayer;
         this._damageController.OnServerDamageReceived -= this.OnPlayerReceivedServerDamage;
         this._weaponController.OnShoot -= this.OnPlayerDidShoot;
     }
@@ -60,7 +60,7 @@ public class InvisibilityAbilityController : AbilityController
         }
     }
 
-    private void OnNonLocalPlayerShotByLocalPlayer(DamageType _, int __) => this.TryInternallyDeactivate();
+    private void OnPlayerDamagedByLocalPlayer(DamageType _, int __) => this.TryInternallyDeactivate();
     private void OnPlayerReceivedServerDamage(DamageType _, int __) => this.TryInternallyDeactivate();
     private void OnPlayerDidShoot() => this.TryInternallyDeactivate();
 

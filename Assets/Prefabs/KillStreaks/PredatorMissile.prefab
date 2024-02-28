@@ -108,8 +108,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2255255474441088359}
   - component: {fileID: 2255255474441088356}
-  - component: {fileID: 2255255474441088358}
   - component: {fileID: 2255255474441088353}
+  - component: {fileID: 2255255474441088358}
+  - component: {fileID: 2720865534182069500}
   m_Layer: 0
   m_Name: PredatorMissile
   m_TagString: Untagged
@@ -149,22 +150,6 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &2255255474441088358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2255255474441088357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9ec73e82d30429479b3c6709d8e223b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _camera: {fileID: 4609480632813320941}
-  _movementSpeed: 50
-  _lookLimit: 100
-  _lookSpeed: 0.2
 --- !u!114 &2255255474441088353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,6 +176,38 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!114 &2255255474441088358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2255255474441088357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9ec73e82d30429479b3c6709d8e223b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camera: {fileID: 4609480632813320941}
+  _movementSpeed: 50
+  _lookLimit: 100
+  _lookSpeed: 0.2
+--- !u!114 &2720865534182069500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2255255474441088357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e960ee026f9f8c4683ff655f68edcb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _explosionPrefab: {fileID: 4325717242527976, guid: 9e2f8589d8d81744aa78528af74862ce,
+    type: 3}
+  _blastRadius: 10
+  Do: 0
 --- !u!1 &2846745258336481183
 GameObject:
   m_ObjectHideFlags: 0
