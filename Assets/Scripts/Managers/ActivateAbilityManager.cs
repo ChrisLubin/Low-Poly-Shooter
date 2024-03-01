@@ -5,6 +5,7 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
 {
     private SelectAbilityManager _selectAbilityManager;
     private SoldierDeathController _deathController;
+    private SoldierKillStreakController _killStreakController;
 
     private NetworkVariable<bool> _isAbilityActive = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -15,7 +16,9 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
         base.Awake();
         this._selectAbilityManager = GetComponent<SelectAbilityManager>();
         this._deathController = GetComponent<SoldierDeathController>();
+        this._killStreakController = GetComponent<SoldierKillStreakController>();
         this._deathController.OnDeath += this.OnDeath;
+        this._killStreakController.OnUseKillStreak += this.OnUseKillStreak;
         this._isAbilityActive.OnValueChanged += this.OnIsAbilityActiveChanged;
 
         foreach (AbilityController ability in this._selectAbilityManager.AllAbilities)
@@ -26,6 +29,7 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
     {
         base.OnDestroy();
         this._deathController.OnDeath -= this.OnDeath;
+        this._killStreakController.OnUseKillStreak -= this.OnUseKillStreak;
         this._isAbilityActive.OnValueChanged -= this.OnIsAbilityActiveChanged;
 
         foreach (AbilityController ability in this._selectAbilityManager.AllAbilities)
@@ -85,7 +89,10 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
             this.DeactiveAbility();
     }
 
-    private void OnDeath(ulong _, DamageType __)
+    private void OnDeath(ulong _, DamageType __) => this.TryDisableAbility();
+    private void OnUseKillStreak() => this.TryDisableAbility();
+
+    private void TryDisableAbility()
     {
         if (this._selectAbilityManager.SelectedAbilityController == null) { return; }
 

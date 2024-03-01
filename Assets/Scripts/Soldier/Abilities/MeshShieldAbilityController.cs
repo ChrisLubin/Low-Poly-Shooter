@@ -20,28 +20,27 @@ public class MeshShieldAbilityController : AbilityController
     {
         base.Activate();
 
-        if (this._cameraController.IsLocalPlayer)
-        {
-            CinemachineController.SetBlendDuration(0.5f);
-            this._cameraController.EnableThirdPersonCamera();
-
-        }
-
         this._shield.gameObject.SetActive(true);
         this._weaponController.gameObject.SetActive(false);
+
+        if (!this._cameraController.IsLocalPlayer) { return; }
+
+        if (!SoldierKillStreakController.IS_USING_KILL_STREAK)
+            CinemachineController.SetBlendDuration(0.5f);
+        this._cameraController.EnableThirdPersonCamera();
     }
 
     public override void Deactivate()
     {
         base.Deactivate();
 
-        if (this._cameraController.IsLocalPlayer)
-        {
-            CinemachineController.SetBlendDuration(0.5f);
-            this._cameraController.EnableFirstPersonCamera();
-        }
-
         this._shield.gameObject.SetActive(false);
         this._weaponController.gameObject.SetActive(true);
+
+        if (!this._cameraController.IsLocalPlayer) { return; }
+
+        if (!SoldierKillStreakController.IS_USING_KILL_STREAK)
+            CinemachineController.SetBlendDuration(0.5f);
+        this._cameraController.EnableFirstPersonCamera();
     }
 }

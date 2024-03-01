@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
 
     private static bool _HAS_KILL_STREAK = true;
     public static bool IS_USING_KILL_STREAK { get; private set; } = false;
+
+    public event Action OnUseKillStreak;
 
     protected override void Awake()
     {
@@ -29,6 +32,7 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
         this._logger.Log($"Local player requested predator missile");
         this.SpawnPredatorMissileServerRpc();
         SoldierKillStreakController.IS_USING_KILL_STREAK = true;
+        this.OnUseKillStreak?.Invoke();
     }
 
     private void OnGameStateChange(GameState state)
