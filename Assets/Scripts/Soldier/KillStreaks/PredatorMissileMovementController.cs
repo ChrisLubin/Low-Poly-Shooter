@@ -17,8 +17,11 @@ public class PredatorMissileMovementController : NetworkBehaviorAutoDisable<Pred
     private float _rotationX = 0;
     private float _rotationZ = 0;
 
-    private static float _CAMERA_EXIT_TRANSITION_TIME = 2f;
+    private const float _CAMERA_EXIT_TRANSITION_TIME = 2f;
+    private const float _AUTO_EXPLODE_TIME = 15f;
     public event Action<Vector3> OnExploded;
+
+    private float _autoExplodeTimer = 0f;
 
     private void Awake()
     {
@@ -33,6 +36,13 @@ public class PredatorMissileMovementController : NetworkBehaviorAutoDisable<Pred
 
     private void Update()
     {
+        this._autoExplodeTimer += Time.deltaTime;
+
+        if (this._autoExplodeTimer >= _AUTO_EXPLODE_TIME)
+        {
+            this.OnExplode(transform.position);
+            return;
+        }
         if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition))
         {
             this.OnExplode(collidePosition);
