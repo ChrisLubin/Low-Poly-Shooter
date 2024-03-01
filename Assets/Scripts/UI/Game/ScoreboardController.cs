@@ -104,7 +104,7 @@ public class ScoreboardController : NetworkBehaviour
         }
     }
 
-    private void OnPlayerDeath(ulong deadClientId, ulong killerClientId)
+    private void OnPlayerDeath(ulong deadClientId, ulong killerClientId, DamageType _)
     {
         for (int i = 0; i < ScoreboardController._rows.Length; i++)
         {

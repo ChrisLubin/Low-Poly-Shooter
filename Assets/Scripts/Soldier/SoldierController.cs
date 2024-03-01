@@ -10,10 +10,10 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     [SerializeField] private WeaponController _weaponController;
 
     public static event Action<ulong, SoldierController> OnSpawn;
-    public static event Action<ulong, ulong> OnDeath;
+    public static event Action<ulong, ulong, DamageType> OnDeath;
     public static event Action<ulong> OnShoot;
-    public static event Action<ulong, DamageType, int> OnLocalTakeDamage;
-    public static event Action<ulong, DamageType, int> OnServerTakeDamage;
+    public static event Action<ulong, Vector3, DamageType, int> OnLocalTakeDamage;
+    public static event Action<ulong, Vector3, DamageType, int> OnServerTakeDamage;
     public static event Action<ulong, DamageType, int> OnServerDamageReceived;
     public static event Action<ulong, HealthData> OnHealthChange;
 
@@ -52,14 +52,14 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     }
 
     public void TakeLocalDamage(DamageType type, int damageAmount, Vector3 damagePoint, bool isDamageFromLocalPlayer) => this._damageController.TakeLocalDamage(type, damageAmount, damagePoint, isDamageFromLocalPlayer);
-    public void TakeServerDamage(ulong damagerClientId, DamageType type, int damageAmount) => this._damageController.TakeServerDamage(damagerClientId, type, damageAmount);
-    private void _OnLocalTakeDamage(DamageType type, int damageAmount) => SoldierController.OnLocalTakeDamage?.Invoke(this.OwnerClientId, type, damageAmount);
-    private void _OnServerTakeDamage(ulong _, DamageType type, int damageAmount) => SoldierController.OnServerTakeDamage?.Invoke(this.OwnerClientId, type, damageAmount);
+    public void TakeServerDamage(ulong damagerClientId, Vector3 damagePoint, DamageType type, int damageAmount) => this._damageController.TakeServerDamage(damagerClientId, damagePoint, type, damageAmount);
+    private void _OnLocalTakeDamage(Vector3 damagePoint, DamageType type, int damageAmount) => SoldierController.OnLocalTakeDamage?.Invoke(this.OwnerClientId, damagePoint, type, damageAmount);
+    private void _OnServerTakeDamage(ulong _, Vector3 damagePoint, DamageType type, int damageAmount) => SoldierController.OnServerTakeDamage?.Invoke(this.OwnerClientId, damagePoint, type, damageAmount);
     private void _OnServerDamageReceived(DamageType type, int damageAmount) => SoldierController.OnServerDamageReceived?.Invoke(this.OwnerClientId, type, damageAmount);
 
     public void Shoot() => this._weaponController.Shoot();
     private void _OnShoot() => SoldierController.OnShoot?.Invoke(this.OwnerClientId);
 
-    private void _OnDeath(ulong killerClientId) => SoldierController.OnDeath?.Invoke(this.OwnerClientId, killerClientId);
+    private void _OnDeath(ulong killerClientId, DamageType latestDamageType) => SoldierController.OnDeath?.Invoke(this.OwnerClientId, killerClientId, latestDamageType);
     private void _OnHealthChange(HealthData _, HealthData newHealthData) => SoldierController.OnHealthChange?.Invoke(this.OwnerClientId, newHealthData);
 }

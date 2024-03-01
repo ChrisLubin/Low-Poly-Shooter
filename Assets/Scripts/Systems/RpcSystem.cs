@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
 using Unity.Netcode;
+using UnityEngine;
 
 public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
 {
     public static event Action<string, string, ulong> OnPlayerGameSceneLoaded;
     public static event Action<ulong> OnPlayerShoot;
-    public static event Action<ulong, ulong, DamageType, int> OnPlayerTakeDamage;
+    public static event Action<ulong, ulong, Vector3, DamageType, int> OnPlayerTakeDamage;
     public static event Action<MultiplayerState> OnMultiplayerStateChange;
     public static event Action<GameState> OnGameStateChange;
     public static event Action<ulong> OnPlayerRequestSpawn;
@@ -48,7 +49,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     private void OnPlayerShootClientRpc(ulong clientId, ClientRpcParams _ = default) => RpcSystem.OnPlayerShoot?.Invoke(clientId);
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnPlayerTakeDamageServerRpc(ulong damagedSoldierClientId, DamageType damageType, int damageAmount, ServerRpcParams serverRpcParams = default) => RpcSystem.OnPlayerTakeDamage?.Invoke(damagedSoldierClientId, serverRpcParams.Receive.SenderClientId, damageType, damageAmount);
+    public void OnPlayerTakeDamageServerRpc(ulong damagedSoldierClientId, Vector3 damagePoint, DamageType damageType, int damageAmount, ServerRpcParams serverRpcParams = default) => RpcSystem.OnPlayerTakeDamage?.Invoke(damagedSoldierClientId, serverRpcParams.Receive.SenderClientId, damagePoint, damageType, damageAmount);
 
     [ServerRpc(RequireOwnership = false)]
     public void RequestPlayerSpawnServerRpc(ServerRpcParams serverRpcParams = default) => RpcSystem.OnPlayerRequestSpawn?.Invoke(serverRpcParams.Receive.SenderClientId);

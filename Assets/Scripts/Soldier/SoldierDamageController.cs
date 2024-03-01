@@ -10,8 +10,8 @@ public class SoldierDamageController : NetworkBehaviour, IDamageable
 
     private const float _BULLET_IMPACT_AUDIO_VOLUME = 0.3f;
 
-    public event Action<DamageType, int> OnPlayerDamagedByLocalPlayer;
-    public event Action<ulong, DamageType, int> OnServerTakeDamage;
+    public event Action<Vector3, DamageType, int> OnPlayerDamagedByLocalPlayer;
+    public event Action<ulong, Vector3, DamageType, int> OnServerTakeDamage;
     public event Action<DamageType, int> OnServerDamageReceived;
 
     private void Awake()
@@ -38,15 +38,15 @@ public class SoldierDamageController : NetworkBehaviour, IDamageable
         if (type == DamageType.Bullet)
             AudioSource.PlayClipAtPoint(this._bulletFleshImpactAudioClip, damagePoint, _BULLET_IMPACT_AUDIO_VOLUME);
 
-        this.OnPlayerDamagedByLocalPlayer?.Invoke(type, damageAmount);
+        this.OnPlayerDamagedByLocalPlayer?.Invoke(damagePoint, type, damageAmount);
     }
 
-    public void TakeServerDamage(ulong damagerClientId, DamageType type, int damageAmount)
+    public void TakeServerDamage(ulong damagerClientId, Vector3 damagePoint, DamageType type, int damageAmount)
     {
         if (!this.IsHost) { return; }
         // Host sending damage to player
 
-        this.OnServerTakeDamage?.Invoke(damagerClientId, type, damageAmount);
+        this.OnServerTakeDamage?.Invoke(damagerClientId, damagePoint, type, damageAmount);
     }
 
     private void OnHealthChange(HealthData oldHealthData, HealthData newHealthData)

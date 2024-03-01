@@ -60,7 +60,7 @@ public class InvisibilityAbilityController : AbilityController
         }
     }
 
-    private void OnPlayerDamagedByLocalPlayer(DamageType _, int __) => this.TryInternallyDeactivate();
+    private void OnPlayerDamagedByLocalPlayer(Vector3 _, DamageType __, int ___) => this.TryInternallyDeactivate();
     private void OnPlayerReceivedServerDamage(DamageType _, int __) => this.TryInternallyDeactivate();
     private void OnPlayerDidShoot() => this.TryInternallyDeactivate();
 

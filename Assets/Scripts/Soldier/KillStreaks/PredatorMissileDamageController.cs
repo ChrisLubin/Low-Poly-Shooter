@@ -7,7 +7,7 @@ public class PredatorMissileDamageController : NetworkBehaviour
     private PredatorMissileMovementController _movementController;
 
     [SerializeField] private Transform _explosionPrefab;
-    [SerializeField] private float _blastRadius = 10f;
+    [SerializeField] private float _blastRadius = 15f;
 
     public static event Action OnLocalPlayerMissileExploded;
 
@@ -39,6 +39,6 @@ public class PredatorMissileDamageController : NetworkBehaviour
 
         if (Helpers.TrySphereCastAll(explodePosition, this._blastRadius, out CastAllData<SoldierDamageController>[] castDatas, Constants.LayerNames.Soldier))
             foreach (CastAllData<SoldierDamageController> castData in castDatas)
-                castData.HitObject.TakeLocalDamage(DamageType.Missile, 100, castData.HitPosition, true);
+                castData.HitObject.TakeLocalDamage(DamageType.Missile, SoldierHealthController.MAX_HEALTH, explodePosition, true);
     }
 }

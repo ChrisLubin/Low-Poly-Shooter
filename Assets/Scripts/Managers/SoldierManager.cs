@@ -22,7 +22,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     public static event Action<HealthData> OnLocalPlayerHealthChange;
     public static event Action OnLocalPlayerSpawn;
     public static event Action OnLocalPlayerDeath;
-    public static event Action<ulong, ulong> OnPlayerDeath;
+    public static event Action<ulong, ulong, DamageType> OnPlayerDeath;
 
     protected override void Awake()
     {
@@ -87,12 +87,12 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         }
     }
 
-    private async void OnDeath(ulong deadClientId, ulong killerClientId)
+    private async void OnDeath(ulong deadClientId, ulong killerClientId, DamageType latestDamageType)
     {
         this._logger.Log($"{MultiplayerSystem.Instance.GetPlayerUsername(killerClientId)} killed {MultiplayerSystem.Instance.GetPlayerUsername(deadClientId)}");
         this._playersMap.TryGetValue(deadClientId, out SoldierController player);
         this._playersMap.Remove(deadClientId);
-        SoldierManager.OnPlayerDeath?.Invoke(deadClientId, killerClientId);
+        SoldierManager.OnPlayerDeath?.Invoke(deadClientId, killerClientId, latestDamageType);
         if (deadClientId == this._localClientId)
         {
             SoldierManager.OnLocalPlayerDeath?.Invoke();
@@ -123,17 +123,17 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         player.Shoot();
     }
 
-    private void OnLocalTakeDamage(ulong clientId, DamageType damageType, int damageAmount)
+    private void OnLocalTakeDamage(ulong clientId, Vector3 damagePoint, DamageType damageType, int damageAmount)
     {
         if (clientId == this._localClientId && damageType == DamageType.Bullet) { return; }
-        RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientId, damageType, damageAmount);
+        RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientId, damagePoint, damageType, damageAmount);
     }
 
-    private void OnServerTakeDamage(ulong damagedClientId, ulong damagerClientId, DamageType damageType, int damageAmount)
+    private void OnServerTakeDamage(ulong damagedClientId, ulong damagerClientId, Vector3 damagePoint, DamageType damageType, int damageAmount)
     {
         if (!this.IsHost || !this._playersMap.TryGetValue(damagedClientId, out SoldierController player)) { return; }
 
-        player.TakeServerDamage(damagerClientId, damageType, damageAmount);
+        player.TakeServerDamage(damagerClientId, damagePoint, damageType, damageAmount);
     }
 
     private void OnServerDamageReceived(ulong clientId, DamageType damageType, int damageAmount)

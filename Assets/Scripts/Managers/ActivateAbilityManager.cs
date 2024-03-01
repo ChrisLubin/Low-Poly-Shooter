@@ -85,7 +85,7 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
             this.DeactiveAbility();
     }
 
-    private void OnDeath(ulong _)
+    private void OnDeath(ulong _, DamageType __)
     {
         if (this._selectAbilityManager.SelectedAbilityController == null) { return; }
 

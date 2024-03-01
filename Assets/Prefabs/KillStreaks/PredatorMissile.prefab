@@ -206,8 +206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosionPrefab: {fileID: 4325717242527976, guid: 9e2f8589d8d81744aa78528af74862ce,
     type: 3}
-  _blastRadius: 10
-  Do: 0
+  _blastRadius: 15
 --- !u!1 &2846745258336481183
 GameObject:
   m_ObjectHideFlags: 0

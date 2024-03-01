@@ -8,7 +8,7 @@ public class SoldierHealthController : NetworkBehaviour
 
     public const int MAX_HEALTH = 100;
     public const int MIN_HEALTH = 0;
-    private NetworkVariable<HealthData> _currentHealth = new(new(MAX_HEALTH, MIN_HEALTH));
+    private NetworkVariable<HealthData> _currentHealth = new(new(MAX_HEALTH, MIN_HEALTH, Vector3.zero));
 
     public event Action<HealthData, HealthData> OnHealthChange;
 
@@ -43,11 +43,11 @@ public class SoldierHealthController : NetworkBehaviour
         this._timeSinceLastHealthRegeneration = 0f;
     }
 
-    private void OnServerTakeDamage(ulong damagerClientId, DamageType damageType, int damageAmount)
+    private void OnServerTakeDamage(ulong damagerClientId, Vector3 damagePoint, DamageType damageType, int damageAmount)
     {
         if (this._currentHealth.Value.Health == MIN_HEALTH || !this.IsHost) { return; }
 
-        this._currentHealth.Value = this._currentHealth.Value.DecreaseHealth(damagerClientId, damageAmount, damageType);
+        this._currentHealth.Value = this._currentHealth.Value.DecreaseHealth(damagerClientId, damageAmount, damagePoint, damageType);
         this._timeSinceLastDamage = 0f;
         this._timeSinceLastHealthRegeneration = 0f;
     }
@@ -62,14 +62,16 @@ public struct HealthData : INetworkSerializable
     public int _MAX_HEALTH;
     public int MIN_HEALTH;
     public ulong LatestDamagerClientId;
+    public Vector3 LatestDamagePoint;
     public DamageType LatestDamageType;
 
-    public HealthData(int maxHealth, int minHealth, DamageType latestDamageType = DamageType.None)
+    public HealthData(int maxHealth, int minHealth, Vector3 latestDamagePoint, DamageType latestDamageType = DamageType.None)
     {
         this.Health = maxHealth;
         this._MAX_HEALTH = maxHealth;
         this.MIN_HEALTH = minHealth;
         this.LatestDamagerClientId = 0;
+        this.LatestDamagePoint = latestDamagePoint; // For explosives, this is the point where they exploded
         this.LatestDamageType = latestDamageType;
     }
 
@@ -79,10 +81,11 @@ public struct HealthData : INetworkSerializable
         return this;
     }
 
-    public HealthData DecreaseHealth(ulong damagerClientId, int damageAmount, DamageType damageType)
+    public HealthData DecreaseHealth(ulong damagerClientId, int damageAmount, Vector3 damagePoint, DamageType damageType)
     {
         this.Health = Math.Clamp(this.Health - damageAmount, this.MIN_HEALTH, this._MAX_HEALTH);
         this.LatestDamagerClientId = damagerClientId;
+        this.LatestDamagePoint = damagePoint;
         this.LatestDamageType = damageType;
         return this;
     }
@@ -94,6 +97,7 @@ public struct HealthData : INetworkSerializable
             var reader = serializer.GetFastBufferReader();
             reader.ReadValueSafe(out Health);
             reader.ReadValueSafe(out LatestDamagerClientId);
+            reader.ReadValueSafe(out LatestDamagePoint);
             reader.ReadValueSafe(out LatestDamageType);
         }
         else
@@ -101,6 +105,7 @@ public struct HealthData : INetworkSerializable
             var writer = serializer.GetFastBufferWriter();
             writer.WriteValueSafe(Health);
             writer.WriteValueSafe(LatestDamagerClientId);
+            writer.WriteValueSafe(LatestDamagePoint);
             writer.WriteValueSafe(LatestDamageType);
         }
     }

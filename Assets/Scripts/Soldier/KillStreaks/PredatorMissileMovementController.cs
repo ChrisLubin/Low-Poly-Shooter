@@ -53,13 +53,14 @@ public class PredatorMissileMovementController : NetworkBehaviorAutoDisable<Pred
     private void OnExplode(Vector3 explodePosition)
     {
         gameObject.SetActive(false);
-        this.OnExploded?.Invoke(explodePosition);
 
         if (this.IsOwner)
         {
             CinemachineController.SetBlendDuration(_CAMERA_EXIT_TRANSITION_TIME);
             this.OnExplodeServerRpc(explodePosition);
         }
+
+        this.OnExploded?.Invoke(explodePosition);
     }
 
     [ServerRpc]

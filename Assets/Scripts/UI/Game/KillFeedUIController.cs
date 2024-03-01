@@ -58,7 +58,7 @@ public class KillFeedUIController : MonoBehaviour
         }
     }
 
-    private void OnPlayerDeath(ulong deadClientId, ulong killerClientId)
+    private void OnPlayerDeath(ulong deadClientId, ulong killerClientId, DamageType latestDamageType)
     {
         string killerPlayerName = MultiplayerSystem.Instance.GetPlayerUsername(killerClientId);
         string deadPlayerName = MultiplayerSystem.Instance.GetPlayerUsername(deadClientId);

@@ -57,7 +57,7 @@ public class EndGameMusicManager : WithLogger<EndGameMusicManager>
         this._logger.Log($"The game is nearing end so playing {(ScoreboardController.IsLocalPlayerInFirstPlace() ? "winning" : "losing")} song!");
     }
 
-    private async void OnPlayerDeath(ulong _, ulong __)
+    private async void OnPlayerDeath(ulong _, ulong __, DamageType ___)
     {
         if (!this._audioSource.isPlaying) { return; }
 
