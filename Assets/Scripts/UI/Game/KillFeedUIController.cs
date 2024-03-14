@@ -77,12 +77,18 @@ public class KillFeedUIController : MonoBehaviour
     {
         string killerPlayerName = MultiplayerSystem.Instance.GetPlayerUsername(killerClientId);
         string deadPlayerName = MultiplayerSystem.Instance.GetPlayerUsername(deadClientId);
+        string killFeedText;
 
         // Remove oldest item if max count is reached
         if (this._killFeedItems.Count == _MAX_KILL_ITEM_COUNT)
             this._killFeedItems.RemoveAt(this._killFeedItems.Count - 1);
 
-        this._killFeedItems.Insert(0, new($"{killerPlayerName} <color=red>{this.GetKillDescription(latestDamageType)}</color> {deadPlayerName}", _KILL_ITEM_DEFAULT_LIFE_SPAN));
+        if (killerClientId == deadClientId)
+            killFeedText = $"{killerPlayerName} <color=red>SUICIDED</color>";
+        else
+            killFeedText = $"{killerPlayerName} <color=red>{this.GetKillDescription(latestDamageType)}</color> {deadPlayerName}";
+
+        this._killFeedItems.Insert(0, new(killFeedText, _KILL_ITEM_DEFAULT_LIFE_SPAN));
         this._OnKillFeedListChange?.Invoke();
     }
 
