@@ -13,6 +13,7 @@ public class KillStreakUIController : MonoBehaviour
         SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         SoldierKillStreakController.OnLocalPlayerKillStreakCountChange += this.OnLocalPlayerKillStreakCountChange;
+        SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated += this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
     private void OnDestroy()
@@ -22,6 +23,7 @@ public class KillStreakUIController : MonoBehaviour
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SoldierKillStreakController.OnLocalPlayerKillStreakCountChange -= this.OnLocalPlayerKillStreakCountChange;
+        SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated -= this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
     private void OnGameStateChange(GameState state)
@@ -40,4 +42,5 @@ public class KillStreakUIController : MonoBehaviour
     private void OnLocalPlayerDeath() => this._uiContainer.gameObject.SetActive(false);
     private void OnHostDisconnect() => this._uiContainer.gameObject.SetActive(false);
     private void OnLocalPlayerKillStreakCountChange(int currentKillStreakCount) => this._currentKillStreakCountText.text = $"{Mathf.Min(currentKillStreakCount, SoldierKillStreakController.KILLS_NEEDED_FOR_PREDATOR_MISSILE)}/{SoldierKillStreakController.KILLS_NEEDED_FOR_PREDATOR_MISSILE}";
+    private void OnLocalPlayerKillStreakActivatedOrDeactivated(bool wasActivated) => this._uiContainer.gameObject.SetActive(!wasActivated);
 }

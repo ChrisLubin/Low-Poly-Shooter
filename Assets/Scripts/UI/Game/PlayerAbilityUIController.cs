@@ -21,6 +21,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
         SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged += this.OnLocalPlayerSelectedAbilityChanged;
+        SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated += this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
     private void Start()
@@ -35,6 +36,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged -= this.OnLocalPlayerSelectedAbilityChanged;
+        SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated -= this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
     private void OnGameStateChange(GameState state)
@@ -69,4 +71,5 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     private void OnLocalPlayerSpawn() => this._uiContainer.gameObject.SetActive(true);
     private void OnLocalPlayerDeath() => this._uiContainer.gameObject.SetActive(false);
     private void OnHostDisconnect() => this._uiContainer.gameObject.SetActive(false);
+    private void OnLocalPlayerKillStreakActivatedOrDeactivated(bool wasActivated) => this._uiContainer.gameObject.SetActive(!wasActivated);
 }

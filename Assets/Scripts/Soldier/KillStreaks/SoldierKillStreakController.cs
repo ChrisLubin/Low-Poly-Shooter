@@ -13,6 +13,7 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
 
     public event Action OnUseKillStreak;
     public static event Action<int> OnLocalPlayerKillStreakCountChange;
+    public static event Action<bool> OnLocalPlayerKillStreakActivatedOrDeactivated;
 
     protected override void OnOwnerNetworkSpawn()
     {
@@ -44,6 +45,7 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
         SoldierKillStreakController._HAS_KILL_STREAK = false;
         SoldierKillStreakController.IS_USING_KILL_STREAK = true;
         this.OnUseKillStreak?.Invoke();
+        OnLocalPlayerKillStreakActivatedOrDeactivated?.Invoke(true);
     }
 
     private void OnGameStateChange(GameState state)
@@ -68,14 +70,18 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
         this._logger.Log($"Spawned predator missile for {MultiplayerSystem.Instance.GetPlayerUsername(this.OwnerClientId)}");
     }
 
-    private void OnLocalPlayerMissileExploded() => SoldierKillStreakController.IS_USING_KILL_STREAK = false;
+    private void OnLocalPlayerMissileExploded()
+    {
+        SoldierKillStreakController.IS_USING_KILL_STREAK = false;
+        SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated?.Invoke(false);
+    }
 
     private void OnLocalPlayerDeath()
     {
         if (SoldierKillStreakController._KILL_STEAK_COUNT < KILLS_NEEDED_FOR_PREDATOR_MISSILE || !SoldierKillStreakController._HAS_KILL_STREAK)
         {
             SoldierKillStreakController._KILL_STEAK_COUNT = 0;
-            OnLocalPlayerKillStreakCountChange?.Invoke(_KILL_STEAK_COUNT);
+            SoldierKillStreakController.OnLocalPlayerKillStreakCountChange?.Invoke(_KILL_STEAK_COUNT);
         }
     }
 
