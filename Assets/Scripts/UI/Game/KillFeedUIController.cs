@@ -13,8 +13,11 @@ public class KillFeedUIController : MonoBehaviour
     private const int _MAX_KILL_ITEM_COUNT = 4;
     private event Action _OnKillFeedListChange;
 
+    private IDictionary<DamageType, string[]> _damageTypeToDescriptionMap;
+
     private void Awake()
     {
+        this.InitializeMaps();
         MultiplayerSystem.OnPlayerDisconnect += this.OnPlayerDisconnect;
         SoldierManager.OnPlayerDeath += this.OnPlayerDeath;
         this._OnKillFeedListChange += this.OnKillFeedListChange;
@@ -48,6 +51,18 @@ public class KillFeedUIController : MonoBehaviour
         }
     }
 
+    private void InitializeMaps()
+    {
+        string[] explosiveDescriptions = new[] { "EXPLODED", "OBLITERATED", "BLASTED", "ANNIHILATED", "ERADICATED", "DECIMATED" };
+
+        this._damageTypeToDescriptionMap = new Dictionary<DamageType, string[]>()
+        {
+            { DamageType.Bullet, new[] { "Shot", "Deleted", "Eliminated", "Terminated", "Incapacitated", "Neutralized" } },
+            { DamageType.Grenade, explosiveDescriptions },
+            { DamageType.Missile, explosiveDescriptions },
+        };
+    }
+
     private void OnKillFeedListChange()
     {
         this._killFeedText.text = "";
@@ -65,11 +80,9 @@ public class KillFeedUIController : MonoBehaviour
 
         // Remove oldest item if max count is reached
         if (this._killFeedItems.Count == _MAX_KILL_ITEM_COUNT)
-        {
             this._killFeedItems.RemoveAt(this._killFeedItems.Count - 1);
-        }
 
-        this._killFeedItems.Insert(0, new($"{killerPlayerName} -> {deadPlayerName}", _KILL_ITEM_DEFAULT_LIFE_SPAN));
+        this._killFeedItems.Insert(0, new($"{killerPlayerName} <color=red>{this.GetKillDescription(latestDamageType)}</color> {deadPlayerName}", _KILL_ITEM_DEFAULT_LIFE_SPAN));
         this._OnKillFeedListChange?.Invoke();
     }
 
@@ -82,6 +95,8 @@ public class KillFeedUIController : MonoBehaviour
         this._killFeedItems.Add(new(playerLeftText, _KILL_ITEM_DEFAULT_LIFE_SPAN));
         this._OnKillFeedListChange?.Invoke();
     }
+
+    private string GetKillDescription(DamageType damageType) => this._damageTypeToDescriptionMap[damageType].GetRandomElement();
 
     private struct KillFeedItem
     {

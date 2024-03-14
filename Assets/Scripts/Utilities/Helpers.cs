@@ -31,6 +31,8 @@ public static class Helpers
         return list.ToArray<T>();
     }
 
+    public static T GetRandomElement<T>(this T[] array) => array[UnityEngine.Random.Range(0, array.Length - 1)];
+
     public static bool WillCollide(Vector3 startPosition, Vector3 endPosition, out Vector3 collidePosition)
     {
         collidePosition = Vector3.zero;
