@@ -14,25 +14,22 @@ public class ReconSensesAbilityController : AbilityController
 
     private void Start()
     {
-        _enemySilhoutteRenderer.SetActive(false);
+        this._enemySilhoutteRenderer.SetActive(false);
     }
 
     public override void Activate()
     {
         base.Activate();
 
-        RenderEnemySilhoutte(true);
+        this.RenderEnemySilhoutte(true);
     }
 
     public override void Deactivate()
     {
         base.Deactivate();
 
-        RenderEnemySilhoutte(false);
+        this.RenderEnemySilhoutte(false);
     }
 
-    private void RenderEnemySilhoutte(bool isReconSensing)
-    {
-        _enemySilhoutteRenderer.SetActive(isReconSensing);
-    }
+    private void RenderEnemySilhoutte(bool isReconSensing) => this._enemySilhoutteRenderer.SetActive(isReconSensing);
 }
