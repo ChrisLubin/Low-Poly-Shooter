@@ -43,7 +43,7 @@ public class PredatorMissileMovementController : NetworkBehaviorAutoDisable<Pred
             this.OnExplode(transform.position);
             return;
         }
-        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition))
+        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out _))
         {
             this.OnExplode(collidePosition);
             return;

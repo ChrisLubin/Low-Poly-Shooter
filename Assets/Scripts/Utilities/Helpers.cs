@@ -33,15 +33,17 @@ public static class Helpers
 
     public static T GetRandomElement<T>(this T[] array) => array[UnityEngine.Random.Range(0, array.Length - 1)];
 
-    public static bool WillCollide(Vector3 startPosition, Vector3 endPosition, out Vector3 collidePosition)
+    public static bool WillCollide(Vector3 startPosition, Vector3 endPosition, out Vector3 collidePosition, out GameObject collideObject)
     {
         collidePosition = Vector3.zero;
+        collideObject = default(GameObject);
         Debug.DrawLine(startPosition, endPosition, Color.black, 2f);
 
         if (Physics.Linecast(startPosition, endPosition, out RaycastHit hit))
         {
             collidePosition = hit.point;
             Debug.DrawLine(startPosition, hit.point, Color.red, 2f);
+            collideObject = hit.transform.gameObject;
             return true;
         }
 

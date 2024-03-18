@@ -20,15 +20,15 @@ public class BulletController : MonoBehaviour
 
     private void Start()
     {
-        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
-            this.OnWillCollide(collidePosition, damageable);
+        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out GameObject hitObject))
+            this.OnWillCollide(collidePosition, hitObject);
     }
 
     private void FixedUpdate()
     {
-        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out IDamageable damageable, Constants.LayerNames.Damageable))
+        if (Helpers.WillCollide(transform.position, this.GetNextPosition(), out Vector3 collidePosition, out GameObject hitObject))
         {
-            this.OnWillCollide(collidePosition, damageable);
+            this.OnWillCollide(collidePosition, hitObject);
             return;
         }
 
@@ -42,12 +42,15 @@ public class BulletController : MonoBehaviour
 
     private Vector3 GetNextPosition() => transform.position + transform.forward * this._speed * Time.fixedDeltaTime;
 
-    private async void OnWillCollide(Vector3 collidePosition, IDamageable damageable)
+    private async void OnWillCollide(Vector3 collidePosition, GameObject hitObject)
     {
         // Set transform to collision point then wait a frame before taking action
         transform.position = collidePosition;
         await UnityTimer.Delay(0);
-        damageable.TakeLocalDamage(DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
+
+        if (hitObject.TryGetComponent(out IDamageable damageable))
+            damageable.TakeLocalDamage(DamageType.Bullet, this._damageAmount, collidePosition, this._wasShotByLocalPlayer);
+
         ObjectPoolSystem.Instance.ReleaseObject(ObjectPoolSystem.PoolType.Bullet, transform);
     }
 }
