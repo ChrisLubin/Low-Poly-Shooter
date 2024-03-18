@@ -125,7 +125,7 @@ public class ScoreboardController : NetworkBehaviour
                     this._isGameNearingEnd = true;
                     ScoreboardController.OnGameNearingEndReached?.Invoke();
                 }
-                if (this.IsHost && row.Kills == _KILLS_NEEDED_TO_WIN)
+                if (this.IsHost && row.Kills >= _KILLS_NEEDED_TO_WIN)
                     RpcSystem.Instance.ChangeGameStateServerRpc(GameState.GameOver);
             }
         }
