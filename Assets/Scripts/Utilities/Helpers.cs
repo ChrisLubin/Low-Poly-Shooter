@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 /// <summary>
@@ -91,6 +92,8 @@ public static class Helpers
         castAllData = castAllDataList.ToArray();
         return true;
     }
+
+    public static string SplitCamelCase(string original, string joinBy = " ") => string.Join(joinBy, Regex.Split(original, @"(?<!^)(?=[A-Z](?![A-Z]|$))"));
 }
 
 public struct CastAllData<T>

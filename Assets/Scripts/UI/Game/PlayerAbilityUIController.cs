@@ -55,7 +55,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     {
         this.ResetOutlines();
 
-        this._selectedAbilityText.text = newAbility.ToString();
+        this._selectedAbilityText.text = Helpers.SplitCamelCase(newAbility.ToString());
         if (this.AbilityOutlineMap.TryGetValue(newAbility, out Outline outline))
             outline.effectColor = this._selectedOutlineColor;
         else
