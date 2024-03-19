@@ -1,6 +1,3 @@
-using System.Linq;
-using QFSW.QC.Editor.Tools;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 public class ReconSensesAbilityController : AbilityController
@@ -12,13 +9,18 @@ public class ReconSensesAbilityController : AbilityController
         this.Ability = Abilities.ReconSenses;
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
+        if (!this.IsOwner) { return; }
         this._enemySilhoutteRenderer.SetActive(false);
     }
 
     public override void Activate()
     {
+        if (!this.IsOwner) { return; }
+
         base.Activate();
 
         this.RenderEnemySilhoutte(true);
@@ -26,6 +28,8 @@ public class ReconSensesAbilityController : AbilityController
 
     public override void Deactivate()
     {
+        if (!this.IsOwner) { return; }
+
         base.Deactivate();
 
         this.RenderEnemySilhoutte(false);
