@@ -244,6 +244,7 @@ GameObject:
   - component: {fileID: 2255255474441088358}
   - component: {fileID: 2720865534182069500}
   - component: {fileID: 6535656390249173392}
+  - component: {fileID: 2899894398133351620}
   m_Layer: 0
   m_Name: PredatorMissile
   m_TagString: Untagged
@@ -353,6 +354,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _laser: {fileID: 8254679253845649867}
+--- !u!114 &2899894398133351620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2255255474441088357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 718e1eccfd177804aa73c49f01800b6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemySilhouette: {fileID: 2100000, guid: 0d864006dd0e29e408b7c8949f376af4, type: 2}
+  _enemyHiddenRenderer: {fileID: -2345226267504738207, guid: c40be3174f62c4acf8c1216858c64956,
+    type: 2}
+  _enemyVisibleRenderer: {fileID: -1597354359573550040, guid: c40be3174f62c4acf8c1216858c64956,
+    type: 2}
+  _volumeProfile: {fileID: 11400000, guid: a6560a915ef98420e9faacc1c7438823, type: 2}
 --- !u!1 &2846745258336481183
 GameObject:
   m_ObjectHideFlags: 0

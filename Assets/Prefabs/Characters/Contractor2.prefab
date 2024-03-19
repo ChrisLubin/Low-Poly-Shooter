@@ -1188,8 +1188,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilityToggledAudioClip: {fileID: 0}
   _toggleAbilityAudioVolume: 0.5
-  _enemySilhoutteRenderer: {fileID: -2345226267504738207, guid: c40be3174f62c4acf8c1216858c64956,
+  _enemyVisibleRenderer: {fileID: -1597354359573550040, guid: c40be3174f62c4acf8c1216858c64956,
     type: 2}
+  _enemyHiddenRenderer: {fileID: -2345226267504738207, guid: c40be3174f62c4acf8c1216858c64956,
+    type: 2}
+  _silhoutteMaterial: {fileID: 2100000, guid: 644bf620bc359b94b8bd68e0d51ab416, type: 2}
 --- !u!1 &3395817449617735310
 GameObject:
   m_ObjectHideFlags: 0
