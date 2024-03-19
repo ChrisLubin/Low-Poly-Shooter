@@ -1,6 +1,5 @@
 using System.Linq;
 using UnityEngine;
-using static SoldierDamageController;
 
 public class InvisibilityAbilityController : AbilityController
 {
@@ -23,8 +22,9 @@ public class InvisibilityAbilityController : AbilityController
         this._originalMaterials = this._meshes.Select(mesh => mesh.materials[0]).ToArray();
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         this._damageController.OnPlayerDamagedByLocalPlayer -= this.OnPlayerDamagedByLocalPlayer;
         this._damageController.OnServerDamageReceived -= this.OnPlayerReceivedServerDamage;
         this._weaponController.OnShoot -= this.OnPlayerDidShoot;
