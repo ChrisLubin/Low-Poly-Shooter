@@ -16,6 +16,11 @@ public class KillStreakUIController : MonoBehaviour
         SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated += this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
+    private void Start()
+    {
+        this._currentKillStreakCountText.text = $"0/{SoldierKillStreakController.KILLS_NEEDED_FOR_PREDATOR_MISSILE}";
+    }
+
     private void OnDestroy()
     {
         GameManager.OnStateChange -= this.OnGameStateChange;
