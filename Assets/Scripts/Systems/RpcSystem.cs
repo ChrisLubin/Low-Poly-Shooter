@@ -30,21 +30,7 @@ public class RpcSystem : NetworkedStaticInstanceWithLogger<RpcSystem>
     private void ChangeGameStateClientRpc(GameState state) => RpcSystem.OnGameStateChange?.Invoke(state);
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnPlayerShootServerRpc(ServerRpcParams serverRpcParams = default)
-    {
-        ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
-
-        // Send to all clients except the shooter
-        ClientRpcParams rpcParams = new()
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = allClientIds.Where((ulong clientId) => clientId != serverRpcParams.Receive.SenderClientId).ToArray()
-            }
-        };
-
-        this.OnPlayerShootClientRpc(serverRpcParams.Receive.SenderClientId, rpcParams);
-    }
+    public void OnPlayerShootServerRpc(ServerRpcParams serverRpcParams = default) => this.OnPlayerShootClientRpc(serverRpcParams.Receive.SenderClientId, serverRpcParams.GetClientRpcParamsWithoutSender());
     [ClientRpc]
     private void OnPlayerShootClientRpc(ulong clientId, ClientRpcParams _ = default) => RpcSystem.OnPlayerShoot?.Invoke(clientId);
 

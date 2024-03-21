@@ -80,20 +80,9 @@ public class PredatorMissileMovementController : NetworkBehaviorAutoDisable<Pred
     [ServerRpc]
     private void OnExplodeServerRpc(Vector3 explodePosition, ServerRpcParams serverRpcParams = default)
     {
-        ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
-
-        // Send to all clients except the owner
-        ClientRpcParams rpcParams = new()
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = allClientIds.Where((ulong clientId) => clientId != serverRpcParams.Receive.SenderClientId).ToArray()
-            }
-        };
-
 #pragma warning disable CS4014
         this.DespawnWithDelay(_CAMERA_EXIT_TRANSITION_TIME + 0.5f);
-        this.OnExplodeClientRpc(explodePosition, rpcParams);
+        this.OnExplodeClientRpc(explodePosition, serverRpcParams.GetClientRpcParamsWithoutSender());
     }
 
     [ClientRpc]

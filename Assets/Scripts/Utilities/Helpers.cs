@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -105,6 +106,19 @@ public static class Helpers
         audioSource.volume = volume;
         audioSource.Play();
         Object.Destroy(gameObject, clip.length * ((Time.timeScale < 0.01f) ? 0.01f : Time.timeScale));
+    }
+
+    public static ClientRpcParams GetClientRpcParamsWithoutSender(this ServerRpcParams serverRpcParams)
+    {
+        ulong[] allClientIds = Helpers.ToArray(NetworkManager.Singleton.ConnectedClientsIds);
+
+        return new()
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = allClientIds.Where((ulong clientId) => clientId != serverRpcParams.Receive.SenderClientId).ToArray()
+            }
+        };
     }
 }
 

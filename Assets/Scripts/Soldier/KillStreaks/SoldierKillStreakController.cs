@@ -15,6 +15,7 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
     public static event Action<int> OnLocalPlayerKillStreakCountChange;
     public static event Action<bool> OnLocalPlayerKillStreakActivatedOrDeactivated;
     public static event Action OnLocalPlayerKillStreakAttained;
+    public static event Action OnNonLocalPlayerKillStreakActivated;
 
     protected override void OnOwnerNetworkSpawn()
     {
@@ -64,11 +65,20 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
     }
 
     [ServerRpc]
-    private void SpawnPredatorMissileServerRpc()
+    private void SpawnPredatorMissileServerRpc(ServerRpcParams serverRpcParams = default)
     {
         Transform playerTransform = Instantiate(this._predatorMissilePrefab, KillStreakManager.Instance.GetPredatorMissileSpawnPoint(), Quaternion.identity);
         playerTransform.GetComponent<NetworkObject>().SpawnWithOwnership(this.OwnerClientId);
         this._logger.Log($"Spawned predator missile for {MultiplayerSystem.Instance.GetPlayerUsername(this.OwnerClientId)}");
+
+        this.PredatorMissileSpawnedClientRpc(serverRpcParams.GetClientRpcParamsWithoutSender());
+    }
+
+    [ClientRpc]
+    private void PredatorMissileSpawnedClientRpc(ClientRpcParams _)
+    {
+        if (this.IsOwner) { return; }
+        SoldierKillStreakController.OnNonLocalPlayerKillStreakActivated?.Invoke();
     }
 
     private void OnLocalPlayerMissileExploded()
