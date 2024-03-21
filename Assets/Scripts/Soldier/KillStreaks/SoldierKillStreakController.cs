@@ -14,6 +14,7 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
     public event Action OnUseKillStreak;
     public static event Action<int> OnLocalPlayerKillStreakCountChange;
     public static event Action<bool> OnLocalPlayerKillStreakActivatedOrDeactivated;
+    public static event Action OnLocalPlayerKillStreakAttained;
 
     protected override void OnOwnerNetworkSpawn()
     {
@@ -92,7 +93,10 @@ public class SoldierKillStreakController : NetworkBehaviorAutoDisableWithLogger<
         SoldierKillStreakController._KILL_STEAK_COUNT++;
 
         if (SoldierKillStreakController._KILL_STEAK_COUNT == SoldierKillStreakController.KILLS_NEEDED_FOR_PREDATOR_MISSILE)
+        {
             SoldierKillStreakController._HAS_KILL_STREAK = true;
+            SoldierKillStreakController.OnLocalPlayerKillStreakAttained?.Invoke();
+        }
 
         OnLocalPlayerKillStreakCountChange?.Invoke(SoldierKillStreakController._KILL_STEAK_COUNT);
     }
