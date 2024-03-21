@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 2720865534182069500}
   - component: {fileID: 6535656390249173392}
   - component: {fileID: 2899894398133351620}
+  - component: {fileID: 5600461115379527694}
   m_Layer: 0
   m_Name: PredatorMissile
   m_TagString: Untagged
@@ -372,6 +373,23 @@ MonoBehaviour:
   _enemyVisibleRenderer: {fileID: -1597354359573550040, guid: c40be3174f62c4acf8c1216858c64956,
     type: 2}
   _volumeProfile: {fileID: 11400000, guid: a6560a915ef98420e9faacc1c7438823, type: 2}
+--- !u!114 &5600461115379527694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2255255474441088357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f395ea3ffa788f4eabca212154e3332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _predatorMissileImpactSoundEffect: {fileID: 8300000, guid: 68d3d9925df475647a96c1e9c4c5e947,
+    type: 3}
+  _predatorMissileDestructionSoundEffect: {fileID: 8300000, guid: bcd3de0ecaf227e46a95bb28112bc68a,
+    type: 3}
+  startFadeAt: 0.8
 --- !u!1 &2846745258336481183
 GameObject:
   m_ObjectHideFlags: 0

@@ -94,6 +94,18 @@ public static class Helpers
     }
 
     public static string SplitCamelCase(string original, string joinBy = " ") => string.Join(joinBy, Regex.Split(original, @"(?<!^)(?=[A-Z](?![A-Z]|$))"));
+
+    public static void PlayClipAtPoint(AudioClip clip, Vector3 position, float volume, out AudioSource audioSource)
+    {
+        GameObject gameObject = new("One shot audio");
+        gameObject.transform.position = position;
+        audioSource = (AudioSource)gameObject.AddComponent(typeof(AudioSource));
+        audioSource.clip = clip;
+        audioSource.spatialBlend = 1f;
+        audioSource.volume = volume;
+        audioSource.Play();
+        Object.Destroy(gameObject, clip.length * ((Time.timeScale < 0.01f) ? 0.01f : Time.timeScale));
+    }
 }
 
 public struct CastAllData<T>
