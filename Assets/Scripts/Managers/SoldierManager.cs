@@ -23,6 +23,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     public static event Action OnLocalPlayerSpawn;
     public static event Action OnLocalPlayerDeath;
     public static event Action<ulong, ulong, DamageType> OnPlayerDeath;
+    public static event Action<DamageType> OnPlayerDamagedByLocalPlayer;
 
     protected override void Awake()
     {
@@ -123,10 +124,14 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         player.Shoot();
     }
 
-    private void OnLocalTakeDamage(ulong clientId, Vector3 damagePoint, DamageType damageType, int damageAmount)
+    private void OnLocalTakeDamage(ulong clientIdTakingDamage, Vector3 damagePoint, DamageType damageType, int damageAmount)
     {
-        if (clientId == this._localClientId && damageType == DamageType.Bullet) { return; }
-        RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientId, damagePoint, damageType, damageAmount);
+        if (clientIdTakingDamage == this._localClientId && damageType == DamageType.Bullet) { return; }
+
+        RpcSystem.Instance.OnPlayerTakeDamageServerRpc(clientIdTakingDamage, damagePoint, damageType, damageAmount);
+
+        if (clientIdTakingDamage != this._localClientId)
+            SoldierManager.OnPlayerDamagedByLocalPlayer?.Invoke(damageType);
     }
 
     private void OnServerTakeDamage(ulong damagedClientId, ulong damagerClientId, Vector3 damagePoint, DamageType damageType, int damageAmount)

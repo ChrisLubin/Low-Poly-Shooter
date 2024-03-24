@@ -11,14 +11,20 @@ public class SoundEffectManager : MonoBehaviour
     [SerializeField] private AudioClip _enemyPredatorMissileIncomingVoiceSoundEffect;
     private const float _ENEMY_PREDATOR_MISSILE_INCOMING_VOICE_AUDIO_VOLUME = 0.05f;
 
+    [Header("Hit Marker")]
+    [SerializeField] private AudioClip _hitMarkerSoundEffect;
+    private const float _HIT_MARKER_AUDIO_VOUME = 0.3f;
+
     private void Awake()
     {
+        SoldierManager.OnPlayerDamagedByLocalPlayer += this.OnPlayerDamagedByLocalPlayer;
         SoldierKillStreakController.OnLocalPlayerKillStreakAttained += this.OnLocalPlayerKillStreakAttained;
         SoldierKillStreakController.OnNonLocalPlayerKillStreakActivated += this.OnNonLocalPlayerKillStreakActivated;
     }
 
     private void OnDestroy()
     {
+        SoldierManager.OnPlayerDamagedByLocalPlayer -= this.OnPlayerDamagedByLocalPlayer;
         SoldierKillStreakController.OnLocalPlayerKillStreakAttained -= this.OnLocalPlayerKillStreakAttained;
         SoldierKillStreakController.OnNonLocalPlayerKillStreakActivated -= this.OnNonLocalPlayerKillStreakActivated;
     }
@@ -34,6 +40,15 @@ public class SoundEffectManager : MonoBehaviour
     {
         this._audioSource.volume = _ENEMY_PREDATOR_MISSILE_INCOMING_VOICE_AUDIO_VOLUME;
         this._audioSource.clip = this._enemyPredatorMissileIncomingVoiceSoundEffect;
+        this._audioSource.Play();
+    }
+
+    private void OnPlayerDamagedByLocalPlayer(DamageType damageType)
+    {
+        if (damageType != DamageType.Bullet) { return; }
+
+        this._audioSource.volume = _HIT_MARKER_AUDIO_VOUME;
+        this._audioSource.clip = this._hitMarkerSoundEffect;
         this._audioSource.Play();
     }
 }
