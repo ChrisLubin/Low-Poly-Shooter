@@ -1186,10 +1186,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04af96e9f19fc6346b46491a5530cb0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _abilityToggledAudioClip: {fileID: 0}
-  _toggleAbilityAudioVolume: 0.5
-  _enemyVisibleRenderer: {fileID: -1597354359573550040, guid: c40be3174f62c4acf8c1216858c64956,
-    type: 2}
+  _abilityToggledAudioClip: {fileID: 8300000, guid: 7e603dabe6b46d543a12b01a371b592b,
+    type: 3}
+  _toggleAbilityAudioVolume: 0.27
   _enemyHiddenRenderer: {fileID: -2345226267504738207, guid: c40be3174f62c4acf8c1216858c64956,
     type: 2}
   _silhoutteMaterial: {fileID: 2100000, guid: 644bf620bc359b94b8bd68e0d51ab416, type: 2}
