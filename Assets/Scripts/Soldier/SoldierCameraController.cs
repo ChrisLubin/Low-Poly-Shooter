@@ -11,6 +11,8 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     private float _rotationX = 0;
     public new bool IsLocalPlayer => this.IsOwner;
 
+    public const float SOLDIER_SPAWN_CAMERA_TRANSITION_TIME = 2f;
+
     private void Awake()
     {
         GameManager.OnStateChange += this.OnGameStateChange;
@@ -24,7 +26,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
 
     protected override void OnOwnerNetworkSpawn()
     {
-        CinemachineController.SetBlendDuration(2f);
+        CinemachineController.SetBlendDuration(SOLDIER_SPAWN_CAMERA_TRANSITION_TIME);
         this._firstPersonCamera.enabled = true;
 
         // Lock cursor
