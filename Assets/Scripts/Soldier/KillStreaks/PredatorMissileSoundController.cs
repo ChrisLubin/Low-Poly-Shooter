@@ -1,9 +1,16 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class PredatorMissileSoundController : MonoBehaviour
+public class PredatorMissileSoundController : NetworkBehaviour
 {
     private PredatorMissileMovementController _movementController;
 
+    [Header("Air")]
+    [SerializeField] private AudioSource _airSoundEffectAudioSource;
+    [SerializeField] private AudioClip _operatorAirSoundEffect;
+    private const float _PREDATOR_MISSILE_OPERATOR_AIR_VOLUME = 0.09f;
+
+    [Header("Impact")]
     [SerializeField] private AudioClip _predatorMissileImpactSoundEffect;
     [SerializeField] private AudioClip _predatorMissileDestructionSoundEffect;
     private const float _PREDATOR_MISSILE_EXPLOSION_VOLUME = 0.3f;
@@ -15,9 +22,22 @@ public class PredatorMissileSoundController : MonoBehaviour
         this._movementController.OnExploded += this.OnExploded;
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         this._movementController.OnExploded -= this.OnExploded;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (this.IsOwner)
+        {
+            this._airSoundEffectAudioSource.clip = this._operatorAirSoundEffect;
+            this._airSoundEffectAudioSource.volume = _PREDATOR_MISSILE_OPERATOR_AIR_VOLUME;
+            this._airSoundEffectAudioSource.Play();
+        }
     }
 
     public void OnExploded(Vector3 explosionPoint)
