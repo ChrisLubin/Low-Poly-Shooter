@@ -10,6 +10,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     [SerializeField] private TextMeshProUGUI _selectedAbilityText;
     [SerializeField] private Color _notSelectedOutlineColor;
     [SerializeField] private Color _selectedOutlineColor;
+    [SerializeField] private Color _activatedOutlineColor;
 
     [SerializedDictionary("Ability", "Outline")] public SerializedDictionary<Abilities, Outline> AbilityOutlineMap; // Can't make private with serialize dictionary asset
 
@@ -21,6 +22,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
         SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged += this.OnLocalPlayerSelectedAbilityChanged;
+        ActivateAbilityManager.OnLocalPlayerAbilityActivatedOrDeactivated += OnLocalPlayerAbilityActivatedOrDeactivated;
         SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated += this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
@@ -36,6 +38,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged -= this.OnLocalPlayerSelectedAbilityChanged;
+        ActivateAbilityManager.OnLocalPlayerAbilityActivatedOrDeactivated += OnLocalPlayerAbilityActivatedOrDeactivated;
         SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated -= this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
@@ -72,4 +75,12 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     private void OnLocalPlayerDeath() => this._uiContainer.gameObject.SetActive(false);
     private void OnHostDisconnect() => this._uiContainer.gameObject.SetActive(false);
     private void OnLocalPlayerKillStreakActivatedOrDeactivated(bool wasActivated) => this._uiContainer.gameObject.SetActive(!wasActivated);
+
+    private void OnLocalPlayerAbilityActivatedOrDeactivated(bool wasActivated, Abilities ability)
+    {
+        if (this.AbilityOutlineMap.TryGetValue(ability, out Outline outline))
+            outline.effectColor = wasActivated ? this._activatedOutlineColor : this._selectedOutlineColor;
+        else
+            this._logger.Log($"Could not find UI for {ability} ability!", Logger.LogLevel.Warning);
+    }
 }

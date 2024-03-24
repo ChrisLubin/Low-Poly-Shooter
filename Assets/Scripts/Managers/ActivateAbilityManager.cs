@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
     private NetworkVariable<bool> _isAbilityActive = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public bool IsAbilityActive => this._isAbilityActive.Value;
+
+    public static event Action<bool, Abilities> OnLocalPlayerAbilityActivatedOrDeactivated;
 
     protected override void Awake()
     {
@@ -62,7 +65,10 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
         this._selectAbilityManager.SelectedAbilityController.Activate();
 
         if (this.IsOwner)
+        {
             this._isAbilityActive.Value = true;
+            ActivateAbilityManager.OnLocalPlayerAbilityActivatedOrDeactivated?.Invoke(true, this._selectAbilityManager.SelectedAbility);
+        }
     }
 
     private void DeactiveAbility()
@@ -76,7 +82,10 @@ public class ActivateAbilityManager : NetworkBehaviorAutoDisableWithLogger<Activ
         this._selectAbilityManager.SelectedAbilityController.Deactivate();
 
         if (this.IsOwner)
+        {
             this._isAbilityActive.Value = false;
+            ActivateAbilityManager.OnLocalPlayerAbilityActivatedOrDeactivated?.Invoke(false, this._selectAbilityManager.SelectedAbility);
+        }
     }
 
     private void OnIsAbilityActiveChanged(bool _, bool isActive)
