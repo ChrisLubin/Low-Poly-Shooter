@@ -38,7 +38,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
         SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
         SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
         SelectAbilityManager.OnLocalPlayerSelectedAbilityChanged -= this.OnLocalPlayerSelectedAbilityChanged;
-        ActivateAbilityManager.OnLocalPlayerAbilityActivatedOrDeactivated += OnLocalPlayerAbilityActivatedOrDeactivated;
+        ActivateAbilityManager.OnLocalPlayerAbilityActivatedOrDeactivated -= OnLocalPlayerAbilityActivatedOrDeactivated;
         SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated -= this.OnLocalPlayerKillStreakActivatedOrDeactivated;
     }
 
