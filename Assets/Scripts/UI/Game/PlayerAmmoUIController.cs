@@ -46,7 +46,7 @@ public class PlayerAmmoUIController : MonoBehaviour
 
     private void OnLocalPlayerAmmoChange(int ammoCount, int magazineSize)
     {
-        this._ammoCountText.text = ammoCount.ToString();
+        this._ammoCountText.text = $"<color={(((float)ammoCount / (float)magazineSize) <= 0.34f ? "red" : "white")}>{ammoCount}</color>";
         this._magazineSizeText.text = magazineSize.ToString();
     }
 }
