@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraController>
 {
+    [SerializeField] private Transform _neck;
     [SerializeField] private CinemachineVirtualCamera _firstPersonCamera;
     [SerializeField] private CinemachineVirtualCamera _thirdPersonCamera;
     [SerializeField] private float _lookSpeed = 2.0f;
-    [SerializeField] private float _lookXLimit = 45.0f;
+    [SerializeField] private float _lookZLimit = 55f;
 
-    private float _rotationX = 0;
+    private float _neckCenterRotationZ;
+    private float _rotationZ = 0f;
     public new bool IsLocalPlayer => this.IsOwner;
 
     public const float SOLDIER_SPAWN_CAMERA_TRANSITION_TIME = 2f;
@@ -16,6 +18,11 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     private void Awake()
     {
         GameManager.OnStateChange += this.OnGameStateChange;
+    }
+
+    private void Start()
+    {
+        this._neckCenterRotationZ = this._neck.localRotation.z;
     }
 
     public override void OnDestroy()
@@ -38,9 +45,9 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     {
         if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
-        this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed;
-        this._rotationX = Mathf.Clamp(this._rotationX, -this._lookXLimit, this._lookXLimit);
-        this._firstPersonCamera.transform.localRotation = Quaternion.Euler(this._rotationX, 0, 0);
+        this._rotationZ += -Input.GetAxis("Mouse Y") * this._lookSpeed;
+        this._rotationZ = Mathf.Clamp(this._rotationZ, this._neckCenterRotationZ - this._lookZLimit, this._neckCenterRotationZ + this._lookZLimit);
+        this._neck.localRotation = Quaternion.Euler(0, 0, this._rotationZ);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * this._lookSpeed, 0);
     }
 

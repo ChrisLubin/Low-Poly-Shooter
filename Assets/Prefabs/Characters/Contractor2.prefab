@@ -1040,10 +1040,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db1afbc60103cd44e8508ca11d91e6ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _neck: {fileID: 3398896418078711230}
   _firstPersonCamera: {fileID: 5787342445692690241}
   _thirdPersonCamera: {fileID: 4388563885249540221}
   _lookSpeed: 2
-  _lookXLimit: 45
+  _lookZLimit: 55
 --- !u!114 &3396908969173115210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4931,6 +4932,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3398896418078711230}
+  - component: {fileID: 3723169920930610372}
   m_Layer: 0
   m_Name: Neck
   m_TagString: Untagged
@@ -4954,6 +4956,32 @@ Transform:
   m_Father: {fileID: 3401408888634851048}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3723169920930610372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3396370468428875358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
 --- !u!1 &3396373238622873256
 GameObject:
   m_ObjectHideFlags: 0
