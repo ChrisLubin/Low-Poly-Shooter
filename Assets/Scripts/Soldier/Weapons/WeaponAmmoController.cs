@@ -61,5 +61,8 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
 
         this._bulletsInMagazine = count;
         WeaponAmmoController.OnLocalPlayerAmmoChange?.Invoke(this._bulletsInMagazine, this._magazineSize);
+
+        if (this._bulletsInMagazine == 0)
+            this.RequestReload();
     }
 }
