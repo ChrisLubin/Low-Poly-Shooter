@@ -30,6 +30,7 @@ public class WeaponAnimationController : MonoBehaviour
         this._networkAnimator = GetComponent<NetworkAnimator>();
         this._weaponController.OnADS += this.SetADS;
         this._ammoController.OnReloadRequest += OnReloadRequest;
+        this._animator.keepAnimatorStateOnDisable = true;
     }
 
     private void OnDestroy()
