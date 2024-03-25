@@ -483,8 +483,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _airSoundEffectAudioSource: {fileID: 4289242830536187746}
-  _operatorAirSoundEffect: {fileID: 8300000, guid: 41e91037884075d4e8a350ff76c97555,
-    type: 3}
+  _airSoundEffect: {fileID: 8300000, guid: 41e91037884075d4e8a350ff76c97555, type: 3}
+  _nonOperatorAirSoundCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -1.9345083
+      outSlope: -1.9345083
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.37461925
+      value: 0.27529594
+      inSlope: -0.6968281
+      outSlope: -0.6968281
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.030596944
+    - serializedVersion: 3
+      time: 0.60006255
+      value: 0.02084928
+      inSlope: -0.37443244
+      outSlope: -0.37443244
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.05213135
+      outSlope: -0.05213135
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   _predatorMissileImpactSoundEffect: {fileID: 8300000, guid: 68d3d9925df475647a96c1e9c4c5e947,
     type: 3}
   _predatorMissileDestructionSoundEffect: {fileID: 8300000, guid: bcd3de0ecaf227e46a95bb28112bc68a,
