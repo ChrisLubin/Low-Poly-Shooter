@@ -20,19 +20,17 @@ public class ReconSensesAbilityController : AbilityController
 
     public override void Activate()
     {
-        if (!this.IsOwner) { return; }
-
         base.Activate();
 
+        if (!this.IsOwner) { return; }
         this.RenderEnemySilhoutte(true);
     }
 
     public override void Deactivate()
     {
-        if (!this.IsOwner) { return; }
-
         base.Deactivate();
 
+        if (!this.IsOwner) { return; }
         this.RenderEnemySilhoutte(false);
     }
 
