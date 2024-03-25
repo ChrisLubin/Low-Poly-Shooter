@@ -6,6 +6,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 {
     private WeaponController _weaponController;
     private WeaponAmmoController _ammoController;
+    private WeaponAnimationController _animationController;
 
     [SerializeField] private Transform _bulletPrefab;
     [SerializeField] private Transform _muzzleFlashVfxPrefab;
@@ -37,6 +38,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     {
         this._weaponController = GetComponent<WeaponController>();
         this._ammoController = GetComponent<WeaponAmmoController>();
+        this._animationController = GetComponent<WeaponAnimationController>();
     }
 
     protected override void OnOwnerNetworkSpawn() => this._weaponController.OnADS += this.OnADS;
@@ -51,7 +53,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     {
         if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
         this._timeSinceLastShot += Time.deltaTime * 1000;
-        if (GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK || !this._ammoController.HasBulletInMagazine) { return; }
+        if (GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK || !this._ammoController.HasBulletInMagazine || this._animationController.IsReloading) { return; }
 
         if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
         {
