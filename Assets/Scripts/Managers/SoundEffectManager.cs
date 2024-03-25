@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class SoundEffectManager : MonoBehaviour
 {
-    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioSource _generalSource;
+    [SerializeField] private AudioSource _hitMarkerSource;
 
     [Header("Predator Missile")]
     [SerializeField] private AudioClip _predatorMissileAttainedSoundEffect;
@@ -31,24 +32,24 @@ public class SoundEffectManager : MonoBehaviour
 
     private void OnLocalPlayerKillStreakAttained()
     {
-        this._audioSource.volume = _PREDATOR_MISSILE_ATTAINED_AUDIO_VOLUME;
-        this._audioSource.clip = this._predatorMissileAttainedSoundEffect;
-        this._audioSource.Play();
+        this._generalSource.volume = _PREDATOR_MISSILE_ATTAINED_AUDIO_VOLUME;
+        this._generalSource.clip = this._predatorMissileAttainedSoundEffect;
+        this._generalSource.Play();
     }
 
     private void OnNonLocalPlayerKillStreakActivated()
     {
-        this._audioSource.volume = _ENEMY_PREDATOR_MISSILE_INCOMING_VOICE_AUDIO_VOLUME;
-        this._audioSource.clip = this._enemyPredatorMissileIncomingVoiceSoundEffect;
-        this._audioSource.Play();
+        this._generalSource.volume = _ENEMY_PREDATOR_MISSILE_INCOMING_VOICE_AUDIO_VOLUME;
+        this._generalSource.clip = this._enemyPredatorMissileIncomingVoiceSoundEffect;
+        this._generalSource.Play();
     }
 
     private void OnPlayerDamagedByLocalPlayer(DamageType damageType)
     {
         if (damageType != DamageType.Bullet) { return; }
 
-        this._audioSource.volume = _HIT_MARKER_AUDIO_VOUME;
-        this._audioSource.clip = this._hitMarkerSoundEffect;
-        this._audioSource.Play();
+        this._hitMarkerSource.volume = _HIT_MARKER_AUDIO_VOUME;
+        this._hitMarkerSource.clip = this._hitMarkerSoundEffect;
+        this._hitMarkerSource.Play();
     }
 }
