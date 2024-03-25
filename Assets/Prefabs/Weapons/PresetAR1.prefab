@@ -348,6 +348,7 @@ GameObject:
   - component: {fileID: 1335413237237149955}
   - component: {fileID: 5967023710246181017}
   - component: {fileID: 5918442952042138978}
+  - component: {fileID: 482718545765882309}
   - component: {fileID: 8121854122192617447}
   - component: {fileID: 8281220306469100172}
   - component: {fileID: 5285188303541009034}
@@ -467,6 +468,7 @@ MonoBehaviour:
   _bulletSpeed: 70
   _bulletDamage: 15
   _bloomMaxAngle: 20
+  _magazineSize: 30
   <RecoilX>k__BackingField: -2
   <RecoilY>k__BackingField: 2
   <RecoilZ>k__BackingField: 0.35
@@ -500,6 +502,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a1070efd768adc4e91faa388e48316d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &482718545765882309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464271373217014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6962af98629e1c479071571c1f790db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &8121854122192617447

@@ -5,6 +5,7 @@ using UnityEngine;
 public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootController>
 {
     private WeaponController _weaponController;
+    private WeaponAmmoController _ammoController;
 
     [SerializeField] private Transform _bulletPrefab;
     [SerializeField] private Transform _muzzleFlashVfxPrefab;
@@ -32,7 +33,12 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         this._bloomMaxAngle = bloomMaxAngle;
     }
 
-    private void Awake() => this._weaponController = GetComponent<WeaponController>();
+    private void Awake()
+    {
+        this._weaponController = GetComponent<WeaponController>();
+        this._ammoController = GetComponent<WeaponAmmoController>();
+    }
+
     protected override void OnOwnerNetworkSpawn() => this._weaponController.OnADS += this.OnADS;
 
     public override void OnDestroy()
@@ -45,7 +51,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     {
         if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
         this._timeSinceLastShot += Time.deltaTime * 1000;
-        if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
+        if (GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK || !this._ammoController.HasBulletInMagazine) { return; }
 
         if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
         {

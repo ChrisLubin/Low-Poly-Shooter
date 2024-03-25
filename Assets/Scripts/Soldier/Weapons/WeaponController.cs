@@ -4,12 +4,14 @@ using UnityEngine;
 public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 {
     private WeaponShootController _shootController;
+    private WeaponAmmoController _ammoController;
 
     [Header("Weapon Attributes")]
     [SerializeField] private int _roundsPerMinute = 700;
     [SerializeField] private float _bulletSpeed = 70f;
     [SerializeField] private int _bulletDamage = 15;
     [SerializeField] private float _bloomMaxAngle = 20f;
+    [SerializeField] private int _magazineSize = 30;
 
     [field: SerializeField, Header("Recoil")] public float RecoilX { get; private set; } = -2f;
     [field: SerializeField] public float RecoilY { get; private set; } = 2f;
@@ -26,8 +28,10 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
     private void Awake()
     {
         this._shootController = GetComponent<WeaponShootController>();
+        this._ammoController = GetComponent<WeaponAmmoController>();
         this._shootController.OnShoot += this.OnShoot;
         this._shootController.Init(this._bulletSpeed, this._bulletDamage, this._roundsPerMinute, this._bloomMaxAngle);
+        this._ammoController.Init(this._magazineSize);
     }
 
     protected override void OnOwnerNetworkSpawn() => this._shootController.OnShoot += this.OnShoot;
