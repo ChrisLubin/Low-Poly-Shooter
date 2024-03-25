@@ -85,7 +85,7 @@ public class SelectAbilityManager : NetworkBehaviorAutoDisableWithLogger<SelectA
 
         for (int i = 1; i <= this.AllAbilities.Length; i++)
         {
-            if (!Input.GetKeyDown(KeyCode.Alpha0 + i)) { continue; }
+            if (!Input.GetKeyDown(KeyCode.Alpha0 + i) && !Input.GetKeyDown(KeyCode.Keypad0 + i)) { continue; }
 
             abilityIndex = i;
             return true;
