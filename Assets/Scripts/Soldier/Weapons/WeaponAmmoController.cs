@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoController>
@@ -8,6 +9,8 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
     private int _bulletsInMagazine;
 
     public bool HasBulletInMagazine => this._bulletsInMagazine > 0;
+
+    public static event Action<int, int> OnLocalPlayerAmmoChange;
 
     public void Init(int magazineSize)
     {
@@ -22,6 +25,7 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
 
     protected override void OnOwnerNetworkSpawn()
     {
+        WeaponAmmoController.OnLocalPlayerAmmoChange?.Invoke(this._bulletsInMagazine, this._magazineSize);
         this._shootController.OnShoot += this.OnShoot;
     }
 
@@ -42,6 +46,15 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
             this.Reload();
     }
 
-    private void OnShoot() => this._bulletsInMagazine -= 1;
-    private void Reload() => this._bulletsInMagazine = this._magazineSize;
+    private void OnShoot() => this.SetBulletsInMagazine(this._bulletsInMagazine - 1);
+
+    private void Reload() => this.SetBulletsInMagazine(this._magazineSize);
+
+    private void SetBulletsInMagazine(int count)
+    {
+        if (count == this._bulletsInMagazine) { return; }
+
+        this._bulletsInMagazine = count;
+        WeaponAmmoController.OnLocalPlayerAmmoChange?.Invoke(this._bulletsInMagazine, this._magazineSize);
+    }
 }
