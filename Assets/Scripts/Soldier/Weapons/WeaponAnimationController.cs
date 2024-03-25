@@ -17,6 +17,11 @@ public class WeaponAnimationController : MonoBehaviour
 
     public event Action OnReloadDone;
 
+    [SerializeField] private AudioSource _reloadAudioSource;
+    [SerializeField] private AudioClip _reloadMagazineOutSoundEffect;
+    [SerializeField] private AudioClip _reloadMagazineInSoundEffect;
+    private const float _RELOAD_MAGAZINE_AUDIO_VOLUME = 0.15f;
+
     private void Awake()
     {
         this._animator = GetComponent<Animator>();
@@ -36,10 +41,24 @@ public class WeaponAnimationController : MonoBehaviour
     private void SetADS(bool isADS) => this._animator.SetBool(_IS_ADS_PARAMETER_NAME, isADS);
     private void OnReloadRequest() => this._networkAnimator.SetTrigger(_DO_RELOAD_PARAMETER_NAME);
 
-    // Called by animation event
+    // Called by animation events
     public void _OnReloadDone()
     {
         this._animator.SetBool(_IS_RELOADING_PARAMETER_NAME, false);
         this.OnReloadDone?.Invoke();
+    }
+
+    public void _OnReloadMagazineOut()
+    {
+        this._reloadAudioSource.clip = this._reloadMagazineOutSoundEffect;
+        this._reloadAudioSource.volume = _RELOAD_MAGAZINE_AUDIO_VOLUME;
+        this._reloadAudioSource.Play();
+    }
+
+    public void _OnReloadMagazineIn()
+    {
+        this._reloadAudioSource.clip = this._reloadMagazineInSoundEffect;
+        this._reloadAudioSource.volume = _RELOAD_MAGAZINE_AUDIO_VOLUME;
+        this._reloadAudioSource.Play();
     }
 }
