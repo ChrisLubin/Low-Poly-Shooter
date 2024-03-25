@@ -6,6 +6,9 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
     private WeaponShootController _shootController;
     private WeaponAnimationController _animationController;
 
+    [SerializeField] private AudioClip _emptyMagazineSoundEffect;
+    private const float _EMPTY_MAGAZINE_AUDIO_VOLUME = 0.7f;
+
     private int _magazineSize;
     private int _bulletsInMagazine;
 
@@ -63,6 +66,11 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
         WeaponAmmoController.OnLocalPlayerAmmoChange?.Invoke(this._bulletsInMagazine, this._magazineSize);
 
         if (this._bulletsInMagazine == 0)
+        {
+            Helpers.PlayClipAtPoint(this._emptyMagazineSoundEffect, Vector3.zero, _EMPTY_MAGAZINE_AUDIO_VOLUME, out AudioSource audioSource);
+            audioSource.spatialBlend = 0f;
+
             this.RequestReload();
+        }
     }
 }

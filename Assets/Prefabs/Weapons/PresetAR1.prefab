@@ -516,6 +516,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6962af98629e1c479071571c1f790db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _emptyMagazineSoundEffect: {fileID: 8300000, guid: c6a3a24d446aa9b4d912017b55874b27,
+    type: 3}
+  test: 0.2
 --- !u!114 &8121854122192617447
 MonoBehaviour:
   m_ObjectHideFlags: 0
