@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c23dded4bca229e469efde3c0ef476e7, type: 3}
+  m_Name: SO_LPAMG_WEP_MR22_Attachments
+  m_EditorClassIdentifier: 
+  attachments:
+  - type: Forestock/Forestock
+    socket: SOCKET_Forestock
+    variants:
+    - {fileID: 2508817695031043893, guid: a511f841130373d4cb42ba364bd8b5ad, type: 3}
+    - {fileID: 8474185825524159651, guid: 990c24f2701c5054da45d9de7cd6e832, type: 3}
+    - {fileID: 7124112961282596117, guid: e3e5e330e1ca52147ba1aa2ed2bac62c, type: 3}
+  - type: Forestock/Barrel
+    socket: SOCKET_Barrel
+    variants:
+    - {fileID: 1410159230456889284, guid: 0230443baedeb244fb70582fbbdc5546, type: 3}
+    - {fileID: 7963038133791377603, guid: 659484867da5dee42b18b269b42b2f89, type: 3}
+    - {fileID: 4570429020802034774, guid: 6e71815caf246e04a93155e72ec76631, type: 3}
+  - type: Laser
+    socket: Forestock/SOCKET_Laser
+    variants:
+    - {fileID: 3823603467981792092, guid: c95eeda37df54c44d80947fbf19a0b25, type: 3}
+    - {fileID: 3729503394278709743, guid: ac32d3bacd041fb49bd42f2235a57d0c, type: 3}
+  - type: Magazine/Magazine_Reserve
+    socket: SOCKET_Magazine_Reserve
+    variants:
+    - {fileID: 687294484821482300, guid: 65c3e8a82c964ce4cbe322a1da8b4562, type: 3}
+    - {fileID: 6034276135758174371, guid: a3a857d4a1e71864ea61b3a7d34538cd, type: 3}
+  - type: Ironsight_B
+    socket: SOCKET_Default
+    variants:
+    - {fileID: 429270216413556477, guid: 23852e36cf4965f45bbf244190c9279a, type: 3}
+  - type: Ironsight_F
+    socket: Forestock/SOCKET_Ironsight_F
+    variants:
+    - {fileID: 3886202166249418176, guid: 2633c25102f8dca48a3f293fd4934f67, type: 3}
+  - type: Scope
+    socket: SOCKET_Scope
+    variants:
+    - {fileID: 3823603467981792092, guid: bafbfb70afd358a4dab56d8d82cf51b0, type: 3}
+    - {fileID: 795514576468771777, guid: 79403a6df9f31c747b92cb874c6071e5, type: 3}
+    - {fileID: 6138214301947297142, guid: ae927c6a311a3394e818a62123dadbfe, type: 3}
+    - {fileID: 4104628700415643959, guid: 2afe1a6db9926a14a8d7f6858a4be693, type: 3}
+  - type: Muzzle
+    socket: Barrel/SOCKET_Muzzle
+    variants:
+    - {fileID: 3823603467981792092, guid: 21db88bcb924f5b4fbf83198111a8eca, type: 3}
+    - {fileID: 92887751413585423, guid: 7551149012d45ea48937abb338b1c752, type: 3}
+  - type: Magazine/Magazine
+    socket: SOCKET_Magazine
+    variants:
+    - {fileID: 6140265030700450860, guid: 49dc6678bcb6ee342bb33bcd52493f79, type: 3}
+    - {fileID: 5291154681223870451, guid: 94fc55894e07e0549a2336c6e89dfef1, type: 3}
+  - type: Grip
+    socket: Forestock/SOCKET_Grip
+    variants:
+    - {fileID: 3823603467981792092, guid: 5a6d1013c59919a4e8e32cfa058da85a, type: 3}
+    - {fileID: 339690230634973770, guid: ab4abb53227a9784da02f8a849f76635, type: 3}
+    - {fileID: 4935569229966537844, guid: d8c9d7cf8ed54cc46822339f5fd9afbf, type: 3}
+  - type: Bipod
+    socket: Forestock/SOCKET_Bipod
+    variants:
+    - {fileID: 236338934494563205, guid: 6eb46be8f56f3b14a928319079ed5af6, type: 3}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa988ca5f9f94022ba2c55174393a01a, type: 3}
+  m_Name: SO_LPAMG_WEP_X13_Linker_Sounds
+  m_EditorClassIdentifier: 
+  soundValues:
+  - type: Inspect
+    clips:
+    - {fileID: 8300000, guid: efd802d1ba9edcd4f89bdbca8349e868, type: 3}
+  - type: Reload Empty
+    clips:
+    - {fileID: 8300000, guid: 1a078ff47520e164eb7c3deac63e4cd7, type: 3}
+  - type: Unholster
+    clips:
+    - {fileID: 8300000, guid: fb864b7742bafa24794a4b1768f131f8, type: 3}
+  - type: Holster
+    clips:
+    - {fileID: 8300000, guid: 98d4e0e4c3de17748a73a039bf37d4d6, type: 3}
+  - type: Unholster Quick
+    clips:
+    - {fileID: 8300000, guid: 3ca2bb07fd2ce484dab95e570947c760, type: 3}
+  - type: Holster Quick
+    clips:
+    - {fileID: 8300000, guid: 9e94052560a68244985db6217a2ad944, type: 3}
+  - type: Throw Grenade
+    clips:
+    - {fileID: 8300000, guid: 1c8c5209178257c4d9c036d0a4f303a6, type: 3}
+    - {fileID: 8300000, guid: ffdacd22a13f8834e948fd351a1d012c, type: 3}
+    - {fileID: 8300000, guid: 73c986b63ff4da946a240f32e100dd0a, type: 3}
+    - {fileID: 8300000, guid: efa86facfc9885a4d845d2b90c77f10e, type: 3}
+  - type: Knife Attack
+    clips:
+    - {fileID: 8300000, guid: ae4fe05f4598cc345b14dc2975c43458, type: 3}
+  - type: Reload
+    clips:
+    - {fileID: 8300000, guid: 67ce60d9e978d8b40986e6af48f4871d, type: 3}

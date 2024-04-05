@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34a9fa004856452eb5a7b15f8c57ed63, type: 3}
+  m_Name: SO_LPAMG_WEP_MAK12_Linker_Icons
+  m_EditorClassIdentifier: 
+  links:
+  - type: Body
+    values:
+    - {fileID: 21300000, guid: aabc1af0f4712f146bbb61d86f5ed8fb, type: 3}
+  - type: Forestock
+    values:
+    - {fileID: 21300000, guid: 7b71849d09de8c84c99b3c37aec1bf9b, type: 3}
+    - {fileID: 21300000, guid: 502e150eab04ea74e9605443c2d247e8, type: 3}
+    - {fileID: 21300000, guid: 00f56e30bc26984419f227ccb36f6aed, type: 3}
+  - type: Ironsight_B
+    values:
+    - {fileID: 21300000, guid: 7db9950b02057b34c965161305680bd6, type: 3}
+  - type: Ironsight_F
+    values:
+    - {fileID: 21300000, guid: 14ab8dd3a1f9b0a4986c84207e8cf878, type: 3}
+    - {fileID: 21300000, guid: 073efbf1ac5eefd438c6d87387364b80, type: 3}
+    - {fileID: 21300000, guid: b2d095f0cda5e4842ad6b7105ba1e35c, type: 3}
+  - type: Magazine
+    values:
+    - {fileID: 21300000, guid: d59763a02094ff140ac302aa61bfa30f, type: 3}
+    - {fileID: 21300000, guid: 69ef2ed3f8c49914aa0f430a0fe500f0, type: 3}
+    - {fileID: 21300000, guid: e3fe24c4826bb0645ac66a9642f423ef, type: 3}
+  - type: Muzzle
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: d3956e233b62f984fbcbcbc6c922c28d, type: 3}
+    - {fileID: 21300000, guid: f669d7d82558eb6448e9acca50a496ca, type: 3}
+    - {fileID: 21300000, guid: c333fadc5acee5b4ebd8c7af6665673b, type: 3}
+  - type: Laser
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 34591410c27673f4282143d896697f9d, type: 3}
+  - type: Grip
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 86c4099a06ce3084c9d379cd66799e09, type: 3}
+    - {fileID: 21300000, guid: 6cde194a923ada8459492cfee6a833dd, type: 3}
+  - type: Scope
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: c1fb9754e2d837942bab9aae89b0f7f2, type: 3}
+    - {fileID: 21300000, guid: c1fb9754e2d837942bab9aae89b0f7f2, type: 3}

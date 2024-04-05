@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c23dded4bca229e469efde3c0ef476e7, type: 3}
+  m_Name: SO_LPAMG_WEP_LRAF9_Attachments
+  m_EditorClassIdentifier: 
+  attachments:
+  - type: Magazine/Magazine_Reserve
+    socket: SOCKET_Rocket_Reserve
+    variants:
+    - {fileID: 8025404551967300109, guid: 074fc5ed276d86e4381d8aa6025354da, type: 3}
+  - type: Rails
+    socket: SOCKET_Rails
+    variants:
+    - {fileID: 627168192841460778, guid: 9ed8308a7194a5f4b9e4be8db01580fb, type: 3}
+  - type: Scope
+    socket: Rails/SOCKET_Scope
+    variants:
+    - {fileID: 6233931315346732377, guid: 400a192601caf57428b09aa9bf2d4d9b, type: 3}
+  - type: Muzzle
+    socket: SOCKET_Muzzle
+    variants:
+    - {fileID: 5350930173428335511, guid: 5479b0571991b594fb778fd31d23a256, type: 3}
+    - {fileID: 4489603820322489970, guid: 7f999fa07801340438bceeb1916b62d2, type: 3}
+  - type: Magazine/Magazine
+    socket: SOCKET_Rocket
+    variants:
+    - {fileID: 5969806186651832588, guid: 2b52da56f29f62f41b6e1be832e7942b, type: 3}
+  - type: Grip
+    socket: SOCKET_Grip
+    variants:
+    - {fileID: 813902150089350071, guid: 70a3e660822edc04e8eca3c7467e9102, type: 3}

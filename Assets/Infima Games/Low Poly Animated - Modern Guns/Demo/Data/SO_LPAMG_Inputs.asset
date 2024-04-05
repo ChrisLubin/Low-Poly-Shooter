@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac62b43aa0594d48a8e8f31b2964779e, type: 3}
+  m_Name: SO_LPAMG_Inputs
+  m_EditorClassIdentifier: 
+  values:
+  - type: Aiming
+    keyCode: 324
+  - type: Crouching
+    keyCode: 306
+  - type: Fire
+    keyCode: 323
+  - type: Lower
+    keyCode: 104
+  - type: Jumping
+    keyCode: 32
+  - type: Reload
+    keyCode: 114
+  - type: Reload Empty
+    keyCode: 101
+  - type: Inspect
+    keyCode: 116
+  - type: Holster
+    keyCode: 51
+  - type: Grenade
+    keyCode: 103
+  - type: Knife
+    keyCode: 102
+  - type: Running
+    keyCode: 304
+  - type: Switch Positive
+    keyCode: 120
+  - type: Switch Negative
+    keyCode: 122
+  - type: Escape
+    keyCode: 27
+  - type: Tactical Sprint
+    keyCode: 304

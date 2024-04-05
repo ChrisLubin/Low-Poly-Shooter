@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8103db9ee0514d9bb631a99db9a90094, type: 3}
+  m_Name: SO_LPAMG_WEP_RC425_Linker_Time
+  m_EditorClassIdentifier: 
+  timeLinks:
+  - type: Knife Attack/Show
+    delay: 0.1
+  - type: Knife Attack/Hide
+    delay: 0.65
+  - type: Reload/Show/Magazine
+    delay: 0.3
+  - type: Reload/Hide/Magazine_Reserve
+    delay: 0.35
+  - type: Reload/Hide/Magazine
+    delay: 0.96
+  - type: Reload/Show/Magazine_Reserve
+    delay: 0.96
+  - type: Reload Empty/Show/Magazine
+    delay: 0.3
+  - type: Reload Empty/Hide/Magazine
+    delay: 0.96
+  - type: Reload Empty/Show/Magazine_Reserve
+    delay: 0.96
+  - type: Reload Empty/Hide/Magazine_Reserve
+    delay: 0.35

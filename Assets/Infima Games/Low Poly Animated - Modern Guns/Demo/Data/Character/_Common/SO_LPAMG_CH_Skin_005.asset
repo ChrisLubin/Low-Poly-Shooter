@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4945a2ec541372a48a198e15919e0567, type: 3}
+  m_Name: SO_LPAMG_CH_Skin_005
+  m_EditorClassIdentifier: 
+  skinProps:
+  - item: Body
+    materialDatas:
+    - link: Arm_Skin
+      material: {fileID: 2100000, guid: 3bb76673911b3e94b88933179e6ed92d, type: 2}
+    - link: Glove_Base
+      material: {fileID: 2100000, guid: 655892edf40f1bd47a5a22f6a4e29b03, type: 2}
+    - link: Glove_Base_Detail
+      material: {fileID: 2100000, guid: 0c9d747ce5aa7db4f950fa0ecb4b9056, type: 2}
+    - link: Glove_Edges
+      material: {fileID: 2100000, guid: b9886bfdb080bd64393554f614a49775, type: 2}
+    - link: Glove_Fingertips
+      material: {fileID: 2100000, guid: b9886bfdb080bd64393554f614a49775, type: 2}
+    - link: Glove_Palm_Inner
+      material: {fileID: 2100000, guid: 0af2d1a6e9d6f1d46b7bb83561e832da, type: 2}
+    - link: Glove_Palm_Outer
+      material: {fileID: 2100000, guid: 1ad365ad43f39df46a0011f413497ce6, type: 2}
+    - link: Glove_Plastic
+      material: {fileID: 2100000, guid: b9886bfdb080bd64393554f614a49775, type: 2}
+    - link: Glove_Plastic_Fingers
+      material: {fileID: 2100000, guid: b9886bfdb080bd64393554f614a49775, type: 2}
+    - link: Glove_Strap
+      material: {fileID: 2100000, guid: 648828a996539b447b1121956cf5e541, type: 2}
+    - link: Glove_Thumb_Top
+      material: {fileID: 2100000, guid: 0c9d747ce5aa7db4f950fa0ecb4b9056, type: 2}
+    - link: Glove_Wrist
+      material: {fileID: 2100000, guid: 648828a996539b447b1121956cf5e541, type: 2}

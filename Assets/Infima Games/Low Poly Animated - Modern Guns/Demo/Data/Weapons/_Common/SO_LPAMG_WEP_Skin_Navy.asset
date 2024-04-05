@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4945a2ec541372a48a198e15919e0567, type: 3}
+  m_Name: SO_LPAMG_WEP_Skin_Navy
+  m_EditorClassIdentifier: 
+  skinProps:
+  - item: Body
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Details
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Grip
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Rails
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Stock
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Text
+      material: {fileID: 2100000, guid: 3fc94b10dd18b73419c2fec985b34a2f, type: 2}
+    - link: Hammer
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Chamber
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+  - item: Grip
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+  - item: Muzzle
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+  - item: Forestock
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Rails
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+  - item: Scope
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Text
+      material: {fileID: 2100000, guid: 3fc94b10dd18b73419c2fec985b34a2f, type: 2}
+    - link: Details
+      material: {fileID: 2100000, guid: aae6348987560b5408a4dca236548108, type: 2}
+  - item: Magazine
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Text
+      material: {fileID: 2100000, guid: 3fc94b10dd18b73419c2fec985b34a2f, type: 2}
+  - item: Magazine_Reserve
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Text
+      material: {fileID: 2100000, guid: 3fc94b10dd18b73419c2fec985b34a2f, type: 2}
+  - item: Barrel
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Rails
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+  - item: Ironsight_B
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Dot
+      material: {fileID: 2100000, guid: f43308cb443ad5145ba7cc1e3b7898b5, type: 2}
+  - item: Ironsight_F
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+    - link: Dot
+      material: {fileID: 2100000, guid: f43308cb443ad5145ba7cc1e3b7898b5, type: 2}
+  - item: Rails
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}
+  - item: Bipod
+    materialDatas:
+    - link: Body
+      material: {fileID: 2100000, guid: cd92e9c2fc68f234591743db38e80b69, type: 2}

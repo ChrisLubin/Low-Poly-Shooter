@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34a9fa004856452eb5a7b15f8c57ed63, type: 3}
+  m_Name: SO_LPAMG_WEP_RC425_Linker_Icons
+  m_EditorClassIdentifier: 
+  links:
+  - type: Body
+    values:
+    - {fileID: 21300000, guid: f063565d52e7b8a40b1c56181a4869af, type: 3}
+  - type: Forestock
+    values:
+    - {fileID: 21300000, guid: 47b87a4e772eb02468e618f533fec041, type: 3}
+    - {fileID: 21300000, guid: ca0fbbcdc50bf64408ff446af1b024a9, type: 3}
+    - {fileID: 21300000, guid: ca0fbbcdc50bf64408ff446af1b024a9, type: 3}
+    - {fileID: 21300000, guid: fbda15d74b6c3c14f85f474c5e1c02dd, type: 3}
+    - {fileID: 21300000, guid: fbda15d74b6c3c14f85f474c5e1c02dd, type: 3}
+  - type: Ironsight_B
+    values:
+    - {fileID: 21300000, guid: ed39bce07f0c2cf499744aec75bfa7f8, type: 3}
+  - type: Ironsight_F
+    values:
+    - {fileID: 21300000, guid: f5fb4b6c2ad0bb74691f95f3efef38da, type: 3}
+    - {fileID: 21300000, guid: 374cf1e784c343b4d95cdd788655b349, type: 3}
+    - {fileID: 21300000, guid: 374cf1e784c343b4d95cdd788655b349, type: 3}
+    - {fileID: 21300000, guid: b7c4197179cb8f542a50c01991a906bc, type: 3}
+    - {fileID: 21300000, guid: b7c4197179cb8f542a50c01991a906bc, type: 3}
+  - type: Magazine
+    values:
+    - {fileID: 21300000, guid: b818b32b4992aba4ea62dd9aa0b9a4e5, type: 3}
+    - {fileID: 21300000, guid: b818b32b4992aba4ea62dd9aa0b9a4e5, type: 3}
+  - type: Muzzle
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 8082c35cb82d50443ac5f2cdddf60deb, type: 3}
+    - {fileID: 21300000, guid: 19116013625f64f47ab52d8c31ab7e57, type: 3}
+    - {fileID: 21300000, guid: 19116013625f64f47ab52d8c31ab7e57, type: 3}
+    - {fileID: 21300000, guid: dcf80a6bccca751458ba568fb607d7bc, type: 3}
+    - {fileID: 21300000, guid: dcf80a6bccca751458ba568fb607d7bc, type: 3}
+  - type: Laser
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 8c2cc2cf66f1f3948b78df9ffa88d421, type: 3}
+  - type: Grip
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 91b163f392de5624aa6f5f54d7afea03, type: 3}
+    - {fileID: 21300000, guid: f37c9036f29ca2d4bb36b4d0b671bc45, type: 3}
+  - type: Scope
+    values:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 6040d147a0b2a9249900c36e0c1ba781, type: 3}
+    - {fileID: 21300000, guid: 6040d147a0b2a9249900c36e0c1ba781, type: 3}

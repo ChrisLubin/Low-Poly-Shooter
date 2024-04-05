@@ -12,7 +12,7 @@ public class PlayerAbilityUIController : WithLogger<PlayerAbilityUIController>
     [SerializeField] private Color _selectedOutlineColor;
     [SerializeField] private Color _activatedOutlineColor;
 
-    [SerializedDictionary("Ability", "Outline")] public SerializedDictionary<Abilities, Outline> AbilityOutlineMap; // Can't make private with serialize dictionary asset
+    [SerializedDictionary("Ability", "Outline")] public AYellowpaper.SerializedCollections.SerializedDictionary<Abilities, Outline> AbilityOutlineMap; // Can't make private with serialize dictionary asset
 
     protected override void Awake()
     {
