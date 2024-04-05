@@ -17,11 +17,11 @@ namespace InfimaGames.Animated.ModernGuns
         /// True if the player has clicked to start the game.
         /// </summary>
         private bool hasClickedToStart;
-        
+
         #endregion
-        
+
         #region METHODS
-        
+
         /// <summary>
         /// SetStarted.
         /// </summary>
@@ -49,25 +49,17 @@ namespace InfimaGames.Animated.ModernGuns
         }
 
         #endregion
-        
+
         #region FUNCTIONS
 
         /// <summary>
         /// HasStarted.
         /// </summary>
-        public bool HasStarted()
-        {
-            //Return.
-            return hasStarted;
-        }
+        public bool HasStarted() => true;
         /// <summary>
         /// HasClickedToStart.
         /// </summary>
-        public bool HasClickedToStart()
-        {
-            //Return.
-            return hasClickedToStart;
-        }
+        public bool HasClickedToStart() => true;
 
         #endregion
     }
