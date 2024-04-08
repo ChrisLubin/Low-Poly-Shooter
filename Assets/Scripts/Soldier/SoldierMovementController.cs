@@ -3,7 +3,7 @@ using UnityEngine;
 public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovementController>
 {
     private CharacterController _characterController;
-    private WeaponController _weaponController;
+    // private WeaponController _weaponController;
 
     [Header("Base setup")]
     [SerializeField] private float _adsSpeed = 1.8f;
@@ -16,7 +16,7 @@ public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovem
     private void Awake()
     {
         this._characterController = GetComponent<CharacterController>();
-        this._weaponController = GetComponentInChildren<WeaponController>();
+        // this._weaponController = GetComponentInChildren<WeaponController>();
     }
 
     private void Update()
@@ -27,9 +27,9 @@ public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovem
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        float movementSpeed = this._weaponController.IsADS ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
-        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : movementSpeed * Input.GetAxis("Vertical");
-        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : movementSpeed * Input.GetAxis("Horizontal");
+        // float movementSpeed = this._weaponController.IsADS ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
+        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : this._walkingSpeed * Input.GetAxis("Vertical");
+        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : this._walkingSpeed * Input.GetAxis("Horizontal");
         float movementDirectionY = this._moveDirection.y;
         this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 

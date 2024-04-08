@@ -1428,6 +1428,11 @@ GameObject:
   - component: {fileID: 2385371499323076738}
   - component: {fileID: 5931507004342945413}
   - component: {fileID: 970969860860627645}
+  - component: {fileID: 1928841320651802431}
+  - component: {fileID: 5212397424570226851}
+  - component: {fileID: 8257121763421967611}
+  - component: {fileID: 9156949869694559156}
+  - component: {fileID: 6992116232846573615}
   m_Layer: 6
   m_Name: P_LPAMG_CH
   m_TagString: Player
@@ -1586,6 +1591,85 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!54 &1928841320651802431
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4151477187955821240}
+  serializedVersion: 2
+  m_Mass: 7.92
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &5212397424570226851
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4151477187955821240}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.45, y: 1.88, z: 0.45}
+  m_Center: {x: 0, y: 0.89, z: 0}
+--- !u!143 &8257121763421967611
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4151477187955821240}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 1.88
+  m_Radius: 0.4
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.86, z: 0}
+--- !u!114 &9156949869694559156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4151477187955821240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dff64865d3f7db4dae489deb7e2ea72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _adsSpeed: 1.8
+  _walkingSpeed: 4.5
+  _runningSpeed: 6.5
+  _jumpSpeed: 8
+  _gravity: 20
+--- !u!114 &6992116232846573615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4151477187955821240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db1afbc60103cd44e8508ca11d91e6ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _neck: {fileID: 4171489560078996506}
+  _lookSpeed: 40
+  _lookZLimit: 55
 --- !u!1 &4199407068040820204
 GameObject:
   m_ObjectHideFlags: 0
