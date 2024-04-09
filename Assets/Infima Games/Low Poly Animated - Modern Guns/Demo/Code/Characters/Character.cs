@@ -13,9 +13,9 @@ namespace InfimaGames.Animated.ModernGuns
 	public class Character : CharacterBehaviour
 	{
 		#region FIELDS SERIALIZED
-		
+
 		[Title(label: "Inventory")]
-		
+
 		[Tooltip("Inventory.")]
 		[SerializeField]
 		private InventoryBehaviour inventory;
@@ -25,13 +25,13 @@ namespace InfimaGames.Animated.ModernGuns
 		[Tooltip("Determines how smooth the locomotion blendspace is.")]
 		[SerializeField]
 		private float dampTimeLocomotion = 0.15f;
-		
+
 		[Title(label: "Animation Procedural")]
-		
+
 		[Tooltip("Character Animator.")]
 		[SerializeField]
 		private Animator characterAnimator;
-		
+
 		#endregion
 
 		#region FIELDS
@@ -53,7 +53,7 @@ namespace InfimaGames.Animated.ModernGuns
 		/// Last Time.time at which we shot.
 		/// </summary>
 		private float lastShotTime;
-		
+
 		/// <summary>
 		/// The currently equipped weapon.
 		/// </summary>
@@ -67,7 +67,7 @@ namespace InfimaGames.Animated.ModernGuns
 		/// True if the character is lowering its weapon.
 		/// </summary>
 		private bool lowered;
-		
+
 		/// <summary>
 		/// Movement Axis Values.
 		/// </summary>
@@ -120,7 +120,7 @@ namespace InfimaGames.Animated.ModernGuns
 		{
 			//Update the cursor's state.
 			UpdateCursorState();
-			
+
 			//Initialize Inventory.
 			inventory.Init();
 			//Refresh!
@@ -131,7 +131,7 @@ namespace InfimaGames.Animated.ModernGuns
 			//Check Reference.
 			if (dataLinker == null)
 				return;
-			
+
 			//Cache Inputs.
 			inputs = dataLinker.Get<Inputs>("Inputs");
 			//Cache IGameStartService.
@@ -144,9 +144,9 @@ namespace InfimaGames.Animated.ModernGuns
 		protected override void Update()
 		{
 			//Handle Input.
-			if(gameStartService.HasStarted())
+			if (gameStartService.HasStarted())
 				HandleInput();
-			
+
 			//Update Animator.
 			UpdateAnimator();
 		}
@@ -178,10 +178,10 @@ namespace InfimaGames.Animated.ModernGuns
 		private void HandleInput()
 		{
 			#region Aiming
-			
+
 			//Update Aiming Value.
 			aiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered;
-			
+
 			//If we're aiming, make sure that the character can never have its weapon lowered or run. We do this because otherwise it looks super odd.
 			if (aiming)
 			{
@@ -191,18 +191,18 @@ namespace InfimaGames.Animated.ModernGuns
 				StopRunning();
 
 				//Stop the reloading.
-				if(!equippedWeapon.CanReloadAimed())
+				if (!equippedWeapon.CanReloadAimed())
 					characterAnimator.SetBool("Stop Reload", true);
 			}
 			else
-                characterAnimator.SetBool("Stop Reload", false);
+				characterAnimator.SetBool("Stop Reload", false);
 
-            #endregion
+			#endregion
 
-            #region Crouching
+			#region Crouching
 
-            //Check Input.
-            if (cursorLocked && Input.GetKeyDown(inputs.Get(CInputs.Crouching)))
+			//Check Input.
+			if (cursorLocked && Input.GetKeyDown(inputs.Get(CInputs.Crouching)))
 			{
 				//Toggle.
 				crouching = !crouching;
@@ -211,7 +211,7 @@ namespace InfimaGames.Animated.ModernGuns
 			}
 
 			#endregion
-			
+
 			#region Firing
 
 			//Get Fire KeyCode.
@@ -225,14 +225,14 @@ namespace InfimaGames.Animated.ModernGuns
 				//Single-Fire.
 				if (Input.GetKeyDown(fireKeyCode) && !equippedWeapon.IsAutomatic())
 					TryFire();
-				
+
 				//Holding the firing button.
 				if (holdingButtonFire && equippedWeapon.IsAutomatic())
 					TryFire();
 			}
 
 			#endregion
-			
+
 			#region Lowering
 
 			//Pressing the lower button.
@@ -240,7 +240,7 @@ namespace InfimaGames.Animated.ModernGuns
 			{
 				//Toggle.
 				lowered = !lowered;
-				
+
 				//Stop running no matter whether the weapon is lowered or not. This way our transitions get to play properly.
 				StopRunning();
 			}
@@ -304,35 +304,32 @@ namespace InfimaGames.Animated.ModernGuns
 				PlayMelee();
 
 			#endregion
-			
+
 			#region Running
-			
+
+			running = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked;
+
 			//Pressing Running Button.
 			if (Input.GetKeyDown(inputs.Get(CInputs.Running)) && !holstered && cursorLocked)
 			{
 				//TODO
-				if (Time.time - lastTimeRunning < 0.2f && running)
+				if (Time.time - lastTimeRunning < 0.2f)
 					tacticalSprint = true;
-				else
-				{
-					//Toggle.
-					running = !running;	
-				}
 
 				//Save the last time we pressed this button so we can use it for tactical sprints.
 				lastTimeRunning = Time.time;
 			}
-			
+
 			//Stop Lowered When Running.
 			if (running)
 				lowered = false;
 			else
 				tacticalSprint = false;
-			
+
 			#endregion
-			
+
 			#region Movement
-			
+
 			//Update Movement.
 			axisMovement = cursorLocked ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) : default;
 
@@ -347,20 +344,20 @@ namespace InfimaGames.Animated.ModernGuns
 				// float scrollWheel = Input.GetAxisRaw("Mouse ScrollWheel");
 				// if(scrollWheel != 0)
 				// 	ScrollInventory(scrollWheel);
-				
+
 				//Scroll Forward.
 				if (Input.GetKeyDown(inputs.Get(CInputs.SwitchPositive)))
 					ScrollInventory(1);
 
 				//Scroll Backward.
 				if (Input.GetKeyDown(inputs.Get(CInputs.SwitchNegative)))
-					ScrollInventory(-1);	
+					ScrollInventory(-1);
 			}
 
 			#endregion
 
 			#region Escape
-			
+
 			//Pressed Escape Button.
 			if (Input.GetKeyDown(inputs.Get(CInputs.Escape)))
 			{
@@ -372,7 +369,7 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#endregion
 		}
-		
+
 		/// <summary>
 		/// Scrolls the inventory in a specific direction. The direction is determined by the sign of the value passed.
 		/// </summary>
@@ -382,7 +379,7 @@ namespace InfimaGames.Animated.ModernGuns
 			int indexNext = value > 0 ? inventory.GetNextIndex() : inventory.GetLastIndex();
 			//Get the current weapon's index.
 			int indexCurrent = inventory.GetEquippedIndex();
-					
+
 			//Make sure we're allowed to change, and also that we're not using the same index, otherwise weird things happen!
 			if (indexCurrent != indexNext)
 				StartCoroutine(nameof(Equip), indexNext);
@@ -394,7 +391,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private void UpdateAnimator()
 		{
 			#region Update Movement Values
-			
+
 			//Movement Value. This value affects absolute movement. Aiming movement uses this, as opposed to per-axis movement.
 			float movementValue = Mathf.Clamp01(Mathf.Abs(axisMovement.x) + Mathf.Abs(axisMovement.y));
 			characterAnimator.SetFloat(AHashes.Movement, holstered ? 0.0f : movementValue, dampTimeLocomotion, Time.deltaTime);
@@ -403,14 +400,14 @@ namespace InfimaGames.Animated.ModernGuns
 			characterAnimator.SetFloat(AHashes.Horizontal, holstered ? 0.0f : axisMovement.x, dampTimeLocomotion, Time.deltaTime);
 			//Vertical Movement Float.
 			characterAnimator.SetFloat(AHashes.Vertical, holstered ? 0.0f : axisMovement.y, dampTimeLocomotion, Time.deltaTime);
-			
+
 			#endregion
 
 			#region Calculate Aiming Alpha
-			
+
 			//Aiming Alpha.
 			var aimingAlpha = 0.0f;
-			
+
 			//This entire weird chunk of code just makes sure that the aimingAlpha value is properly set to the correct percentage.
 			if (characterAnimator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
 			{
@@ -420,17 +417,17 @@ namespace InfimaGames.Animated.ModernGuns
 			{
 				aimingAlpha = characterAnimator.GetNextAnimatorStateInfo(0).IsName("Idle") ? Mathf.Lerp(1f, 0, characterAnimator.GetAnimatorTransitionInfo(0).normalizedTime) : 1.0f;
 			}
-			
+
 			//Update the aiming value, but use interpolation. This makes sure that things like firing can transition properly.
 			characterAnimator.SetFloat(AHashes.AimingAlpha, aimingAlpha);
 			//Update weapon aiming value too!
-			if(equippedWeapon)
+			if (equippedWeapon)
 				equippedWeapon.GetComponent<Animator>().SetFloat(AHashes.AimingAlpha, aimingAlpha);
 
 			#endregion
-			
+
 			#region Update Grip Index
-			
+
 			//Get AttachmentBehaviour. This will allow us to get attachments.
 			AttachmentBehaviour attachmentBehaviour = equippedWeapon.GetAttachments();
 			//Reference Check.
@@ -439,9 +436,9 @@ namespace InfimaGames.Animated.ModernGuns
 				//Get Grip Attachment.
 				var gripBehaviour = attachmentBehaviour.GetVariant<GripBehaviour>("Grip");
 				//Update the Grip Index value. This value is what changes the animation used for the idle pose.
-				characterAnimator.SetFloat(AHashes.GripIndex, gripBehaviour != null ? gripBehaviour.GetIndex() : 0, 0.05f, Time.deltaTime);	
+				characterAnimator.SetFloat(AHashes.GripIndex, gripBehaviour != null ? gripBehaviour.GetIndex() : 0, 0.05f, Time.deltaTime);
 			}
-			
+
 			#endregion
 
 			//Update Jumping Value.
@@ -462,7 +459,7 @@ namespace InfimaGames.Animated.ModernGuns
 		{
 			//Play.
 			characterAnimator.CrossFade("Inspect", 0.0f, 1, 0);
-			
+
 			//Stop Running/Lowered To Inspect. Doing this actually helps a lot with feel.
 			lowered = false; StopRunning();
 		}
@@ -472,9 +469,9 @@ namespace InfimaGames.Animated.ModernGuns
 		private void TryFire()
 		{
 			//Check Fire Rate.
-			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire())) 
+			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()))
 				return;
-			
+
 			//Save the shot time, so we can calculate the fire rate correctly.
 			lastShotTime = Time.time;
 
@@ -484,7 +481,7 @@ namespace InfimaGames.Animated.ModernGuns
 			//Stop Running/Lowered To Fire. Doing this actually helps a lot with feel.
 			lowered = false; StopRunning();
 		}
-		
+
 		/// <summary>
 		/// Plays the reload animation.
 		/// </summary>
@@ -494,12 +491,12 @@ namespace InfimaGames.Animated.ModernGuns
 
 			//Get the name of the animation state to play, which depends on weapon settings, and ammunition!
 			string stateName = equippedWeapon.HasCycledReload() ? "Reload Open" : animName;
-			
+
 			//Play the animation state!
 			characterAnimator.Play(stateName, 1, 0.0f);
 
 			#endregion
-			
+
 			//Reload.
 			equippedWeapon.Reload();
 			//Stop Running/Lowered.
@@ -512,7 +509,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private IEnumerator Equip(int index = 0)
 		{
 			//Only if we're not holstered, holster. If we are already, we don't need to wait.
-			if(!holstered)
+			if (!holstered)
 			{
 				//Play.
 				characterAnimator.CrossFade("Holster Quick", 0.0f, 3, 0.0f);
@@ -521,12 +518,12 @@ namespace InfimaGames.Animated.ModernGuns
 				//Wait.
 				yield return new WaitUntil(() => characterAnimator.GetCurrentAnimatorStateInfo(3).IsName("Holster Quick Completed"));
 			}
-			
+
 			//Equip The New Weapon.
 			inventory.Equip(index);
 			//Refresh.
 			RefreshWeaponSetup();
-			
+
 			//Rebind. If we don't do this we get some super weird errors with some animation curves not working properly.
 			characterAnimator.Rebind();
 
@@ -542,7 +539,7 @@ namespace InfimaGames.Animated.ModernGuns
 			//Make sure we have a weapon. We don't want errors!
 			if ((equippedWeapon = inventory.GetEquipped()) == null)
 				return;
-			
+
 			//Update Animator Controller. We do this to update all animations to a specific weapon's set.
 			characterAnimator.runtimeAnimatorController = equippedWeapon.GetAnimatorController();
 		}
@@ -566,7 +563,7 @@ namespace InfimaGames.Animated.ModernGuns
 			//Play.
 			characterAnimator.CrossFade("Grenade Throw", 0.0f,
 				1, 0.0f);
-			
+
 			//Stop Running/Lowered.
 			lowered = false; StopRunning();
 		}
@@ -577,11 +574,11 @@ namespace InfimaGames.Animated.ModernGuns
 		{
 			//Play Normal.
 			characterAnimator.CrossFade("Knife Attack", 0, 1, 0.0f);
-			
+
 			//Stop Running/Lowered.
 			lowered = false; StopRunning();
 		}
-		
+
 		/// <summary>
 		/// Updates the "Holstered" variable, along with the Character's Animator value.
 		/// </summary>
@@ -589,7 +586,7 @@ namespace InfimaGames.Animated.ModernGuns
 		{
 			//Update value.
 			holstered = value;
-			
+
 			//Update Animator.
 			const string boolName = "Holstered";
 			characterAnimator.SetBool(boolName, holstered);
