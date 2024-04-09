@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Random = UnityEngine.Random;
+using AYellowpaper.SerializedCollections;
 
 namespace InfimaGames.Animated.ModernGuns
 {
@@ -25,7 +26,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Sockets Component. Contains references to all the item's socket points.
         /// </summary>
         private Sockets sockets;
-        
+
         /// <summary>
         /// ScriptableObject containing all the required information on what Attachments to spawn.
         /// </summary>
@@ -40,9 +41,11 @@ namespace InfimaGames.Animated.ModernGuns
         private readonly List<AttachmentSpawned> spawnedAttachments = new List<AttachmentSpawned>();
 
         #endregion
-        
+
         #region UNITY
-        
+
+        [SerializedDictionary("Attachment Name", "Variant Index")] public AYellowpaper.SerializedCollections.SerializedDictionary<string, int> AttachmentVariantMap; // Can't make private with serialize dictionary asset
+
         /// <summary>
         /// Awake.
         /// </summary>
@@ -50,13 +53,13 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Base.
             base.Awake();
-            
+
             //Get DataLinker.
             var dataLinker = GetComponent<DataLinker>();
             //Check Reference.
             if (dataLinker == null)
                 return;
-            
+
             //Get WeaponSkinner.
             weaponSkinner = GetComponent<WeaponSkinner>();
             //Get AttachmentData Value.
@@ -65,9 +68,9 @@ namespace InfimaGames.Animated.ModernGuns
             //Spawn Attachments.
             Spawn();
         }
-        
+
         #endregion
-        
+
         #region FUNCTIONS
 
         /// <summary>
@@ -106,7 +109,7 @@ namespace InfimaGames.Animated.ModernGuns
                 //Split The Type By '/'.
                 string[] types = x.Type.Split('/');
                 //Return this attachment if the last of "types" matches the type passed as input.
-                return types[types.Length-1] == type;
+                return types[types.Length - 1] == type;
             });
         }
 
@@ -121,7 +124,7 @@ namespace InfimaGames.Animated.ModernGuns
             //Spawn.
             Spawn();
         }
-        
+
         /// <summary>
         /// Waits until all attachments are spawned before finally applying a skin to everything.
         /// </summary>
@@ -130,14 +133,14 @@ namespace InfimaGames.Animated.ModernGuns
             //Yield.
             yield return new WaitUntil(() => spawning == false);
             //Apply Skin.
-            if(weaponSkinner != null)
+            if (weaponSkinner != null)
                 weaponSkinner.Apply();
         }
-        
+
         #endregion
 
         #region METHODS
-        
+
         /// <summary>
         /// Sets up for spawning all the attachments.
         /// </summary>
@@ -146,7 +149,7 @@ namespace InfimaGames.Animated.ModernGuns
             //We start spawning the attachments, so we let the value know.
             spawning = true;
             //Spawn all the attachments.
-            SpawnAll(data.Attachments.Select(attachment => new Attachment() {Type = attachment.Type, Socket = attachment.Socket, Variants = attachment.Variants}).ToList());
+            SpawnAll(data.Attachments.Select(attachment => new Attachment() { Type = attachment.Type, Socket = attachment.Socket, Variants = attachment.Variants }).ToList());
             //Wait to apply a skin to the GameObject.
             StartCoroutine(nameof(WaitAndApplySkin));
         }
@@ -156,21 +159,22 @@ namespace InfimaGames.Animated.ModernGuns
         private void SpawnAll(List<Attachment> toSpawn)
         {
             //If we get here it means that we're done spawning all attachments!
-            if(toSpawn.Count == 0)
+            if (toSpawn.Count == 0)
             {
                 //Stop spawning more!
                 spawning = false;
-                
+
                 //Return.
                 return;
             }
-            
+
             //Get Attachment.
             Attachment attachment = toSpawn[0];
-            
-            //Index of the variant to spawn. We randomize this for every Attachment type.
-            int index = Random.Range(0, attachment.Variants.Count);
-            
+
+            //Index of the variant to spawn. It's randomized if not already set in variant map
+            if (!this.AttachmentVariantMap.TryGetValue(attachment.Type, out int index))
+                index = Random.Range(0, attachment.Variants.Count);
+
             //Split Types.
             string[] typeSplit = attachment.Type.Split('/');
             //Check if we have sub-types.
@@ -188,9 +192,9 @@ namespace InfimaGames.Animated.ModernGuns
                     //Return true if the types match.
                     return subTypeSplit[0] == typeSplit[0];
                 });
-                
+
                 //Duplicate list of the attachments to spawn. Used so we can safely remove items while still inside the for loop iterating on them.
-                List<Attachment> toSpawnDuplicate = toSpawn.Select(att => new Attachment() {Type = att.Type, Socket = att.Socket, Variants = att.Variants}).ToList();
+                List<Attachment> toSpawnDuplicate = toSpawn.Select(att => new Attachment() { Type = att.Type, Socket = att.Socket, Variants = att.Variants }).ToList();
 
                 //Loop through the Attachment items that have the same first Type (../..) as the current Attachment value in the for loop.
                 foreach (Attachment item in sameGroupAttachments)
@@ -200,14 +204,14 @@ namespace InfimaGames.Animated.ModernGuns
                     //Remove it from the list of Attachment items to spawn.
                     toSpawnDuplicate.Remove(item);
                 }
-                
+
                 //Keep spawning attachments that are in the duplicate list. This list doesn't have any of the attachments that were spawned as a consequence of matching the first Type with the current one (../..).
                 SpawnAll(toSpawnDuplicate);
 
                 //Break. Don't keep iterating on this Attachment list, as it is faulty. We now have the toSpawnDuplicate one, which excludes all the already-spawned ones.
                 return;
             }
-            
+
             //Spawn The Attachment.
             SpawnAttachment(attachment, index);
 
@@ -225,12 +229,12 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Get Sockets.
             sockets = GetComponent<Sockets>();
-            
+
             //Split the Socket value to check for sub-Sockets.
             string[] socketSplit = attachment.Socket.Split('/');
-                
+
             //Check if the Socket value has some sort of Type before it. If it does, that means we're specifying we want a socket on an already spawned Attachment variant instead of on the item itself.
-            if(socketSplit.Length > 1)
+            if (socketSplit.Length > 1)
             {
                 //This tries to give us an Attachment that matches the type we're looking for to use as a Socket point.
                 Attachment matchingAttachment = data.Attachments.Find(x =>
@@ -247,17 +251,17 @@ namespace InfimaGames.Animated.ModernGuns
                 //Check Reference.
                 if (socketTransform == null)
                     return;
-                
+
                 //Actual Variant.
                 Transform variantSpawnedObject = socketTransform.GetChild(0);
                 //Check Reference.
                 if (variantSpawnedObject == null)
                     return;
-                
+
                 //Get Sockets. This time we get it from the actual variant, this way we can socket to it.
                 sockets = variantSpawnedObject.GetComponent<Sockets>();
             }
-                
+
             //Socket Parent. Gets the Transform of the Socket we actually will use to parent the new Attachment spawned.
             Transform socketParent = sockets.GetSocketTransform(socketSplit[socketSplit.Length - 1]);
             //Instantiate the new Attachment variant.
@@ -266,7 +270,7 @@ namespace InfimaGames.Animated.ModernGuns
             attachmentGameObject.transform.localPosition = default;
             //Reset Rotation.
             attachmentGameObject.transform.localEulerAngles = default;
-                
+
             //Add New Attachment.
             spawnedAttachments.Add(new AttachmentSpawned()
             {
@@ -288,13 +292,13 @@ namespace InfimaGames.Animated.ModernGuns
             //Destroy Attachment Variants.
             foreach (AttachmentSpawned attachment in spawnedAttachments)
                 Destroy(attachment.GameObject);
-            
+
             //Clear.
             spawnedAttachments.Clear();
             //Wait And Spawn.
             StartCoroutine(nameof(WaitAndSpawn));
         }
-        
+
         #endregion
     }
 }
