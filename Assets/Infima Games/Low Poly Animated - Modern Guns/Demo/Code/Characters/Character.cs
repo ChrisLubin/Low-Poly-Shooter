@@ -39,11 +39,11 @@ namespace InfimaGames.Animated.ModernGuns
 		/// <summary>
 		/// True if the character is aiming.
 		/// </summary>
-		private bool aiming;
+		public bool IsAiming { get; private set; }
 		/// <summary>
 		/// True if the character is running.
 		/// </summary>
-		private bool running;
+		public bool IsRunning { get; private set; }
 		/// <summary>
 		/// True if the character has its weapon holstered.
 		/// </summary>
@@ -170,7 +170,7 @@ namespace InfimaGames.Animated.ModernGuns
 		#region METHODS
 
 		//TODO
-		private void StopRunning() => running = tacticalSprint = false;
+		private void StopRunning() => IsRunning = tacticalSprint = false;
 
 		/// <summary>
 		/// HandleInput. This function handles all the inputs in the asset.
@@ -180,10 +180,10 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Aiming
 
 			//Update Aiming Value.
-			aiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered;
+			IsAiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered;
 
 			//If we're aiming, make sure that the character can never have its weapon lowered or run. We do this because otherwise it looks super odd.
-			if (aiming)
+			if (IsAiming)
 			{
 				//Stop Lowered.
 				lowered = false;
@@ -250,7 +250,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Reloading
 
 			//We can't reload while being holstered.
-			bool canReloadAimed = !aiming || equippedWeapon.CanReloadAimed();
+			bool canReloadAimed = !IsAiming || equippedWeapon.CanReloadAimed();
 			if (!holstered && cursorLocked && canReloadAimed)
 			{
 				//Pressing the reload button.
@@ -307,7 +307,7 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#region Running
 
-			running = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked;
+			IsRunning = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked;
 
 			//Pressing Running Button.
 			if (Input.GetKeyDown(inputs.Get(CInputs.Running)) && !holstered && cursorLocked)
@@ -321,7 +321,7 @@ namespace InfimaGames.Animated.ModernGuns
 			}
 
 			//Stop Lowered When Running.
-			if (running)
+			if (IsRunning)
 				lowered = false;
 			else
 				tacticalSprint = false;
@@ -446,9 +446,9 @@ namespace InfimaGames.Animated.ModernGuns
 			//Update Lowered Value.
 			characterAnimator.SetBool(AHashes.Lowered, lowered);
 			//Update Animator Aiming.
-			characterAnimator.SetBool(AHashes.Aim, aiming);
+			characterAnimator.SetBool(AHashes.Aim, IsAiming);
 			//Update Animator Running.
-			characterAnimator.SetBool(AHashes.Running, running);
+			characterAnimator.SetBool(AHashes.Running, IsRunning);
 			//Update Animator Tactical Sprint.
 			characterAnimator.SetBool(AHashes.TacticalSprint, tacticalSprint);
 		}

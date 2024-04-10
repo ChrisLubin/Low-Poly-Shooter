@@ -1,35 +1,38 @@
+using InfimaGames.Animated.ModernGuns;
 using UnityEngine;
 
 public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovementController>
 {
+    private Character _character;
     private CharacterController _characterController;
     // private WeaponController _weaponController;
 
     [Header("Base setup")]
-    [SerializeField] private float _adsSpeed = 1.8f;
-    [SerializeField] private float _walkingSpeed = 4.5f;
-    [SerializeField] private float _runningSpeed = 6.5f;
-    [SerializeField] private float _jumpSpeed = 8.0f;
-    [SerializeField] private float _gravity = 20.0f;
+    [SerializeField] private float _adsSpeed = 1.4f;
+    [SerializeField] private float _walkingSpeed = 3f;
+    [SerializeField] private float _runningSpeed = 6f;
+    [SerializeField] private float _jumpSpeed = 8f;
+    [SerializeField] private float _gravity = 20f;
     private Vector3 _moveDirection = Vector3.zero;
 
     private void Awake()
     {
+        this._character = GetComponent<Character>();
         this._characterController = GetComponent<CharacterController>();
         // this._weaponController = GetComponentInChildren<WeaponController>();
     }
 
     private void Update()
     {
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        bool isRunning = this._character.IsRunning;
 
         // We are grounded, so recalculate move direction based on axis
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        // float movementSpeed = this._weaponController.IsADS ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
-        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : this._walkingSpeed * Input.GetAxis("Vertical");
-        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : this._walkingSpeed * Input.GetAxis("Horizontal");
+        float movementSpeed = this._character.IsAiming ? this._adsSpeed : isRunning ? this._runningSpeed : this._walkingSpeed;
+        float curSpeedX = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : movementSpeed * Input.GetAxis("Vertical");
+        float curSpeedY = PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK ? 0 : movementSpeed * Input.GetAxis("Horizontal");
         float movementDirectionY = this._moveDirection.y;
         this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
