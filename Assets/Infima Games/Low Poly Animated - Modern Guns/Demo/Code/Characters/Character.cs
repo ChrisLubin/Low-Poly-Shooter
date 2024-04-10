@@ -305,7 +305,7 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#region Running
 
-			IsRunning = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked;
+			IsRunning = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked && !IsAiming && !equippedWeapon.IsReloading;
 
 			//Pressing Running Button.
 			if (Input.GetKeyDown(inputs.Get(CInputs.Running)) && !holstered && cursorLocked)
@@ -467,7 +467,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private void TryFire()
 		{
 			//Check Fire Rate.
-			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()) || !_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading)
+			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()) || !_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading || IsRunning)
 				return;
 
 			//Save the shot time, so we can calculate the fire rate correctly.
