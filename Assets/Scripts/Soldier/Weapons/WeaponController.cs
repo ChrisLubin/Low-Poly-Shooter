@@ -1,14 +1,14 @@
 using System;
+using InfimaGames.Animated.ModernGuns;
 using UnityEngine;
 
 public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 {
+    private WeaponBehaviour _weapon;
     private WeaponShootController _shootController;
     private WeaponAmmoController _ammoController;
 
     [Header("Weapon Attributes")]
-    [SerializeField] private int _roundsPerMinute = 700;
-    [SerializeField] private float _bulletSpeed = 70f;
     [SerializeField] private int _bulletDamage = 15;
     [SerializeField] private float _bloomMaxAngle = 20f;
     [SerializeField] private int _magazineSize = 30;
@@ -27,19 +27,20 @@ public class WeaponController : NetworkBehaviorAutoDisable<WeaponController>
 
     private void Awake()
     {
+        this._weapon = GetComponent<WeaponBehaviour>();
         this._shootController = GetComponent<WeaponShootController>();
         this._ammoController = GetComponent<WeaponAmmoController>();
-        this._shootController.OnShoot += this.OnShoot;
-        this._shootController.Init(this._bulletSpeed, this._bulletDamage, this._roundsPerMinute, this._bloomMaxAngle);
+        this._weapon.OnShoot += this.OnShoot;
+        this._shootController.Init(this._bulletDamage, this._bloomMaxAngle);
         this._ammoController.Init(this._magazineSize);
     }
 
-    protected override void OnOwnerNetworkSpawn() => this._shootController.OnShoot += this.OnShoot;
+    protected override void OnOwnerNetworkSpawn() => this._weapon.OnShoot += this.OnShoot;
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._shootController.OnShoot -= this.OnShoot;
+        this._weapon.OnShoot -= this.OnShoot;
     }
 
     private void Update()

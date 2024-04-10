@@ -15,21 +15,15 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private const float _GUN_SHOT_AUDIO_VOLUME = 0.15f;
     private const float _BULLET_BLOOM_OFFSET = 0.1f;
-    private float _bulletSpeed;
     private int _bulletDamage;
     private float _bloomMaxAngle;
 
-    private float _minTimeBetweenShots;
-    private float _timeSinceLastShot = Mathf.Infinity;
     public event Action OnShoot;
 
     private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    public void Init(float bulletSpeed, int bulletDamage, int roundPerMinute, float bloomMaxAngle)
+    public void Init(int bulletDamage, float bloomMaxAngle)
     {
-        int millisecondsInAMinute = 1000 * 60;
-        this._minTimeBetweenShots = millisecondsInAMinute / roundPerMinute;
-        this._bulletSpeed = bulletSpeed;
         this._bulletDamage = bulletDamage;
         this._bloomMaxAngle = bloomMaxAngle;
     }
@@ -49,37 +43,36 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         this._weaponController.OnADS -= this.OnADS;
     }
 
-    private void Update()
-    {
-        if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
-        this._timeSinceLastShot += Time.deltaTime * 1000;
-        if (GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK || !this._ammoController.HasBulletInMagazine || this._animationController.IsReloading) { return; }
+    // private void Update()
+    // {
+    //     if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
+    //     if (GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK || !this._ammoController.HasBulletInMagazine || this._animationController.IsReloading) { return; }
 
-        if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
-        {
-            Shoot();
-            this._timeSinceLastShot = 0f;
-        }
-    }
+    //     if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
+    //     {
+    //         Shoot();
+    //         this._timeSinceLastShot = 0f;
+    //     }
+    // }
 
     private void OnADS(bool isADS) => this._isADS.Value = isADS;
 
     public void Shoot()
     {
-        Vector3 pointForBulletToLookAt = this._isADS.Value ? this._shootPoint.position + this._shootPoint.forward : this.GetRandomBulletDirectionPoint(this._shootPoint.position, _BULLET_BLOOM_OFFSET, this._bloomMaxAngle, this._shootPoint.forward);
+        // Vector3 pointForBulletToLookAt = this._isADS.Value ? this._shootPoint.position + this._shootPoint.forward : this.GetRandomBulletDirectionPoint(this._shootPoint.position, _BULLET_BLOOM_OFFSET, this._bloomMaxAngle, this._shootPoint.forward);
 
-        ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.Bullet, out Transform bullet);
-        bullet.position = this._shootPoint.transform.position;
-        bullet.LookAt(pointForBulletToLookAt);
-        bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this._bulletDamage, this.IsOwner);
+        // ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.Bullet, out Transform bullet);
+        // bullet.position = this._shootPoint.transform.position;
+        // bullet.LookAt(pointForBulletToLookAt);
+        // bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this._bulletDamage, this.IsOwner);
 
-        ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.MuzzleFlash, out Transform muzzleFlash);
-        muzzleFlash.transform.position = this._shootPoint.position;
-        muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
-        muzzleFlash.GetComponent<MuzzleFlashController>().Init(this._shootPoint);
+        // ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.MuzzleFlash, out Transform muzzleFlash);
+        // muzzleFlash.transform.position = this._shootPoint.position;
+        // muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
+        // muzzleFlash.GetComponent<MuzzleFlashController>().Init(this._shootPoint);
 
-        AudioSource.PlayClipAtPoint(this._gunShotAudioClip, this._shootPoint.position, _GUN_SHOT_AUDIO_VOLUME);
-        this.OnShoot?.Invoke();
+        // AudioSource.PlayClipAtPoint(this._gunShotAudioClip, this._shootPoint.position, _GUN_SHOT_AUDIO_VOLUME);
+        // this.OnShoot?.Invoke();
     }
 
     public Vector3 GetRandomBulletDirectionPoint(Vector3 origin, float coneAltitude, float coneAngle, Vector3 coneDirection, float biasTowardsCenter = 1f)

@@ -10,36 +10,38 @@ namespace InfimaGames.Animated.ModernGuns
     public class Inventory : InventoryBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Title(label: "References")]
-    
+
         [Tooltip("The root of all items we're going to spawn.")]
         [SerializeField, NotNull]
         private Transform root;
-        
+
         [Title(label: "Prefabs")]
-        
+
         [Tooltip("All the possible items that we can spawn in the game. This is very important!")]
         [SerializeField, ReorderableList(Foldable = true)]
         private GameObject[] items;
 
         #endregion
-        
+
         #region FIELDS
-        
+
         /// <summary>
         /// Currently equipped WeaponBehaviour.
         /// </summary>
         private WeaponBehaviour equipped;
+        [SerializeField, ReorderableList(Foldable = true)]
+        private WeaponBehaviour[] _weapons;
         /// <summary>
         /// Currently equipped index.
         /// </summary>
         private int equippedIndex = -1;
 
         #endregion
-        
+
         #region METHODS
-        
+
         /// <summary>
         /// Init.
         /// </summary>
@@ -60,7 +62,7 @@ namespace InfimaGames.Animated.ModernGuns
             //No point in allowing equipping the already-equipped weapon.
             if (equippedIndex == index)
                 return equipped;
-            
+
             //Disable the currently equipped weapon, if we have one.
             if (equipped != null)
                 Destroy(equipped.gameObject);
@@ -68,7 +70,7 @@ namespace InfimaGames.Animated.ModernGuns
             //Update index.
             equippedIndex = index;
             //Update equipped.
-            equipped = Instantiate(items[equippedIndex], root).GetComponent<WeaponBehaviour>();
+            equipped = _weapons[index];
 
             //Reset Location.
             equipped.transform.localPosition = default;
@@ -78,7 +80,7 @@ namespace InfimaGames.Animated.ModernGuns
             //Return.
             return equipped;
         }
-        
+
         #endregion
 
         #region GETTERS
@@ -109,7 +111,7 @@ namespace InfimaGames.Animated.ModernGuns
             //Return.
             return newIndex;
         }
-        
+
         /// <summary>
         /// GetEquipped.
         /// </summary>

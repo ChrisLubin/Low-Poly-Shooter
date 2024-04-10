@@ -3,6 +3,7 @@
 using UnityEngine;
 using System.Collections;
 using Vector2 = UnityEngine.Vector2;
+using System;
 
 namespace InfimaGames.Animated.ModernGuns
 {
@@ -58,6 +59,7 @@ namespace InfimaGames.Animated.ModernGuns
 		/// The currently equipped weapon.
 		/// </summary>
 		private WeaponBehaviour equippedWeapon;
+		private WeaponAmmoController _weaponAmmoController;
 
 		/// <summary>
 		/// True if the character is crouching.
@@ -255,11 +257,7 @@ namespace InfimaGames.Animated.ModernGuns
 			{
 				//Pressing the reload button.
 				if (Input.GetKeyDown(inputs.Get(CInputs.Reload)))
-					PlayReloadAnimation();
-
-				//Pressing the reload empty button.
-				if (Input.GetKeyDown(inputs.Get(CInputs.ReloadEmpty)))
-					PlayReloadAnimation("Reload Empty");
+					TryReload();
 			}
 
 			#endregion
@@ -469,7 +467,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private void TryFire()
 		{
 			//Check Fire Rate.
-			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()))
+			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()) || !_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading)
 				return;
 
 			//Save the shot time, so we can calculate the fire rate correctly.
@@ -477,19 +475,22 @@ namespace InfimaGames.Animated.ModernGuns
 
 			//Play firing animation.
 			characterAnimator.CrossFade("Fire", 0.0f, 1, 0);
+			OnShoot?.Invoke();
 
 			//Stop Running/Lowered To Fire. Doing this actually helps a lot with feel.
 			lowered = false; StopRunning();
 		}
 
-		/// <summary>
-		/// Plays the reload animation.
-		/// </summary>
-		private void PlayReloadAnimation(string animName = "Reload")
+		public event Action OnShoot;
+
+		public void TryReload()
 		{
+			if (!_weaponAmmoController.CanReload) { return; }
+
 			#region Animation
 
 			//Get the name of the animation state to play, which depends on weapon settings, and ammunition!
+			string animName = _weaponAmmoController.HasBulletInMagazine ? "Reload" : "Reload Empty";
 			string stateName = equippedWeapon.HasCycledReload() ? "Reload Open" : animName;
 
 			//Play the animation state!
@@ -539,6 +540,8 @@ namespace InfimaGames.Animated.ModernGuns
 			//Make sure we have a weapon. We don't want errors!
 			if ((equippedWeapon = inventory.GetEquipped()) == null)
 				return;
+
+			_weaponAmmoController = equippedWeapon.GetComponent<WeaponAmmoController>();
 
 			//Update Animator Controller. We do this to update all animations to a specific weapon's set.
 			characterAnimator.runtimeAnimatorController = equippedWeapon.GetAnimatorController();

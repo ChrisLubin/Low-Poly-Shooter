@@ -1,5 +1,6 @@
 ﻿//Copyright 2022, Infima Games. All Rights Reserved.
 
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -17,19 +18,19 @@ namespace InfimaGames.Animated.ModernGuns
         [Tooltip("The name of this item. Mostly just for display purposes.")]
         [SerializeField]
         private string itemName = "SP60";
-        
+
         [Title(label: "Firing")]
 
         [Tooltip("Is this weapon automatic? If yes, then holding down the firing button will continuously fire.")]
-        [SerializeField] 
+        [SerializeField]
         private bool automatic;
 
         [Tooltip("Amount of shots this weapon can shoot in a minute. It determines how fast the weapon shoots.")]
-        [SerializeField] 
+        [SerializeField]
         private int roundsPerMinutes = 200;
 
         [Title(label: "Reloading")]
-        
+
         [Tooltip("Determines if this weapon reloads in cycles, meaning that it inserts one bullet at a time, or not.")]
         [SerializeField]
         private bool cycledReload;
@@ -45,9 +46,9 @@ namespace InfimaGames.Animated.ModernGuns
         private float casingDelay;
 
         [Title(label: "Resources")]
-        
+
         [Tooltip("The AnimatorController a player character needs to use while wielding this weapon.")]
-        [SerializeField] 
+        [SerializeField]
         public RuntimeAnimatorController controller;
 
         [Tooltip("Prefab spawned when firing this weapon as a casing.")]
@@ -67,15 +68,17 @@ namespace InfimaGames.Animated.ModernGuns
         /// </summary>
         private AttachmentBehaviour attachment;
 
+        public override bool IsReloading { get => animator.GetBool("Reloading"); }
+
         /// <summary>
         /// The player character's camera.
         /// </summary>
         private Transform playerCamera;
-        
+
         #endregion
 
         #region UNITY
-        
+
         /// <summary>
         /// Awake.
         /// </summary>
@@ -95,7 +98,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// GetItemName.
         /// </summary>
         public override string GetItemName() => itemName;
-        
+
         /// <summary>
         /// HasCycledReload.
         /// </summary>
@@ -133,7 +136,7 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Yield.
             yield return new WaitForSeconds(casingDelay);
-            
+
             //Eject.
             EjectCasing();
         }
@@ -148,6 +151,8 @@ namespace InfimaGames.Animated.ModernGuns
             animator.SetBool(boolName, true);
         }
 
+        public Action OnReloadDone;
+
         /// <summary>
         /// EjectCasing.
         /// </summary>
@@ -158,11 +163,11 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (sockets == null)
                 return;
-            
+
             //Get Eject Socket.
             Transform ejectSocket = sockets.GetSocketTransform("SOCKET_Eject");
             //Check Reference.
-            if(ejectSocket == null)
+            if (ejectSocket == null)
                 return;
 
             //Instantiate.
@@ -179,16 +184,19 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (muzzleBehaviour == null)
                 return;
-            
+
             //Fire Muzzle.
             muzzleBehaviour.Fire();
-            
+            OnShoot?.Invoke();
+
             //Make sure we're not still waiting for some other casing to spawn.
             StopCoroutine(nameof(WaitForCasing));
 
             //Spawn Casing.
             StartCoroutine(nameof(WaitForCasing));
         }
+
+        public override event Action OnShoot;
 
         #endregion
     }

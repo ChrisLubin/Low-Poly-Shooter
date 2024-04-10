@@ -1,5 +1,6 @@
 ﻿//Copyright 2022, Infima Games. All Rights Reserved.
 
+using System;
 using UnityEngine;
 
 namespace InfimaGames.Animated.ModernGuns
@@ -11,7 +12,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// <summary>
         /// Awake.
         /// </summary>
-        protected virtual void Awake(){}
+        protected virtual void Awake() { }
 
         #endregion
 
@@ -25,7 +26,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Determines if this Weapon reloads in cycles.
         /// </summary>
         public abstract bool HasCycledReload();
-        
+
         /// <summary>
         /// Returns true if this weapon shoots in automatic.
         /// </summary>
@@ -41,6 +42,8 @@ namespace InfimaGames.Animated.ModernGuns
         /// <returns></returns>
         public abstract bool CanReloadAimed();
 
+        public abstract bool IsReloading { get; }
+
         /// <summary>
         /// Returns the RuntimeAnimationController the Character needs to use when this Weapon is equipped!
         /// </summary>
@@ -49,7 +52,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Returns the weapon's attachment manager component.
         /// </summary>
         public abstract AttachmentBehaviour GetAttachments();
-        
+
         #endregion
 
         #region METHODS
@@ -58,6 +61,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Fires the weapon.
         /// </summary>
         public abstract void Fire();
+        public abstract event Action OnShoot;
         /// <summary>
         /// Reloads the weapon.
         /// </summary>

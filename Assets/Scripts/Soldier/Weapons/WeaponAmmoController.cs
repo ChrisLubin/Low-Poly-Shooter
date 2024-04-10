@@ -1,8 +1,10 @@
 using System;
+using InfimaGames.Animated.ModernGuns;
 using UnityEngine;
 
 public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoController>
 {
+    private Weapon _weapon;
     private WeaponShootController _shootController;
     private WeaponAnimationController _animationController;
 
@@ -13,6 +15,7 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
     private int _bulletsInMagazine;
 
     public bool HasBulletInMagazine => this._bulletsInMagazine > 0;
+    public bool CanReload => this._bulletsInMagazine != this._magazineSize && !this._weapon.IsReloading;
     public event Action OnReloadRequest;
 
     public static event Action<int, int> OnLocalPlayerAmmoChange;
@@ -25,6 +28,7 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
 
     private void Awake()
     {
+        this._weapon = GetComponent<Weapon>();
         this._shootController = GetComponent<WeaponShootController>();
         this._animationController = GetComponent<WeaponAnimationController>();
     }
@@ -32,8 +36,8 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
     protected override void OnOwnerNetworkSpawn()
     {
         WeaponAmmoController.OnLocalPlayerAmmoChange?.Invoke(this._bulletsInMagazine, this._magazineSize);
-        this._shootController.OnShoot += this.OnShoot;
-        this._animationController.OnReloadDone += this.OnReloadDone;
+        this._weapon.OnShoot += this.OnShoot;
+        this._weapon.OnReloadDone += this.OnReloadDone;
     }
 
     public override void OnDestroy()
@@ -42,8 +46,8 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
 
         if (!this.IsOwner) { return; }
 
-        this._shootController.OnShoot -= this.OnShoot;
-        this._animationController.OnReloadDone -= this.OnReloadDone;
+        this._weapon.OnShoot -= this.OnShoot;
+        this._weapon.OnReloadDone -= this.OnReloadDone;
     }
 
     private void Update()

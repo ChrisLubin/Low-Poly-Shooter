@@ -1,13 +1,14 @@
 using System;
+using InfimaGames.Animated.ModernGuns;
 using UnityEngine;
 
 public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 {
+    private Character _character;
     private SoldierHealthController _healthController;
     private SoldierDamageController _damageController;
     private SoldierDeathController _deathController;
-
-    [SerializeField] private WeaponController _weaponController;
+    private WeaponController _weaponController;
 
     public static event Action<ulong, SoldierController> OnSpawn;
     public static event Action<ulong, ulong, DamageType> OnDeath;
@@ -19,6 +20,7 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     private void Awake()
     {
+        this._character = GetComponent<Character>();
         this._healthController = GetComponent<SoldierHealthController>();
         this._deathController = GetComponent<SoldierDeathController>();
         this._damageController = GetComponent<SoldierDamageController>();
@@ -33,6 +35,8 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
     {
         base.OnNetworkSpawn();
         SoldierController.OnSpawn?.Invoke(this.OwnerClientId, this);
+
+        this._weaponController = this._character.GetInventory().GetEquipped().GetComponent<WeaponController>();
     }
 
     protected override void OnOwnerNetworkSpawn()

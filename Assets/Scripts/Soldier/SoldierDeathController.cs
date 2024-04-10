@@ -28,9 +28,9 @@ public class SoldierDeathController : NetworkBehaviour
         if (newHealthData.Health > SoldierHealthController.MIN_HEALTH) { return; }
         this.gameObject.SetActive(false);
 
-        Transform ragdollTransform = Instantiate(this._ragdollPrefab, transform.position, transform.rotation);
-        SoldierRagdollController ragdollController = ragdollTransform.GetComponent<SoldierRagdollController>();
-        ragdollController.DoRagroll(this._soldierRootBone, this.IsOwner, newHealthData.LatestDamagePoint, newHealthData.LatestDamageType);
+        // Transform ragdollTransform = Instantiate(this._ragdollPrefab, transform.position, transform.rotation);
+        // SoldierRagdollController ragdollController = ragdollTransform.GetComponent<SoldierRagdollController>();
+        // ragdollController.DoRagroll(this._soldierRootBone, this.IsOwner, newHealthData.LatestDamagePoint, newHealthData.LatestDamageType);
         this.OnDeath?.Invoke(newHealthData.LatestDamagerClientId, newHealthData.LatestDamageType);
     }
 }
