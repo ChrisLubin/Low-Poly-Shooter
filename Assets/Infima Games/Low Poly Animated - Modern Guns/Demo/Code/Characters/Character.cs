@@ -255,19 +255,6 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#endregion
 
-			#region Reloading
-
-			//We can't reload while being holstered.
-			bool canReloadAimed = !IsAiming || equippedWeapon.CanReloadAimed();
-			if (!holstered && cursorLocked && canReloadAimed)
-			{
-				//Pressing the reload button.
-				if (Input.GetKeyDown(inputs.Get(CInputs.Reload)))
-					TryReload();
-			}
-
-			#endregion
-
 			#region Inspect
 
 			//Pressing Inspect Button.
@@ -504,7 +491,8 @@ namespace InfimaGames.Animated.ModernGuns
 
 		public void TryReload()
 		{
-			if (!_weaponAmmoController.CanReload) { return; }
+			bool canReloadAimed = !IsAiming || equippedWeapon.CanReloadAimed();
+			if (!_weaponAmmoController.CanReload || holstered || !cursorLocked || !canReloadAimed) { return; }
 
 			#region Animation
 
@@ -560,7 +548,14 @@ namespace InfimaGames.Animated.ModernGuns
 			if ((equippedWeapon = inventory.GetEquipped()) == null)
 				return;
 
-			_weaponAmmoController = equippedWeapon.GetComponent<WeaponAmmoController>();
+			WeaponAmmoController oldAmmoController = _weaponAmmoController;
+			WeaponAmmoController newAmmoController = equippedWeapon.GetComponent<WeaponAmmoController>();
+
+			if (newAmmoController != null && oldAmmoController != null && newAmmoController != oldAmmoController)
+				oldAmmoController.OnReloadRequest -= this.TryReload;
+
+			_weaponAmmoController = newAmmoController;
+			_weaponAmmoController.OnReloadRequest += this.TryReload;
 
 			//Update Animator Controller. We do this to update all animations to a specific weapon's set.
 			characterAnimator.runtimeAnimatorController = equippedWeapon.GetAnimatorController();

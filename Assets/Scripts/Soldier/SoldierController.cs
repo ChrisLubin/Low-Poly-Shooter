@@ -33,10 +33,10 @@ public class SoldierController : NetworkBehaviorAutoDisable<SoldierController>
 
     public override void OnNetworkSpawn()
     {
+        this._weaponController = this._character.GetInventory().GetEquipped().GetComponent<WeaponController>();
+
         base.OnNetworkSpawn();
         SoldierController.OnSpawn?.Invoke(this.OwnerClientId, this);
-
-        this._weaponController = this._character.GetInventory().GetEquipped().GetComponent<WeaponController>();
     }
 
     protected override void OnOwnerNetworkSpawn()

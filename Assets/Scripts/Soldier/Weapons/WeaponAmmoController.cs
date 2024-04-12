@@ -6,7 +6,6 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
 {
     private Weapon _weapon;
     private WeaponShootController _shootController;
-    private WeaponAnimationController _animationController;
 
     [SerializeField] private AudioClip _emptyMagazineSoundEffect;
     private const float _EMPTY_MAGAZINE_AUDIO_VOLUME = 0.7f;
@@ -30,7 +29,6 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
     {
         this._weapon = GetComponent<Weapon>();
         this._shootController = GetComponent<WeaponShootController>();
-        this._animationController = GetComponent<WeaponAnimationController>();
     }
 
     protected override void OnOwnerNetworkSpawn()
@@ -54,7 +52,7 @@ public class WeaponAmmoController : NetworkBehaviorAutoDisable<WeaponAmmoControl
     {
         if (!this.IsOwner || PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
-        if (Input.GetKeyDown(KeyCode.R) && this._bulletsInMagazine != this._magazineSize && !this._animationController.IsReloading)
+        if (Input.GetKeyDown(KeyCode.R) && this._bulletsInMagazine != this._magazineSize)
             this.RequestReload();
     }
 
