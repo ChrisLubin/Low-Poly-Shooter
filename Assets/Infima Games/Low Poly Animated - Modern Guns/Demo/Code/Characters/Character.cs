@@ -106,6 +106,8 @@ namespace InfimaGames.Animated.ModernGuns
 		/// </summary>
 		private IGameStartService gameStartService;
 
+		public float CrouchingAlpha => characterAnimator.GetFloat(AHashes.CrouchingAlpha);
+
 		//TODO
 		private float lastTimeRunning;
 		//TODO
@@ -201,18 +203,18 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#endregion
 
-			#region Crouching
+			// #region Crouching
 
-			//Check Input.
-			if (cursorLocked && Input.GetKeyDown(inputs.Get(CInputs.Crouching)))
-			{
-				//Toggle.
-				crouching = !crouching;
-				//Set Bool.
-				characterAnimator.SetBool(AHashes.Crouching, crouching);
-			}
+			// //Check Input.
+			// if (cursorLocked && Input.GetKeyDown(inputs.Get(CInputs.Crouching)))
+			// {
+			// 	//Toggle.
+			// 	crouching = !crouching;
+			// 	//Set Bool.
+			// 	characterAnimator.SetBool(AHashes.Crouching, crouching);
+			// }
 
-			#endregion
+			// #endregion
 
 			#region Firing
 
@@ -423,6 +425,19 @@ namespace InfimaGames.Animated.ModernGuns
 				equippedWeapon.GetComponent<Animator>().SetFloat(AHashes.AimingAlpha, aimingAlpha);
 
 			#endregion
+
+			var crouchingAlpha = 0.0f;
+			if (characterAnimator.GetCurrentAnimatorStateInfo(7).IsName("Idle"))
+			{
+				crouchingAlpha = characterAnimator.GetNextAnimatorStateInfo(7).IsName("Crouching") ? Mathf.Lerp(0, 1f, characterAnimator.GetAnimatorTransitionInfo(7).normalizedTime) : 0.0f;
+			}
+			else if (characterAnimator.GetCurrentAnimatorStateInfo(7).IsName("Crouching"))
+			{
+				crouchingAlpha = characterAnimator.GetNextAnimatorStateInfo(7).IsName("Idle") ? Mathf.Lerp(1f, 0, characterAnimator.GetAnimatorTransitionInfo(7).normalizedTime) : 1.0f;
+			}
+
+			//Update the aiming value, but use interpolation. This makes sure that things like firing can transition properly.
+			characterAnimator.SetFloat(AHashes.CrouchingAlpha, crouchingAlpha);
 
 			#region Update Grip Index
 

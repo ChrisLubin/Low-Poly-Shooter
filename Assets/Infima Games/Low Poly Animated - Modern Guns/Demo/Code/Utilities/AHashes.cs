@@ -13,7 +13,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Aiming Bool Hash.
         /// </summary>
         public static readonly int Aim = Animator.StringToHash("Aim");
-        
+
         /// <summary>
         /// Crouching Bool Hash.
         /// </summary>
@@ -45,7 +45,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Hashed "Movement".
         /// </summary>
         public static readonly int Movement = Animator.StringToHash("Movement");
-        
+
         /// <summary>
         /// Hashed "Horizontal".
         /// </summary>
@@ -54,7 +54,7 @@ namespace InfimaGames.Animated.ModernGuns
         /// Hashed "Vertical".
         /// </summary>
         public static readonly int Vertical = Animator.StringToHash("Vertical");
-        
+
         /// <summary>
         /// Hashed "Stop Fidgets".
         /// </summary>
@@ -63,5 +63,6 @@ namespace InfimaGames.Animated.ModernGuns
         /// Hashed "Tactical Sprint".
         /// </summary>
         public static readonly int TacticalSprint = Animator.StringToHash("Tactical Sprint");
+        public static readonly int CrouchingAlpha = Animator.StringToHash("Crouching Alpha");
     }
 }
