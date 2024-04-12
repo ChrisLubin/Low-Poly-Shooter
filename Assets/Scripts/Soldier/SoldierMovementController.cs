@@ -36,7 +36,7 @@ public class SoldierMovementController : NetworkBehaviorAutoDisable<SoldierMovem
         float movementDirectionY = this._moveDirection.y;
         this._moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
-        if (!PauseMenuController.IsPaused && !SoldierKillStreakController.IS_USING_KILL_STREAK && Input.GetButton("Jump") && this._characterController.isGrounded)
+        if (!PauseMenuController.IsPaused && !SoldierKillStreakController.IS_USING_KILL_STREAK && Input.GetButtonDown("Jump") && this._characterController.isGrounded)
             this._moveDirection.y = this._jumpSpeed;
         else
             this._moveDirection.y = movementDirectionY;

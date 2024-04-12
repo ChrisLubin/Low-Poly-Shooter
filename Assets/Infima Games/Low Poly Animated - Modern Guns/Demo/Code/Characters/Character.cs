@@ -117,11 +117,15 @@ namespace InfimaGames.Animated.ModernGuns
 
 		#region UNITY
 
+		private CharacterController _characterController;
+
 		/// <summary>
 		/// Awake.
 		/// </summary>
 		protected override void Awake()
 		{
+			this._characterController = GetComponent<CharacterController>();
+
 			//Update the cursor's state.
 			UpdateCursorState();
 
@@ -455,7 +459,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#endregion
 
 			//Update Jumping Value.
-			characterAnimator.SetBool(AHashes.Jumping, Input.GetKey(inputs.Get(CInputs.Jumping)));
+			characterAnimator.SetBool(AHashes.Jumping, !this._characterController.isGrounded);
 			//Update Lowered Value.
 			characterAnimator.SetBool(AHashes.Lowered, lowered);
 			//Update Animator Aiming.
