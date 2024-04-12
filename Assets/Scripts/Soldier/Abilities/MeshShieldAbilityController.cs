@@ -4,16 +4,15 @@ using UnityEngine;
 public class MeshShieldAbilityController : AbilityController
 {
     private SoldierCameraController _cameraController;
-    private WeaponController _weaponController;
 
     [SerializeField] private Transform _shield;
+    [SerializeField] private GameObject[] _disableOnActive;
 
     private void Awake()
     {
         this.Ability = Abilities.MeshShield;
 
         this._cameraController = GetComponent<SoldierCameraController>();
-        this._weaponController = GetComponentInChildren<WeaponController>();
     }
 
     public override void Activate()
@@ -21,7 +20,8 @@ public class MeshShieldAbilityController : AbilityController
         base.Activate();
 
         this._shield.gameObject.SetActive(true);
-        this._weaponController.gameObject.SetActive(false);
+        foreach (GameObject gameObjToDisable in this._disableOnActive)
+            gameObjToDisable.SetActive(false);
 
         if (!this._cameraController.IsLocalPlayer) { return; }
 
@@ -35,7 +35,8 @@ public class MeshShieldAbilityController : AbilityController
         base.Deactivate();
 
         this._shield.gameObject.SetActive(false);
-        this._weaponController.gameObject.SetActive(true);
+        foreach (GameObject gameObjToEnable in this._disableOnActive)
+            gameObjToEnable.SetActive(true);
 
         if (!this._cameraController.IsLocalPlayer) { return; }
 

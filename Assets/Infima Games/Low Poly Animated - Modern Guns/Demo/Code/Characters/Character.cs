@@ -263,22 +263,22 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#endregion
 
-			#region Holster
+			// #region Holster
 
-			//Pressing Holster Button.
-			if (cursorLocked && Input.GetKeyDown(inputs.Get(CInputs.Holster)))
-			{
-				//Stop Running/Lowered. These make no sense while holstering, obviously.
-				lowered = false; StopRunning();
+			// //Pressing Holster Button.
+			// if (cursorLocked && Input.GetKeyDown(inputs.Get(CInputs.Holster)))
+			// {
+			// 	//Stop Running/Lowered. These make no sense while holstering, obviously.
+			// 	lowered = false; StopRunning();
 
-				//Set.
-				SetHolstered(!holstered);
+			// 	//Set.
+			// 	SetHolstered(!holstered);
 
-				//Play Animation.
-				characterAnimator.CrossFade(holstered ? "Holster" : "Unholster", 0.0f, 3, 0.0f);
-			}
+			// 	//Play Animation.
+			// 	characterAnimator.CrossFade(holstered ? "Holster" : "Unholster", 0.0f, 3, 0.0f);
+			// }
 
-			#endregion
+			// #endregion
 
 			#region Grenade Throw
 

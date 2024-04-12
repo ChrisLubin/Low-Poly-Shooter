@@ -8,7 +8,7 @@ public class InvisibilityAbilityController : AbilityController
 
     [SerializeField] private Material _semiTransparentMaterial;
     private Renderer[] _meshes;
-    private Material[] _originalMaterials;
+    private Material[][] _originalMaterials;
 
     private void Awake()
     {
@@ -18,8 +18,6 @@ public class InvisibilityAbilityController : AbilityController
         this._damageController.OnServerDamageReceived += this.OnPlayerReceivedServerDamage;
         this._weaponController = GetComponentInChildren<WeaponController>();
         this._weaponController.OnShoot += this.OnPlayerDidShoot;
-        this._meshes = GetComponentsInChildren<Renderer>();
-        this._originalMaterials = this._meshes.Select(mesh => mesh.materials[0]).ToArray();
     }
 
     public override void OnDestroy()
@@ -28,6 +26,13 @@ public class InvisibilityAbilityController : AbilityController
         this._damageController.OnPlayerDamagedByLocalPlayer -= this.OnPlayerDamagedByLocalPlayer;
         this._damageController.OnServerDamageReceived -= this.OnPlayerReceivedServerDamage;
         this._weaponController.OnShoot -= this.OnPlayerDidShoot;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        this._meshes = GetComponentsInChildren<Renderer>();
+        this._originalMaterials = this._meshes.Select(mesh => mesh.materials).ToArray();
     }
 
     public override void Activate()
@@ -54,7 +59,7 @@ public class InvisibilityAbilityController : AbilityController
             if (isTurningInvisible)
                 materialArray[0] = this._semiTransparentMaterial;
             else
-                materialArray[0] = this._originalMaterials[i];
+                materialArray = this._originalMaterials[i];
 
             renderer.materials = materialArray;
         }
