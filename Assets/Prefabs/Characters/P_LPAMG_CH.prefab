@@ -3313,7 +3313,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinnedMesh: {fileID: 3694687334332814164}
   skinRandom: {fileID: 11400000, guid: a26d0aa74461e214ba2e500445877a31, type: 2}
+  defaultSkin: {fileID: 11400000, guid: 0ba2a2febd0dffb4794d9e3b3a1a2e86, type: 2}
   autoApplyAtStart: 1
+  shouldRandomizeSkin: 0
 --- !u!1 &7406925132219879191
 GameObject:
   m_ObjectHideFlags: 0
@@ -4610,6 +4612,17 @@ PrefabInstance:
     - target: {fileID: 521039102215751339, guid: 240ceff9c3009354aa584ee24e803240,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5381117300087245067, guid: 240ceff9c3009354aa584ee24e803240,
+        type: 3}
+      propertyPath: defaultSkin
+      value: 
+      objectReference: {fileID: 11400000, guid: 871fae4dc1e81d54d88b460842f2bd14,
+        type: 2}
+    - target: {fileID: 5381117300087245067, guid: 240ceff9c3009354aa584ee24e803240,
+        type: 3}
+      propertyPath: shouldRandomizeSkin
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8632084748792481011, guid: 240ceff9c3009354aa584ee24e803240,

@@ -10,7 +10,7 @@ namespace InfimaGames.Animated.ModernGuns
     public class Skinner : MonoBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Title(label: "References")]
 
         [Tooltip("SkinnedMesh Component To Modify.")]
@@ -20,35 +20,41 @@ namespace InfimaGames.Animated.ModernGuns
         [Tooltip("ScriptableObject containing all the Skins that this component can pick from when selecting a Skin to apply.")]
         [SerializeField]
         private SkinRandom skinRandom;
-        
+        [Tooltip("Skin to use if doRandom is false")]
+        [SerializeField]
+        private Skin defaultSkin;
+
         [Title(label: "Settings")]
 
         [Tooltip("Determines if the Skinner should immediately apply a Skin to the SkinnedMesh when starting.")]
         [SerializeField]
         private bool autoApplyAtStart;
-        
+
+        [SerializeField]
+        private bool shouldRandomizeSkin = true;
+
         #endregion
-        
+
         #region FIELDS
-        
+
         /// <summary>
         /// Current Skin Applied.
         /// </summary>
         protected Skin skin;
 
         #endregion
-        
+
         #region UNITY
-        
+
         /// <summary>
         /// Awake.
         /// </summary>
         private void Awake()
         {
             //Check autoApplyAtStart.
-            if (!autoApplyAtStart) 
+            if (!autoApplyAtStart)
                 return;
-            
+
             //Randomize.
             Randomize();
             //Apply.
@@ -67,8 +73,9 @@ namespace InfimaGames.Animated.ModernGuns
             //Reference Check.
             if (skinRandom == null)
                 return;
-            //Get random skin.
-            skin = skinRandom.Get();
+
+            //Get skin.
+            skin = shouldRandomizeSkin ? skinRandom.Get() : defaultSkin;
         }
 
         /// <summary>
@@ -84,7 +91,7 @@ namespace InfimaGames.Animated.ModernGuns
             if (skin != null)
                 skin.Apply("Body", skinnedMesh);
         }
-        
+
         #endregion
     }
 }
