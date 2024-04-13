@@ -1,11 +1,11 @@
-// using Cinemachine;
+using Cinemachine;
 using UnityEngine;
 
 public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraController>
 {
     [SerializeField] private Transform _neck;
-    // [SerializeField] private CinemachineVirtualCamera _firstPersonCamera;
-    // [SerializeField] private CinemachineVirtualCamera _thirdPersonCamera;
+    [SerializeField] private CinemachineVirtualCamera _firstPersonCamera;
+    [SerializeField] private CinemachineVirtualCamera _thirdPersonCamera;
     [SerializeField] private float _lookSpeed = 40f;
     [SerializeField] private float _lookXLimit = 55f;
 
@@ -34,7 +34,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     protected override void OnOwnerNetworkSpawn()
     {
         CinemachineController.SetBlendDuration(SOLDIER_SPAWN_CAMERA_TRANSITION_TIME);
-        // this._firstPersonCamera.enabled = true;
+        this._firstPersonCamera.enabled = true;
 
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
@@ -53,14 +53,14 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
 
     public void EnableFirstPersonCamera()
     {
-        // this._firstPersonCamera.enabled = true;
-        // this._thirdPersonCamera.enabled = false;
+        this._firstPersonCamera.enabled = true;
+        this._thirdPersonCamera.enabled = false;
     }
 
     public void EnableThirdPersonCamera()
     {
-        // this._firstPersonCamera.enabled = false;
-        // this._thirdPersonCamera.enabled = true;
+        this._firstPersonCamera.enabled = false;
+        this._thirdPersonCamera.enabled = true;
     }
 
     private void OnGameStateChange(GameState state)
@@ -69,8 +69,8 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
         {
             case GameState.GameOver:
                 CinemachineController.SetBlendDuration(4f);
-                // this._firstPersonCamera.enabled = false;
-                // this._thirdPersonCamera.enabled = false;
+                this._firstPersonCamera.enabled = false;
+                this._thirdPersonCamera.enabled = false;
                 break;
             default:
                 break;
