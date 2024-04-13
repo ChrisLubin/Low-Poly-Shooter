@@ -107,6 +107,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private IGameStartService gameStartService;
 
 		public float CrouchingAlpha => characterAnimator.GetFloat(AHashes.CrouchingAlpha);
+		private bool _isUsingMeshShieldAbility => this._selectAbilityManager.SelectedAbility == Abilities.MeshShield && this._activateAbilityManager.IsAbilityActive;
 
 		//TODO
 		private float lastTimeRunning;
@@ -118,6 +119,8 @@ namespace InfimaGames.Animated.ModernGuns
 		#region UNITY
 
 		private CharacterController _characterController;
+		private SelectAbilityManager _selectAbilityManager;
+		private ActivateAbilityManager _activateAbilityManager;
 
 		/// <summary>
 		/// Awake.
@@ -125,6 +128,8 @@ namespace InfimaGames.Animated.ModernGuns
 		protected override void Awake()
 		{
 			this._characterController = GetComponent<CharacterController>();
+			this._selectAbilityManager = GetComponent<SelectAbilityManager>();
+			this._activateAbilityManager = GetComponent<ActivateAbilityManager>();
 
 			//Update the cursor's state.
 			UpdateCursorState();
@@ -188,7 +193,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Aiming
 
 			//Update Aiming Value.
-			IsAiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered;
+			IsAiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered && !this._isUsingMeshShieldAbility;
 
 			//If we're aiming, make sure that the character can never have its weapon lowered or run. We do this because otherwise it looks super odd.
 			if (IsAiming)
@@ -241,24 +246,24 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#endregion
 
-			#region Lowering
+			// #region Lowering
 
-			//Pressing the lower button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Lower)) && cursorLocked)
-			{
-				//Toggle.
-				lowered = !lowered;
+			// //Pressing the lower button.
+			// if (Input.GetKeyDown(inputs.Get(CInputs.Lower)) && cursorLocked)
+			// {
+			// 	//Toggle.
+			// 	lowered = !lowered;
 
-				//Stop running no matter whether the weapon is lowered or not. This way our transitions get to play properly.
-				StopRunning();
-			}
+			// 	//Stop running no matter whether the weapon is lowered or not. This way our transitions get to play properly.
+			// 	StopRunning();
+			// }
 
-			#endregion
+			// #endregion
 
 			#region Inspect
 
 			//Pressing Inspect Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Inspect)) && !holstered && cursorLocked)
+			if (Input.GetKeyDown(inputs.Get(CInputs.Inspect)) && !holstered && cursorLocked && !this._isUsingMeshShieldAbility)
 				Inspect();
 
 			#endregion
@@ -283,7 +288,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Grenade Throw
 
 			//Pressing Grenade Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Grenade)) && !holstered && cursorLocked)
+			if (Input.GetKeyDown(inputs.Get(CInputs.Grenade)) && !holstered && cursorLocked && !this._isUsingMeshShieldAbility)
 				PlayGrenadeThrow();
 
 			#endregion
@@ -291,7 +296,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Knife
 
 			//Pressing Knife Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Knife)))
+			if (Input.GetKeyDown(inputs.Get(CInputs.Knife)) && !this._isUsingMeshShieldAbility)
 				PlayMelee();
 
 			#endregion
@@ -473,7 +478,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private void TryFire()
 		{
 			//Check Fire Rate.
-			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()) || !_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading || IsRunning)
+			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()) || !_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading || IsRunning || this._isUsingMeshShieldAbility)
 				return;
 
 			//Save the shot time, so we can calculate the fire rate correctly.

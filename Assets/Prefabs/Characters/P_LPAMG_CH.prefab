@@ -1848,7 +1848,6 @@ MonoBehaviour:
   _shield: {fileID: 1688842714306042681}
   _disableOnActive:
   - {fileID: 1710440659125134205}
-  - {fileID: 7337479799746498322}
 --- !u!114 &1257942726714146858
 MonoBehaviour:
   m_ObjectHideFlags: 0
