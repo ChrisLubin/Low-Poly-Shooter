@@ -10,15 +10,15 @@ namespace InfimaGames.Animated.ModernGuns
     public class Muzzle : MuzzleBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Title(label: "Settings")]
-        
+
         [Tooltip("Socket at the tip of the Muzzle. Commonly used as a firing point.")]
         [SerializeField]
         private Transform socket;
-        
+
         [Title(label: "Particles")]
-        
+
         [Tooltip("Firing Particles.")]
         [SerializeField]
         private GameObject prefabFlashParticles;
@@ -26,9 +26,9 @@ namespace InfimaGames.Animated.ModernGuns
         [Tooltip("Number of particles to emit when firing.")]
         [SerializeField]
         private int flashParticlesCount = 5;
-        
+
         [Title(label: "Audio")]
-        
+
         [Tooltip("Audio clip played when firing through this muzzle.")]
         [SerializeField, ReorderableList]
         private AudioClip[] audioClipsFire;
@@ -36,27 +36,27 @@ namespace InfimaGames.Animated.ModernGuns
         [Tooltip("Audio Settings used when playing the firing Audio Clip.")]
         [SerializeField]
         private AudioSettings audioSettingsFire;
-        
+
         #endregion
-        
+
         #region FIELDS
-        
+
         /// <summary>
         /// Instantiated Particle System.
         /// </summary>
         private ParticleSystem particles;
 
         #endregion
-        
+
         #region UNITY
-        
+
         /// <summary>
         /// Awake.
         /// </summary>
         private void Awake()
         {
             //Null Check.
-            if(prefabFlashParticles != null)
+            if (prefabFlashParticles != null)
             {
                 //Instantiate Particles.
                 GameObject spawnedParticlesPrefab = Instantiate(prefabFlashParticles, socket);
@@ -64,29 +64,38 @@ namespace InfimaGames.Animated.ModernGuns
                 spawnedParticlesPrefab.transform.localPosition = default;
                 //Reset the rotation.
                 spawnedParticlesPrefab.transform.localEulerAngles = default;
-                
+
                 //Get Reference.
                 particles = spawnedParticlesPrefab.GetComponent<ParticleSystem>();
             }
         }
 
         #endregion
-        
+
         #region METHODS
-        
+
         /// <summary>
         /// Fire.
         /// </summary>
         public override void Fire()
         {
             //Try to play the fire particles from the muzzle!
-            if(particles != null)
+            if (particles != null)
                 particles.Emit(flashParticlesCount);
-            
-            //Play One Shot.
-            ServiceLocator.Current.Get<IAudioManagerService>().PlayOneShot(audioClipsFire, audioSettingsFire);
+
+            Helpers.PlayClipAtPoint(audioClipsFire[Random.Range(0, audioClipsFire.Length)], transform.position, 0f, out AudioSource audioSource);
+            audioSource.volume = audioSettingsFire.Volume;
+            audioSource.spatialBlend = audioSettingsFire.SpatialBlend;
+            audioSource.loop = audioSettingsFire.Loop;
+            audioSource.outputAudioMixerGroup = audioSettingsFire.Output;
+
+            // if (this.isOwner) {
+            //     // Make sound 2d
+            // }
+
+            // ServiceLocator.Current.Get<IAudioManagerService>().PlayOneShot(audioClipsFire, audioSettingsFire);
         }
-        
+
         #endregion
     }
 }

@@ -1,5 +1,6 @@
 ﻿//Copyright 2022, Infima Games. All Rights Reserved.
 
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace InfimaGames.Animated.ModernGuns
@@ -12,15 +13,15 @@ namespace InfimaGames.Animated.ModernGuns
         #region FIELDS SERIALIZED
 
         [Title(label: "Setup")]
-        
+
         [Tooltip("Delay at which the audio is played.")]
         [SerializeField]
         private float delay;
-        
+
         [Tooltip("Sound Type. Determines the type of sound we're trying to play.")]
         [SerializeField]
         private string type;
-        
+
         [Title(label: "Audio Settings")]
 
         [Tooltip("Settings applied to the AudioClip played when the Animation State this component is on starts playing.")]
@@ -48,44 +49,44 @@ namespace InfimaGames.Animated.ModernGuns
         /// Last AudioClip played through this component.
         /// </summary>
         private AudioClip lastClip;
-        
+
         #endregion
-        
+
         #region UNITY
 
         /// <summary>
         /// On State Enter.
         /// </summary>
-        public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+        public async override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             //We need to get the character component.
             playerCharacter ??= ServiceLocator.Current.Get<IGameModeService>().GetPlayerCharacter();
             //Check Reference.
             if (playerCharacter == null)
                 return;
-            
+
             //Get Inventory.
             playerInventory ??= playerCharacter.GetInventory();
-            
+
             //Try to get the equipped weapon's Weapon component.
-            if (!(playerInventory.GetEquipped() is {} weaponBehaviour))
+            if (!(playerInventory.GetEquipped() is { } weaponBehaviour))
                 return;
-            
+
             //Try grab a reference to the sound managing service.
             audioManagerService ??= ServiceLocator.Current.Get<IAudioManagerService>();
-            
+
             //Get DataLinker.
             var dataLinker = weaponBehaviour.GetComponent<DataLinker>();
             //Check Reference.
             if (dataLinker == null)
                 return;
-            
+
             //Get SoundLinker.
             var soundLinker = dataLinker.Get<SoundLinker>("Sounds");
             //Check Reference.
             if (soundLinker == null)
                 return;
-            
+
             #region Select Correct Clip To Play
 
             //Get Correct Audio Clip.
@@ -93,11 +94,26 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (lastClip == null)
                 return;
-            
+
             #endregion
-            
+
             //Play with some delay. Granted, if the delay is set to zero, this will just straight-up play!
-            audioManagerService.PlayOneShotDelayed(lastClip, audioSettings, delay);
+            // audioManagerService.PlayOneShotDelayed(lastClip, audioSettings, delay);
+            await PlayOneShotDelayed(animator.transform.position, lastClip, audioSettings, delay);
+        }
+
+        private async UniTask PlayOneShotDelayed(Vector3 position, AudioClip clip, AudioSettings settings = default, float delay = 1.0f)
+        {
+            await UniTask.WaitForSeconds(delay);
+            Helpers.PlayClipAtPoint(clip, position, 0f, out AudioSource audioSource);
+            audioSource.volume = settings.Volume;
+            audioSource.spatialBlend = settings.SpatialBlend;
+            audioSource.loop = settings.Loop;
+            audioSource.outputAudioMixerGroup = settings.Output;
+
+            // if (this.isOwner) {
+            //     // Make sound 2d
+            // }
         }
 
         /// <summary>
@@ -111,11 +127,11 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (lastClip == null)
                 return;
-            
+
             //Try to find the last audio clip that we've played through one of these behaviours.
             GameObject found = GameObject.Find($"Audio Source -> {lastClip.name}");
             //Destroy that clip if there is one.
-            if(found != null)
+            if (found != null)
                 Destroy(found);
         }
 

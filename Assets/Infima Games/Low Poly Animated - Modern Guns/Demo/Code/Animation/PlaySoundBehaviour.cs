@@ -10,21 +10,21 @@ namespace InfimaGames.Animated.ModernGuns
     public class PlaySoundBehaviour : StateMachineBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Header("Setup")]
-        
+
         [Tooltip("Array of AudioClip values to pick from when trying to play a sound through this component.")]
         [SerializeField]
         private AudioClip[] clips;
-        
+
         [Header("Settings")]
 
         [Tooltip("Settings applied to the AudioClip played when the Animation State this component is on starts playing.")]
         [SerializeField]
         private AudioSettings settings = new AudioSettings(1.0f, 0.0f, true);
-        
+
         #endregion
-        
+
         #region FIELDS
 
         /// <summary>
@@ -48,13 +48,19 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Randomize Clip To Play.
             lastClip = clips[Random.Range(0, clips.Length)];
-            
+
             //Try grab a reference to the sound managing service.
-            audioManagerService ??= ServiceLocator.Current.Get<IAudioManagerService>();
+            // audioManagerService ??= ServiceLocator.Current.Get<IAudioManagerService>();
             //Play!
-            audioManagerService?.PlayOneShot(lastClip, settings);
+            // audioManagerService?.PlayOneShot(lastClip, settings);
+
+            Helpers.PlayClipAtPoint(lastClip, animator.transform.position, 0f, out AudioSource audioSource);
+            audioSource.volume = settings.Volume;
+            audioSource.spatialBlend = settings.SpatialBlend;
+            audioSource.loop = settings.Loop;
+            audioSource.outputAudioMixerGroup = settings.Output;
         }
-        
+
         /// <summary>
         /// OnStateExit.
         /// </summary>
@@ -62,11 +68,11 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Base.
             base.OnStateExit(animator, stateInfo, layerIndex);
-            
+
             //Find the last Audio Source we spawned through the manager.
             GameObject found = GameObject.Find($"Audio Source -> {lastClip.name}");
             //If there is one, destroy it.
-            if(found != null)
+            if (found != null)
                 Destroy(found);
         }
 
