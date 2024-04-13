@@ -16,9 +16,6 @@ public class PauseMenuController : NetworkBehaviour
 
     public static bool IsPaused { get; private set; } = false;
 
-    private CursorLockMode _prevCursorLockMode;
-    private bool _prevCursorVisibility;
-
     private void Awake()
     {
         this._resumeButton.onClick.AddListener(this.ToggleOpen);
@@ -59,8 +56,8 @@ public class PauseMenuController : NetworkBehaviour
         if (PauseMenuController.IsPaused)
         {
             // Resuming game
-            Cursor.lockState = this._prevCursorLockMode;
-            Cursor.visible = this._prevCursorVisibility;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
             if (!MultiplayerSystem.IsMultiplayer)
                 Time.timeScale = 1f;
@@ -68,8 +65,6 @@ public class PauseMenuController : NetworkBehaviour
         else
         {
             // Pausing game
-            this._prevCursorLockMode = Cursor.lockState;
-            this._prevCursorVisibility = Cursor.visible;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 

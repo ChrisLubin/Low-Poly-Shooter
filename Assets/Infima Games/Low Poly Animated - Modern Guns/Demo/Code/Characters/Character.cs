@@ -131,9 +131,6 @@ namespace InfimaGames.Animated.ModernGuns
 			this._selectAbilityManager = GetComponent<SelectAbilityManager>();
 			this._activateAbilityManager = GetComponent<ActivateAbilityManager>();
 
-			//Update the cursor's state.
-			UpdateCursorState();
-
 			//Initialize Inventory.
 			inventory.Init();
 			//Refresh!
@@ -185,6 +182,8 @@ namespace InfimaGames.Animated.ModernGuns
 		//TODO
 		private void StopRunning() => IsRunning = tacticalSprint = false;
 
+		private bool _isInputBlocked => (MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK;
+
 		/// <summary>
 		/// HandleInput. This function handles all the inputs in the asset.
 		/// </summary>
@@ -193,7 +192,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Aiming
 
 			//Update Aiming Value.
-			IsAiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered && !this._isUsingMeshShieldAbility;
+			IsAiming = cursorLocked && Input.GetKey(inputs.Get(CInputs.Aiming)) && !holstered && !this._isUsingMeshShieldAbility && !this._isInputBlocked;
 
 			//If we're aiming, make sure that the character can never have its weapon lowered or run. We do this because otherwise it looks super odd.
 			if (IsAiming)
@@ -263,7 +262,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Inspect
 
 			//Pressing Inspect Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Inspect)) && !holstered && cursorLocked && !this._isUsingMeshShieldAbility)
+			if (Input.GetKeyDown(inputs.Get(CInputs.Inspect)) && !holstered && cursorLocked && !this._isUsingMeshShieldAbility && !this._isInputBlocked)
 				Inspect();
 
 			#endregion
@@ -288,7 +287,7 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Grenade Throw
 
 			//Pressing Grenade Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Grenade)) && !holstered && cursorLocked && !this._isUsingMeshShieldAbility)
+			if (Input.GetKeyDown(inputs.Get(CInputs.Grenade)) && !holstered && cursorLocked && !this._isUsingMeshShieldAbility && !this._isInputBlocked)
 				PlayGrenadeThrow();
 
 			#endregion
@@ -296,17 +295,17 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Knife
 
 			//Pressing Knife Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Knife)) && !this._isUsingMeshShieldAbility)
+			if (Input.GetKeyDown(inputs.Get(CInputs.Knife)) && !this._isUsingMeshShieldAbility && !this._isInputBlocked)
 				PlayMelee();
 
 			#endregion
 
 			#region Running
 
-			IsRunning = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked && !IsAiming && !equippedWeapon.IsReloading;
+			IsRunning = Input.GetKey(inputs.Get(CInputs.Running)) && !holstered && cursorLocked && !IsAiming && !equippedWeapon.IsReloading && !this._isInputBlocked;
 
 			//Pressing Running Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Running)) && !holstered && cursorLocked)
+			if (Input.GetKeyDown(inputs.Get(CInputs.Running)) && !holstered && cursorLocked && !this._isInputBlocked)
 			{
 				//TODO
 				if (Time.time - lastTimeRunning < 0.2f)
@@ -327,14 +326,14 @@ namespace InfimaGames.Animated.ModernGuns
 			#region Movement
 
 			//Update Movement.
-			axisMovement = cursorLocked ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) : default;
+			axisMovement = cursorLocked && !this._isInputBlocked ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) : default;
 
 			#endregion
 
 			#region Inventory Switching
 
 			//Make sure the cursor is locked, and we're not paused.
-			if (cursorLocked)
+			if (cursorLocked && !this._isInputBlocked)
 			{
 				//ScrollWheel Value.
 				// float scrollWheel = Input.GetAxisRaw("Mouse ScrollWheel");
@@ -352,18 +351,18 @@ namespace InfimaGames.Animated.ModernGuns
 
 			#endregion
 
-			#region Escape
+			// #region Escape
 
-			//Pressed Escape Button.
-			if (Input.GetKeyDown(inputs.Get(CInputs.Escape)))
-			{
-				//Toggle the cursor locked value.
-				cursorLocked = !cursorLocked;
-				//Update the cursor's state.
-				UpdateCursorState();
-			}
+			// //Pressed Escape Button.
+			// if (Input.GetKeyDown(inputs.Get(CInputs.Escape)))
+			// {
+			// 	//Toggle the cursor locked value.
+			// 	cursorLocked = !cursorLocked;
+			// 	//Update the cursor's state.
+			// 	UpdateCursorState();
+			// }
 
-			#endregion
+			// #endregion
 		}
 
 		/// <summary>
@@ -477,8 +476,10 @@ namespace InfimaGames.Animated.ModernGuns
 		/// </summary>
 		private void TryFire()
 		{
+			if (!_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading || IsRunning || this._isUsingMeshShieldAbility || this._isInputBlocked) { return; }
+
 			//Check Fire Rate.
-			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()) || !_weaponAmmoController.HasBulletInMagazine || equippedWeapon.IsReloading || IsRunning || this._isUsingMeshShieldAbility)
+			if (!(Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire()))
 				return;
 
 			//Save the shot time, so we can calculate the fire rate correctly.
@@ -497,7 +498,7 @@ namespace InfimaGames.Animated.ModernGuns
 		public void TryReload()
 		{
 			bool canReloadAimed = !IsAiming || equippedWeapon.CanReloadAimed();
-			if (!_weaponAmmoController.CanReload || holstered || !cursorLocked || !canReloadAimed) { return; }
+			if (!_weaponAmmoController.CanReload || holstered || !cursorLocked || !canReloadAimed || this._isInputBlocked) { return; }
 
 			#region Animation
 
@@ -522,7 +523,7 @@ namespace InfimaGames.Animated.ModernGuns
 		private IEnumerator Equip(int index = 0)
 		{
 			//Only if we're not holstered, holster. If we are already, we don't need to wait.
-			if (!holstered)
+			if (!holstered && !this._isInputBlocked)
 			{
 				//Play.
 				characterAnimator.CrossFade("Holster Quick", 0.0f, 3, 0.0f);
@@ -569,13 +570,13 @@ namespace InfimaGames.Animated.ModernGuns
 		/// <summary>
 		/// Updates the cursor state based on the value of the cursorLocked variable.
 		/// </summary>
-		private void UpdateCursorState()
-		{
-			//Update cursor visibility.
-			Cursor.visible = !cursorLocked;
-			//Update cursor lock state.
-			Cursor.lockState = cursorLocked ? CursorLockMode.Locked : CursorLockMode.None;
-		}
+		// private void UpdateCursorState()
+		// {
+		// 	//Update cursor visibility.
+		// 	Cursor.visible = !cursorLocked;
+		// 	//Update cursor lock state.
+		// 	Cursor.lockState = cursorLocked ? CursorLockMode.Locked : CursorLockMode.None;
+		// }
 
 		/// <summary>
 		/// Plays The Grenade Throwing Animation.
