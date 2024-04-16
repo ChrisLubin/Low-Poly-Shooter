@@ -1,5 +1,6 @@
 ﻿//Copyright 2022, Infima Games. All Rights Reserved.
 
+using Unity.Netcode;
 using UnityEngine;
 
 namespace InfimaGames.Animated.ModernGuns.Interface
@@ -7,10 +8,10 @@ namespace InfimaGames.Animated.ModernGuns.Interface
     /// <summary>
     /// The Crosshair component helps with making sure that the on-screen crosshair changes its appearance based on different events in the asset.
     /// </summary>
-    public class Crosshair : Element
+    public class Crosshair : MonoBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Tooltip("Reference to the RectTransform that this component needs to modify in order to make the entire crosshair look bigger//smaller.")]
         [SerializeField]
         private RectTransform holderTransform;
@@ -20,13 +21,10 @@ namespace InfimaGames.Animated.ModernGuns.Interface
         private CanvasGroup canvasGroup;
 
         #endregion
-        
+
         #region FIELDS
-        
-        /// <summary>
-        /// Reference to the player character’s Animator component that drives everything in the asset.
-        /// </summary>
-        private Animator characterAnimator;
+
+        private Character character;
         /// <summary>
         /// Represents the current size of the crosshair.
         /// </summary>
@@ -37,39 +35,43 @@ namespace InfimaGames.Animated.ModernGuns.Interface
         private float currentOpacity = 1.0f;
 
         #endregion
-        
+
         #region UNITY
-        
-        /// <summary>
-        /// Awake.
-        /// </summary>
-        protected override void Awake()
+
+        private void Awake()
         {
-            //Base.
-            base.Awake();
-            //Cache Animator.
-            characterAnimator = characterBehaviour.GetComponent<ObjectLinker>().Get<Animator>("Animator");
+            GameManager.OnStateChange += this.OnGameStateChange;
+            MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
+            SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+            SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
+            SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated += this.OnLocalPlayerKillStreakActivatedOrDeactivated;
         }
-        
+
+        private void OnDestroy()
+        {
+            GameManager.OnStateChange -= this.OnGameStateChange;
+            MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
+            SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+            SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
+            SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated -= this.OnLocalPlayerKillStreakActivatedOrDeactivated;
+        }
+
         #endregion
-        
-        #region METHODS
 
         /// <summary>
         /// Tick.
         /// </summary>
-        protected override void Tick()
+        private void Update()
         {
-            //Base.
-            base.Tick();
+            if (!SoldierManager.IsLocalPlayerAlive) { return; }
 
             //Get AimingAlpha value from the character's animator. This is the value from [0, 1] that represents how much we're aiming.
-            float aimingAlpha = characterAnimator.GetFloat(AHashes.AimingAlpha);
+            float aimingAlpha = character.AimingAlpha;
             //Modify the size based on that alpha so we can hide the crosshair when aiming.
             currentSize = Mathf.Lerp(50.0f, 0.0f, aimingAlpha);
             //Modify the opacity based on that alpha so we can hide the crosshair when aiming.
             currentOpacity = Mathf.Lerp(1.0f, 0.0f, aimingAlpha);
-            
+
             //Update Horizontal Size.
             holderTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, currentSize);
             //Update Vertical Size.
@@ -77,7 +79,35 @@ namespace InfimaGames.Animated.ModernGuns.Interface
             //Update Alpha.
             canvasGroup.alpha = currentOpacity;
         }
-        
-        #endregion
+
+        public void SetActive(bool isActive)
+        {
+            this.holderTransform.gameObject.SetActive(isActive);
+            this.canvasGroup.gameObject.SetActive(isActive);
+        }
+
+        private void OnGameStateChange(GameState state)
+        {
+            switch (state)
+            {
+                case GameState.GameOver:
+                    this.SetActive(false);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void OnLocalPlayerSpawn()
+        {
+            if (!SoldierManager.Instance.TryGetPlayer(NetworkManager.Singleton.LocalClientId, out SoldierController player)) { return; }
+
+            this.character = player.GetComponent<Character>();
+            this.SetActive(true);
+        }
+
+        private void OnLocalPlayerDeath() => this.SetActive(false);
+        private void OnHostDisconnect() => this.SetActive(false);
+        private void OnLocalPlayerKillStreakActivatedOrDeactivated(bool wasActivated) => this.SetActive(!wasActivated);
     }
 }

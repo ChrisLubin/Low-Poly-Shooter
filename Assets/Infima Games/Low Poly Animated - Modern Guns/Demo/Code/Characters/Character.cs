@@ -106,6 +106,7 @@ namespace InfimaGames.Animated.ModernGuns
 		/// </summary>
 		private IGameStartService gameStartService;
 
+		public float AimingAlpha => characterAnimator.GetFloat(AHashes.AimingAlpha);
 		public float CrouchingAlpha => characterAnimator.GetFloat(AHashes.CrouchingAlpha);
 		private bool _isUsingMeshShieldAbility => this._selectAbilityManager.SelectedAbility == Abilities.MeshShield && this._activateAbilityManager.IsAbilityActive;
 

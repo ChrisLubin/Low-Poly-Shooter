@@ -25,6 +25,8 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
     public static event Action<ulong, ulong, DamageType> OnPlayerDeath;
     public static event Action<DamageType> OnPlayerDamagedByLocalPlayer;
 
+    public static bool IsLocalPlayerAlive { get; private set; } = false;
+
     protected override void Awake()
     {
         base.Awake();
@@ -85,6 +87,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         if (clientId == this._localClientId)
         {
             SoldierManager.OnLocalPlayerSpawn?.Invoke();
+            SoldierManager.IsLocalPlayerAlive = true;
         }
     }
 
@@ -97,6 +100,7 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
         if (deadClientId == this._localClientId)
         {
             SoldierManager.OnLocalPlayerDeath?.Invoke();
+            SoldierManager.IsLocalPlayerAlive = false;
             // Request server to spawn us after a timer
             await UnityTimer.Delay(_SPAWN_PLAYER_REQUEST_TIMER);
             RpcSystem.Instance.RequestPlayerSpawnServerRpc();
@@ -207,4 +211,6 @@ public class SoldierManager : NetworkedStaticInstanceWithLogger<SoldierManager>
 
         this.SpawnPlayer(clientId);
     }
+
+    public bool TryGetPlayer(ulong clientId, out SoldierController soldier) => this._playersMap.TryGetValue(clientId, out soldier);
 }
