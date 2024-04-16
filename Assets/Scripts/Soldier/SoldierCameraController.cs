@@ -50,7 +50,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     {
         if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
-        float lookSpeed = Mathf.Lerp(this._nonADSlookSpeed, this._ADSlookSpeed, this._character.AimingAlpha);
+        float lookSpeed = Mathf.Lerp(this._nonADSlookSpeed, this._ADSlookSpeed, this._character.AimingAlpha) * PauseMenuController.MouseSensitivityMultiplier;
         this._rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
         this._rotationX = Mathf.Clamp(this._rotationX, this._neckCenterRotationX - this._lookXLimit, this._neckCenterRotationX + this._lookXLimit);
         this._neck.localRotation = Quaternion.Euler(this._rotationX, 0, 0);
