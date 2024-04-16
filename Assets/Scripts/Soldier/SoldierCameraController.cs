@@ -6,7 +6,7 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     [SerializeField] private Transform _neck;
     [SerializeField] private CinemachineVirtualCamera _firstPersonCamera;
     [SerializeField] private CinemachineVirtualCamera _thirdPersonCamera;
-    [SerializeField] private float _lookSpeed = 40f;
+    [SerializeField] private float _lookSpeed = 1f;
     [SerializeField] private float _lookXLimit = 55f;
 
     private float _neckCenterRotationX;
@@ -45,10 +45,10 @@ public class SoldierCameraController : NetworkBehaviorAutoDisable<SoldierCameraC
     {
         if (PauseMenuController.IsPaused || GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK) { return; }
 
-        this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed * Time.deltaTime;
+        this._rotationX += -Input.GetAxis("Mouse Y") * this._lookSpeed;
         this._rotationX = Mathf.Clamp(this._rotationX, this._neckCenterRotationX - this._lookXLimit, this._neckCenterRotationX + this._lookXLimit);
         this._neck.localRotation = Quaternion.Euler(this._rotationX, 0, 0);
-        transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * this._lookSpeed * Time.deltaTime, 0);
+        transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * this._lookSpeed, 0);
     }
 
     public void EnableFirstPersonCamera()

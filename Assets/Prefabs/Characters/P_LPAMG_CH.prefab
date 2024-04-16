@@ -1729,7 +1729,7 @@ MonoBehaviour:
   _neck: {fileID: 4171489560078996506}
   _firstPersonCamera: {fileID: 5573814559590888724}
   _thirdPersonCamera: {fileID: 1046213713207223857}
-  _lookSpeed: 40
+  _lookSpeed: 1
   _lookXLimit: 55
 --- !u!114 &9156949869694559156
 MonoBehaviour:
