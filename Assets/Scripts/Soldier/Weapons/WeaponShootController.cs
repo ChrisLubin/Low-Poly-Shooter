@@ -1,17 +1,13 @@
 using System;
+using InfimaGames.Animated.ModernGuns;
 using Unity.Netcode;
 using UnityEngine;
 
 public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootController>
 {
-    private WeaponController _weaponController;
-    private WeaponAmmoController _ammoController;
-    private WeaponAnimationController _animationController;
+    private Character _charater;
 
-    [SerializeField] private Transform _bulletPrefab;
-    [SerializeField] private Transform _muzzleFlashVfxPrefab;
-    [SerializeField] private Transform _shootPoint;
-    [SerializeField] private AudioClip _gunShotAudioClip;
+    private Transform _shootPoint;
 
     private const float _GUN_SHOT_AUDIO_VOLUME = 0.15f;
     private const float _BULLET_BLOOM_OFFSET = 0.1f;
@@ -19,8 +15,6 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     private float _bloomMaxAngle;
 
     public event Action OnShoot;
-
-    private NetworkVariable<bool> _isADS = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public void Init(int bulletDamage, float bloomMaxAngle)
     {
@@ -30,32 +24,21 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private void Awake()
     {
-        this._weaponController = GetComponent<WeaponController>();
-        this._ammoController = GetComponent<WeaponAmmoController>();
-        this._animationController = GetComponent<WeaponAnimationController>();
+        this._charater = GetComponentInParent<Character>();
+        this._charater.OnShoot += this.Shoot;
     }
 
-    protected override void OnOwnerNetworkSpawn() => this._weaponController.OnADS += this.OnADS;
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        this._shootPoint = GetComponentInChildren<Muzzle>().GetShootPoint();
+    }
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._weaponController.OnADS -= this.OnADS;
+        this._charater.OnShoot -= this.Shoot;
     }
-
-    // private void Update()
-    // {
-    //     if (!MultiplayerSystem.IsMultiplayer && PauseMenuController.IsPaused) { return; }
-    //     if (GameManager.State == GameState.GameOver || SoldierKillStreakController.IS_USING_KILL_STREAK || !this._ammoController.HasBulletInMagazine || this._animationController.IsReloading) { return; }
-
-    //     if (Input.GetMouseButton(0) && this._timeSinceLastShot > this._minTimeBetweenShots)
-    //     {
-    //         Shoot();
-    //         this._timeSinceLastShot = 0f;
-    //     }
-    // }
-
-    private void OnADS(bool isADS) => this._isADS.Value = isADS;
 
     public void Shoot()
     {
@@ -66,13 +49,13 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         // bullet.LookAt(pointForBulletToLookAt);
         // bullet.GetComponent<BulletController>().Init(this._bulletSpeed, this._bulletDamage, this.IsOwner);
 
-        // ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.MuzzleFlash, out Transform muzzleFlash);
-        // muzzleFlash.transform.position = this._shootPoint.position;
-        // muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
-        // muzzleFlash.GetComponent<MuzzleFlashController>().Init(this._shootPoint);
+        ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.MuzzleFlash, out Transform muzzleFlash);
+        muzzleFlash.transform.position = this._shootPoint.position;
+        muzzleFlash.rotation = Quaternion.LookRotation(this._shootPoint.forward);
+        muzzleFlash.GetComponent<MuzzleFlashController>().Init(this._shootPoint);
 
         // AudioSource.PlayClipAtPoint(this._gunShotAudioClip, this._shootPoint.position, _GUN_SHOT_AUDIO_VOLUME);
-        // this.OnShoot?.Invoke();
+        this.OnShoot?.Invoke();
     }
 
     public Vector3 GetRandomBulletDirectionPoint(Vector3 origin, float coneAltitude, float coneAngle, Vector3 coneDirection, float biasTowardsCenter = 1f)

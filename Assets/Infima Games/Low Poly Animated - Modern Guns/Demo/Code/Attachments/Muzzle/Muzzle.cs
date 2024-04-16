@@ -96,6 +96,8 @@ namespace InfimaGames.Animated.ModernGuns
             // ServiceLocator.Current.Get<IAudioManagerService>().PlayOneShot(audioClipsFire, audioSettingsFire);
         }
 
+        public Transform GetShootPoint() => this.socket;
+
         #endregion
     }
 }
