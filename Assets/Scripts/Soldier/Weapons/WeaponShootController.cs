@@ -1,11 +1,10 @@
 using System;
 using InfimaGames.Animated.ModernGuns;
-using Unity.Netcode;
 using UnityEngine;
 
 public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootController>
 {
-    private Character _charater;
+    private Character _character;
 
     private Transform _shootPoint;
 
@@ -24,8 +23,8 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
     private void Awake()
     {
-        this._charater = GetComponentInParent<Character>();
-        this._charater.OnShoot += this.Shoot;
+        this._character = GetComponentInParent<Character>();
+        this._character.OnShoot += this.Shoot;
     }
 
     public override void OnNetworkSpawn()
@@ -37,12 +36,14 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
     public override void OnDestroy()
     {
         base.OnDestroy();
-        this._charater.OnShoot -= this.Shoot;
+        this._character.OnShoot -= this.Shoot;
     }
 
     public void Shoot()
     {
-        // Vector3 pointForBulletToLookAt = this._isADS.Value ? this._shootPoint.position + this._shootPoint.forward : this.GetRandomBulletDirectionPoint(this._shootPoint.position, _BULLET_BLOOM_OFFSET, this._bloomMaxAngle, this._shootPoint.forward);
+        float bloomMaxAngle = Mathf.Lerp(18f, 0.2f, this._character.AimingAlpha);
+        Vector3 pointForBulletToLookAt = this.GetRandomBulletDirectionPoint(this._shootPoint.position, 10f, bloomMaxAngle, this._shootPoint.forward);
+        Debug.DrawLine(this._shootPoint.position, this._shootPoint.position + (pointForBulletToLookAt - this._shootPoint.position).normalized * 10f, Color.black, 2f);
 
         // ObjectPoolSystem.Instance.TryGetObject(ObjectPoolSystem.PoolType.Bullet, out Transform bullet);
         // bullet.position = this._shootPoint.transform.position;
@@ -58,7 +59,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
         this.OnShoot?.Invoke();
     }
 
-    public Vector3 GetRandomBulletDirectionPoint(Vector3 origin, float coneAltitude, float coneAngle, Vector3 coneDirection, float biasTowardsCenter = 1f)
+    public Vector3 GetRandomBulletDirectionPoint(Vector3 origin, float coneAltitude, float coneAngle, Vector3 coneDirection)
     {
         // Convert cone angle to radians
         float coneAngleRad = Mathf.Deg2Rad * coneAngle;
@@ -68,6 +69,7 @@ public class WeaponShootController : NetworkBehaviorAutoDisable<WeaponShootContr
 
         // Get a random position within a unit circle, biased towards the center
         Vector2 randomCirclePoint = UnityEngine.Random.insideUnitCircle;
+        float biasTowardsCenter = 1f;
         randomCirclePoint *= Mathf.Pow(randomCirclePoint.magnitude, biasTowardsCenter);
 
         // Calculate the position on the base of the cone using the random position within the unit circle
