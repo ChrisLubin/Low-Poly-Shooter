@@ -10,8 +10,10 @@ namespace InfimaGames.Animated.ModernGuns
     /// </summary>
     public class StopFidgetsBehaviour : StateMachineBehaviour
     {
+        private Character playerCharacter;
+
         #region UNITY
-        
+
         /// <summary>
         /// OnStateExit.
         /// </summary>
@@ -19,7 +21,12 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Base.
             base.OnStateExit(animator, stateInfo, layerIndex);
-            
+
+            if (playerCharacter == null)
+                playerCharacter = animator.GetComponentInParent<Character>();
+
+            if (!playerCharacter.IsOwner) { return; }
+
             //Enable Fidgets Again.
             animator.SetBool(AHashes.StopFidgets, false);
         }
@@ -31,11 +38,16 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //Base.
             base.OnStateUpdate(animator, stateInfo, layerIndex);
-            
+
+            if (playerCharacter == null)
+                playerCharacter = animator.GetComponentInParent<Character>();
+
+            if (!playerCharacter.IsOwner) { return; }
+
             //Stop Fidgets.
             animator.SetBool(AHashes.StopFidgets, true);
         }
-        
+
         #endregion
     }
 }

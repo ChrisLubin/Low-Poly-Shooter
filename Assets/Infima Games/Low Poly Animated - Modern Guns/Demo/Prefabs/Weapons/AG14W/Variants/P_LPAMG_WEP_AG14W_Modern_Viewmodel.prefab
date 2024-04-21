@@ -266,3 +266,23 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &7010111609046569871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8632084748792481011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8deae8091111f4eb30a56c1f4e0d3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 8796902970852782654}
+--- !u!95 &8796902970852782654 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6040603719257722592, guid: 11e5ea58ee784f54694c8e42a3e12317,
+    type: 3}
+  m_PrefabInstance: {fileID: 3008520759443242206}
+  m_PrefabAsset: {fileID: 0}

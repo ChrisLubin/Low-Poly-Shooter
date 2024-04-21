@@ -22,9 +22,9 @@ namespace InfimaGames.Animated.ModernGuns
         private int layer = 0;
 
         #endregion
-        
+
         #region FIELDS
-        
+
         /// <summary>
         /// Player Character.
         /// </summary>
@@ -35,17 +35,16 @@ namespace InfimaGames.Animated.ModernGuns
         private InventoryBehaviour playerInventory;
 
         #endregion
-        
+
         #region UNITY
 
         public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            //We need to get the character component.
-            playerCharacter ??= ServiceLocator.Current.Get<IGameModeService>().GetPlayerCharacter();
-            //Check Reference.
             if (playerCharacter == null)
-                return;
-            
+                playerCharacter = animator.GetComponentInParent<Character>();
+
+            if (!playerCharacter.IsOwner) { return; }
+
             //Get Inventory.
             playerInventory ??= playerCharacter.GetInventory();
 
@@ -54,18 +53,18 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (weaponBehaviour == null)
                 return;
-            
+
             //Get the weapon's Animator component.
             var weaponAnimator = weaponBehaviour.GetComponent<Animator>();
             //Check Reference.
             if (weaponAnimator == null)
                 return;
-            
+
             //Try to play the corresponding state.
-            if(weaponAnimator.HasState(layer, Animator.StringToHash(stateName)))
+            if (weaponAnimator.HasState(layer, Animator.StringToHash(stateName)))
                 weaponAnimator.CrossFade(stateName, 0.0f, layer, 0.0f);
             //This right here is a little hacky, but it solves some issues with certain custom animation setups.
-            if(weaponAnimator.HasState(layer + 1, Animator.StringToHash(stateName)))
+            if (weaponAnimator.HasState(layer + 1, Animator.StringToHash(stateName)))
                 weaponAnimator.CrossFade(stateName, 0.0f, layer + 1, 0.0f);
         }
 

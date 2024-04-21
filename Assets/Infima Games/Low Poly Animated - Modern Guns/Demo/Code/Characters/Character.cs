@@ -154,6 +154,8 @@ namespace InfimaGames.Animated.ModernGuns
 		/// </summary>
 		protected override void Update()
 		{
+			if (!this.IsOwner) { return; }
+
 			//Handle Input.
 			if (gameStartService.HasStarted())
 				HandleInput();

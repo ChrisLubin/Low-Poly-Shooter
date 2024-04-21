@@ -59,11 +59,8 @@ namespace InfimaGames.Animated.ModernGuns
         /// </summary>
         public async override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            //We need to get the character component.
-            playerCharacter ??= ServiceLocator.Current.Get<IGameModeService>().GetPlayerCharacter();
-            //Check Reference.
             if (playerCharacter == null)
-                return;
+                playerCharacter = animator.GetComponentInParent<Character>();
 
             //Get Inventory.
             playerInventory ??= playerCharacter.GetInventory();

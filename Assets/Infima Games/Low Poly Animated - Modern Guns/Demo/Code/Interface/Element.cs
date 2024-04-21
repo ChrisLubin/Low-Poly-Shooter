@@ -10,12 +10,12 @@ namespace InfimaGames.Animated.ModernGuns.Interface
     public abstract class Element : MonoBehaviour
     {
         #region FIELDS
-        
+
         /// <summary>
         /// Game Mode Service.
         /// </summary>
         protected IGameModeService gameModeService;
-        
+
         /// <summary>
         /// Player Character.
         /// </summary>
@@ -29,7 +29,7 @@ namespace InfimaGames.Animated.ModernGuns.Interface
         /// Equipped Weapon.
         /// </summary>
         protected WeaponBehaviour equippedWeaponBehaviour;
-        
+
         #endregion
 
         #region UNITY
@@ -39,15 +39,16 @@ namespace InfimaGames.Animated.ModernGuns.Interface
         /// </summary>
         protected virtual void Awake()
         {
-            //Get Game Mode Service. Very useful to get Game Mode references.
-            gameModeService = ServiceLocator.Current.Get<IGameModeService>();
-            
-            //Get Player Character.
-            characterBehaviour = gameModeService.GetPlayerCharacter();
-            //Get Player Character Inventory.
-            inventoryBehaviour = characterBehaviour.GetInventory();
+            SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+            SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
         }
-        
+
+        private void OnDestroy()
+        {
+            SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+            SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
+        }
+
         /// <summary>
         /// Update.
         /// </summary>
@@ -59,7 +60,7 @@ namespace InfimaGames.Animated.ModernGuns.Interface
 
             //Get Equipped Weapon.
             equippedWeaponBehaviour = inventoryBehaviour.GetEquipped();
-            
+
             //Tick.
             Tick();
         }
@@ -71,7 +72,24 @@ namespace InfimaGames.Animated.ModernGuns.Interface
         /// <summary>
         /// Tick.
         /// </summary>
-        protected virtual void Tick() {}
+        protected virtual void Tick() { }
+
+        private void OnLocalPlayerSpawn()
+        {
+            //Get Game Mode Service. Very useful to get Game Mode references.
+            gameModeService = ServiceLocator.Current.Get<IGameModeService>();
+
+            //Get Player Character.
+            characterBehaviour = gameModeService.GetPlayerCharacter();
+            //Get Player Character Inventory.
+            inventoryBehaviour = characterBehaviour.GetInventory();
+        }
+
+        private void OnLocalPlayerDeath()
+        {
+            characterBehaviour = null;
+            inventoryBehaviour = null;
+        }
 
         #endregion
     }

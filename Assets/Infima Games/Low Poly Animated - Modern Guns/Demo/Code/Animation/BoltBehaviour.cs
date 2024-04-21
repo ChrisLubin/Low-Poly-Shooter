@@ -14,7 +14,7 @@ namespace InfimaGames.Animated.ModernGuns
 		/// <summary>
 		/// Player Character.
 		/// </summary>
-		private CharacterBehaviour playerCharacter;
+		private Character playerCharacter;
 		/// <summary>
 		/// Player Inventory.
 		/// </summary>
@@ -29,8 +29,10 @@ namespace InfimaGames.Animated.ModernGuns
 		/// </summary>
 		public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
 		{
-			//We need to get the character component.
-			playerCharacter ??= ServiceLocator.Current.Get<IGameModeService>().GetPlayerCharacter();
+			if (playerCharacter == null)
+				playerCharacter = animator.GetComponentInParent<Character>();
+
+			if (!playerCharacter.IsOwner) { return; }
 
 			//Get Inventory.
 			playerInventoryBehaviour ??= playerCharacter.GetInventory();
@@ -38,7 +40,7 @@ namespace InfimaGames.Animated.ModernGuns
 			//Try to get the equipped weapon's Weapon component.
 			if (!(playerInventoryBehaviour.GetEquipped() is { } weaponBehaviour))
 				return;
-			
+
 			//Get the weapon animator.
 			var weaponAnimator = weaponBehaviour.gameObject.GetComponent<Animator>();
 			//Play Bolt Action Animation.

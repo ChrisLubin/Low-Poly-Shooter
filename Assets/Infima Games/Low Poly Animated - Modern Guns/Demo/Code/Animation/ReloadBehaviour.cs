@@ -13,15 +13,15 @@ namespace InfimaGames.Animated.ModernGuns
     public class ReloadBehaviour : StateMachineBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Tooltip("The type of reload we're apply this behaviour to. We have two types, the Reload type, and the Reload Empty type.")]
         [SerializeField]
         private string reloadType = "Reload";
 
         #endregion
-        
+
         #region FIELDS
-        
+
         /// <summary>
         /// TimeLink Array. Contains all TimeLink values used to show/hide magazines.
         /// </summary>
@@ -37,16 +37,16 @@ namespace InfimaGames.Animated.ModernGuns
         private GameObject magazineReserve;
 
         #endregion
-        
+
         #region METHODS
-        
+
         /// <summary>
         /// Gets all required references.
         /// </summary>
-        private void GetReferences()
+        private void GetReferences(Animator animator)
         {
             //Get Equipped Weapon.
-            WeaponBehaviour weaponBehaviour = ServiceLocator.Current.Get<IGameModeService>().GetEquippedWeapon();
+            WeaponBehaviour weaponBehaviour = animator.GetComponentInChildren<WeaponBehaviour>();
             //Check Reference.
             if (weaponBehaviour == null)
                 return;
@@ -62,7 +62,7 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (time == null)
                 return;
-            
+
             //Get All Reload Time Links.
             timeLinks = time.GetLinks(reloadType).ToList();
 
@@ -71,17 +71,17 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (manager == null)
                 return;
-            
+
             //Get Magazine.
             magazine = manager.GetVariant("Magazine");
             //Get Reserve Magazine.
             magazineReserve = manager.GetVariant("Magazine_Reserve");
         }
-        
+
         #endregion
-        
+
         #region UNITY
-        
+
         /// <summary>
         /// OnStateEnter.
         /// </summary>
@@ -90,11 +90,11 @@ namespace InfimaGames.Animated.ModernGuns
             //Base.
             base.OnStateEnter(animator, stateInfo, layerIndex);
             //Get References.
-            GetReferences();
-            
+            GetReferences(animator);
+
             //Enable Magazine.
             Show(magazine);
-            
+
             //Enable Magazine Reserve.
             Show(magazineReserve);
         }
@@ -110,13 +110,13 @@ namespace InfimaGames.Animated.ModernGuns
             //Check References.
             if (timeLinks == null || timeLinks.Count == 0)
                 return;
-            
+
             //Get References.
-            GetReferences();
+            GetReferences(animator);
 
             //Show Magazine At This Delay.
             UpdateMagazine(magazine, $"{reloadType}/Show/Magazine", false, stateInfo);
-            
+
             //Show Magazine Reserve At This Delay.
             UpdateMagazine(magazineReserve, $"{reloadType}/Show/Magazine_Reserve", false, stateInfo);
 
@@ -133,17 +133,17 @@ namespace InfimaGames.Animated.ModernGuns
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             //Get References.
-            GetReferences();
-            
+            GetReferences(animator);
+
             //Determine.
             DetermineEndVisibility(magazine);
-            
+
             //Determine.
             DetermineEndVisibility(magazineReserve, false);
         }
-        
+
         #endregion
-        
+
         #region METHODS
 
         /// <summary>
@@ -158,15 +158,15 @@ namespace InfimaGames.Animated.ModernGuns
             //Return if we cannot find such an item.
             if (!timeLinks.Exists(Predicate))
                 return;
-            
+
             //Returns the current necessary time link.
             TimeLink timeLink = timeLinks.First(Predicate);
             //We check whether we actually need to change anything based on this TimeLink.
-            if(Mathf.Abs(stateInfo.normalizedTime - timeLink.Delay) > 0.005f)
+            if (Mathf.Abs(stateInfo.normalizedTime - timeLink.Delay) > 0.005f)
                 return;
-            
+
             //We update the object.
-            if(hide)
+            if (hide)
                 Hide(magazineObject);
             else
                 Show(magazineObject);
@@ -180,13 +180,13 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (magazineObject == null)
                 return;
-            
+
             //Activate.
             magazineObject.SetActive(true);
-            
+
             //We do this so we can run functions when the magazine gets shown.
             var magazineManager = magazineObject.GetComponent<IMagazine>();
-            if(magazineManager != null)
+            if (magazineManager != null)
                 magazineObject.GetComponent<IMagazine>().Shown();
         }
 
@@ -198,12 +198,12 @@ namespace InfimaGames.Animated.ModernGuns
             //Check Reference.
             if (magazineObject == null)
                 return;
-            
+
             //We do this so we can run functions when the magazine gets hidden.
             var magazineManager = magazineObject.GetComponent<IMagazine>();
-            if(magazineManager != null)
+            if (magazineManager != null)
                 magazineObject.GetComponent<IMagazine>().Hidden();
-            
+
             //De-activate.
             magazineObject.SetActive(false);
         }
@@ -215,19 +215,19 @@ namespace InfimaGames.Animated.ModernGuns
         {
             //This little variable determines whether we keep the magazine visible after this state finishes (now).
             bool keepVisible = defaultVisibility;
-            
+
             //We do this so we can change this based on the magazine, which we only do for specific weapons.
             var magazineManager = magazineObject.GetComponent<IMagazine>();
             if (magazineManager != null)
                 keepVisible = magazineManager.KeepVisibleAtEndOfReload();
-            
+
             //Hide/Show.
-            if(keepVisible)
+            if (keepVisible)
                 Show(magazineObject);
             else
                 Hide(magazineObject);
         }
-        
+
         #endregion
     }
 }
