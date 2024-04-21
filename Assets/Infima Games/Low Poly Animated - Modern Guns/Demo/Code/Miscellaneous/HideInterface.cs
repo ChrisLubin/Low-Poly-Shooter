@@ -10,25 +10,56 @@ namespace InfimaGames.Animated.ModernGuns
     public class HideInterface : MonoBehaviour
     {
         #region FIELDS SERIALIZED
-        
+
         [Tooltip("The player’s interface object. This is the actual Game Object that we’re going to be messing around with in this script.")]
         [SerializeField]
         private GameObject interfaceObject;
-        
+
         #endregion
-        
+
         #region UNITY
-        
-        /// <summary>
-        /// Update.
-        /// </summary>
-        private void Update()
+
+        private void Awake()
         {
-            //Toggle the interface's visibility.
-            if(Input.GetKeyDown(KeyCode.O))
-                interfaceObject.SetActive(!interfaceObject.activeInHierarchy);
+            GameManager.OnStateChange += this.OnGameStateChange;
+            MultiplayerSystem.OnHostDisconnect += this.OnHostDisconnect;
+            SoldierManager.OnLocalPlayerSpawn += this.OnLocalPlayerSpawn;
+            SoldierManager.OnLocalPlayerDeath += this.OnLocalPlayerDeath;
+            SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated += this.OnLocalPlayerKillStreakActivatedOrDeactivated;
         }
-        
+
+        private void Start()
+        {
+            this.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            GameManager.OnStateChange -= this.OnGameStateChange;
+            MultiplayerSystem.OnHostDisconnect -= this.OnHostDisconnect;
+            SoldierManager.OnLocalPlayerSpawn -= this.OnLocalPlayerSpawn;
+            SoldierManager.OnLocalPlayerDeath -= this.OnLocalPlayerDeath;
+            SoldierKillStreakController.OnLocalPlayerKillStreakActivatedOrDeactivated -= this.OnLocalPlayerKillStreakActivatedOrDeactivated;
+        }
+
+        private void OnGameStateChange(GameState state)
+        {
+            switch (state)
+            {
+                case GameState.GameOver:
+                    this.SetActive(false);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void OnLocalPlayerSpawn() => this.SetActive(true);
+        private void OnLocalPlayerDeath() => this.SetActive(false);
+        private void OnHostDisconnect() => this.SetActive(false);
+        private void OnLocalPlayerKillStreakActivatedOrDeactivated(bool wasActivated) => this.SetActive(!wasActivated);
+        private void SetActive(bool isActive) => interfaceObject.SetActive(isActive);
+
         #endregion
-    }    
+    }
 }
